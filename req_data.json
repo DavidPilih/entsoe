@@ -1,0 +1,12 @@
+{
+    "capacity": 14.56,
+    "power": 2.44,
+    "minimum_profit": 10,
+    "date": "2026-08-20",
+    "latitude": 45.4745,
+    "longitude": 13.6888,
+    "start_time": "00:00",
+    "soc": 0.00,
+    "next_day": false,
+    "unique_id": 158
+}

@@ -1,0 +1,8 @@
+entsoe-py
+pandas
+python-dotenv
+matplotlib
+paho-mqtt
+openpyxl
+filelock
+requests
