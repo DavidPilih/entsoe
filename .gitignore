@@ -1,0 +1,4 @@
+.env
+cache/
+sun_data/
+graph_imgs
