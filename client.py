@@ -1,8 +1,12 @@
 import json
-import paho.mqtt.client as mqtt
-from datetime import datetime
-from algo import main
+import math
+from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
+
+import paho.mqtt.client as mqtt
+
+from algo import main
+
 
 topic_inp = "controllers/IQFleks/Entsoe/energy_prices/req"
 topic_res = "controllers/IQFleks/Entsoe/energy_prices/res"
@@ -11,28 +15,49 @@ executor = ThreadPoolExecutor(max_workers=20)
 
 
 def process_request(payload):
-
+    unique_id = payload.get("unique_id")
 
     try:
-        required = ["capacity", "power", "minimum_profit", "latitude", "longitude", "unique_id"]
+        if "help" in payload:
+            sendData({
+                "success": True,
+                "unique_id": unique_id,
+                "help": {
+                    "required": ["unique_id", "capacity", "power", "minimum_profit"],
+                    "optional": ["date", "latitude", "longitude", "start_time", "soc", "next_day", "power_factor"]
+                }
+            })
+            return
 
+        required = ["capacity", "power", "minimum_profit", "unique_id"]
         missing = [key for key in required if key not in payload]
 
         if missing:
-            raise ValueError(f"Manjkajoči podatki: {', '.join(missing)}")
+            raise ValueError(f"Manjkajoči podatki: {', '.join(missing)}.")
 
-        def_date = datetime.now().strftime("%Y-%m-%d")
-        
-        unique_id = payload.get("unique_id")
+        now = datetime.now()
+        rounded_minute = math.ceil(now.minute / 15) * 15
+
+        if rounded_minute == 60:
+            now = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
+        else:
+            now = now.replace(minute=rounded_minute, second=0, microsecond=0)
+
+        def_date = now.strftime("%Y-%m-%d")
+        def_time = now.strftime("%H:%M")
+
         capacity = payload["capacity"]
         power = payload["power"]
         minimum_profit = payload["minimum_profit"]
         date = payload.get("date", def_date)
-        lat = payload["latitude"]
-        lng = payload["longitude"]
-        from_time = payload.get("start_time", "00:00")
-        soc = payload.get("soc", 1)
+        lat = payload.get("latitude", 46.0569)
+        lng = payload.get("longitude", 14.5058)
+        from_time = payload.get("start_time", def_time)
+        soc = payload.get("soc", 0)
         next_day = payload.get("next_day", False)
+
+        power_factor = payload.get("power_factor", 1)
+        power *= power_factor
 
         print(f"Začenjam zahtevek: {unique_id}")
 
@@ -45,12 +70,18 @@ def process_request(payload):
         result["unique_id"] = unique_id
 
         sendData(result)
+
         print(f"Končan zahtevek: {unique_id}")
 
     except Exception as e:
         print("NAPAKA:", type(e).__name__, "-", str(e), "- unique_id:", unique_id)
 
-        error = {"success": False, "unique_id": unique_id, "error": type(e).__name__, "message": str(e)}
+        error = {
+            "success": False,
+            "unique_id": unique_id,
+            "error": type(e).__name__,
+            "message": str(e)
+        }
 
         try:
             sendData(error)
@@ -88,7 +119,12 @@ def on_message(client, userdata, msg):
     except Exception as e:
         print("NAPAKA pri sprejemu:", type(e).__name__, "-", str(e))
 
-        error = {"success": False, "unique_id": None, "error": type(e).__name__, "message": str(e)}
+        error = {
+            "success": False,
+            "unique_id": None,
+            "error": type(e).__name__,
+            "message": str(e)
+        }
 
         try:
             sendData(error)
@@ -117,5 +153,10 @@ if __name__ == "__main__":
     finally:
         print("Ustavljam ThreadPool...")
         executor.shutdown(wait=True)
-        client.disconnect()
+
+        try:
+            client.disconnect()
+        except Exception:
+            pass
+
         print("Program ustavljen")

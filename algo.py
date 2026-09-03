@@ -2,9 +2,6 @@ import pandas as pd
 from pathlib import Path
 import json
 from typing import List, Dict, Any, Tuple
-import matplotlib
-matplotlib.use("Agg")
-from matplotlib.figure import Figure
 import traceback
 from api_client import scrap_data
 from api_client import scrap_data_sun
@@ -13,12 +10,9 @@ from filelock import FileLock
 import tempfile
 import os
 
+from graph import graph_plot
+
 MARGIN = 0.1  # V PROCENTIH 0.1=10
-
-
-def show_graph():
-    pass
-    # plt.show()
 
 
 def optimize_trades(data: List[Dict[str, Any]], max_positions: int, minimum_profit: float, buy_mask: List[bool], trade_mask: List[bool], initial_position: int = 0, force_flat_end: bool = False) -> List[Dict[str, Any]]:
@@ -82,391 +76,6 @@ def optimize_trades(data: List[Dict[str, Any]], max_positions: int, minimum_prof
     return [{"time": times[i], "price": prices[i], "order": actions[i]} for i in range(T)]
 
 
-def wh_to_hm(interval):
-    minutes = interval * 15
-    return f"{minutes // 60:02d}:{minutes % 60:02d}"
-
-
-def graph_plot(
-    timestamps: List[pd.Timestamp],
-    prices_all: List[float],
-    orders: List[Dict[str, Any]],
-    country_code: str,
-    start: pd.Timestamp,
-    filename_png: str,
-    fwh: str = None,
-    lwh: str = None,
-    fwh_tom: str = None,
-    lwh_tom: str = None,
-    tomorrow_date: pd.Timestamp = None,
-    day_boundary: int = None,
-    end_date: pd.Timestamp = None,
-
-    # INPUT PODATKI
-    capacity: float = None,
-    power: float = None,
-    intervals_needed: int = None,
-    minimum_profit: float = None,
-    soc: float = None,
-    initial_position: int = None,
-    from_time: str = None,
-    include_next_day: bool = False
-):
-    times_labels = [ts.strftime("%m-%d %H:%M") for ts in timestamps]
-
-    # ---------------------------------------------------------
-    # BUY / SELL TOČKE
-    # ---------------------------------------------------------
-    buy_x = [
-        i for i, o in enumerate(orders)
-        if o["order"] == "buy"
-    ]
-    buy_prices = [
-        prices_all[i]
-        for i in buy_x
-    ]
-
-    sell_x = [
-        i for i, o in enumerate(orders)
-        if o["order"] == "sell"
-    ]
-    sell_prices = [
-        prices_all[i]
-        for i in sell_x
-    ]
-
-    # ---------------------------------------------------------
-    # GRAF
-    # ---------------------------------------------------------
-    fig = Figure(figsize=(16, 8))
-    ax = fig.add_subplot(111)
-
-    # ---------------------------------------------------------
-    # INPUT PODATKI
-    # ---------------------------------------------------------
-    input_lines = [
-        "INPUT PODATKI",
-        (
-            f"Capacity: {capacity} kWh    |    "
-            f"Power: {power} kW    |    "
-            f"Intervals: {intervals_needed}    |    "
-            f"Min profit: {minimum_profit} EUR"
-        ),
-        (
-            f"SOC: {soc:.2f}    |    "
-            f"Initial position: {initial_position}    |    "
-            f"From time: {from_time}    |    "
-            f"Date: {start.strftime('%Y-%m-%d')}    |    "
-            f"Country: {country_code}"
-        ),
-    ]
-
-    # FWH / LWH
-    fwh_text = wh_to_hm(fwh) if fwh is not None else "-"
-    lwh_text = wh_to_hm(lwh) if lwh is not None else "-"
-
-    input_lines.append(
-        f"FWH: {fwh_text}    |    "
-        f"LWH: {lwh_text}    |    "
-        f"Include next day: {'DA' if include_next_day else 'NE'}"
-    )
-
-    # Jutrišnji dan
-    if tomorrow_date is not None:
-        tomorrow_text = tomorrow_date.strftime("%Y-%m-%d")
-
-        input_lines.append(
-            f"Tomorrow date: {tomorrow_text}"
-        )
-
-    # Jutrišnji FWH/LWH
-    if fwh_tom is not None and lwh_tom is not None:
-        input_lines.append(
-            f"FWH jutri: {wh_to_hm(fwh_tom)}    |    "
-            f"LWH jutri: {wh_to_hm(lwh_tom)}"
-        )
-
-    input_text = "\n".join(input_lines)
-
-    # Prostor za input panel
-    fig.subplots_adjust(
-        top=0.72,
-        bottom=0.18,
-        left=0.06,
-        right=0.98
-    )
-
-    # INPUT PANEL
-    fig.text(
-        0.5,
-        0.96,
-        input_text,
-        ha="center",
-        va="top",
-        fontsize=9,
-        family="monospace",
-        bbox=dict(
-            boxstyle="round,pad=0.6",
-            facecolor="whitesmoke",
-            edgecolor="gray",
-            linewidth=1
-        )
-    )
-
-    # ---------------------------------------------------------
-    # CENA
-    # ---------------------------------------------------------
-    ax.plot(
-        range(len(prices_all)),
-        prices_all,
-        color="steelblue",
-        linewidth=1.6,
-        label="Cena"
-    )
-
-    # ---------------------------------------------------------
-    # BUY
-    # ---------------------------------------------------------
-    ax.scatter(
-        buy_x,
-        buy_prices,
-        color="green",
-        zorder=5,
-        s=50,
-        label="Nakup (polnjenje)"
-    )
-
-    # ---------------------------------------------------------
-    # SELL
-    # ---------------------------------------------------------
-    ax.scatter(
-        sell_x,
-        sell_prices,
-        color="red",
-        zorder=5,
-        s=50,
-        label="Prodaja (praznjenje)"
-    )
-
-    # ---------------------------------------------------------
-    # FWH / LWH DANES
-    # ---------------------------------------------------------
-    if fwh is not None and lwh is not None:
-
-        fwh_hm = wh_to_hm(fwh)
-        lwh_hm = wh_to_hm(lwh)
-
-        fwh_time = pd.to_datetime(
-            f"{start.strftime('%Y-%m-%d')} {fwh_hm}"
-        )
-
-        lwh_time = pd.to_datetime(
-            f"{start.strftime('%Y-%m-%d')} {lwh_hm}"
-        )
-
-        fwh_x = min(
-            range(len(timestamps)),
-            key=lambda i: abs(
-                timestamps[i].replace(tzinfo=None) - fwh_time
-            )
-        )
-
-        lwh_x = min(
-            range(len(timestamps)),
-            key=lambda i: abs(
-                timestamps[i].replace(tzinfo=None) - lwh_time
-            )
-        )
-
-        ax.axvline(
-            fwh_x,
-            color="purple",
-            linestyle=":",
-            linewidth=0.8,
-            alpha=0.35,
-            label="FWH jutri"
-        )
-
-        ax.axvline(
-            lwh_x,
-            color="purple",
-            linestyle=":",
-            linewidth=0.8,
-            alpha=0.35,
-            label="LWH jutri"
-        )
-
-        ax.axvspan(
-            fwh_x,
-            lwh_x,
-            alpha=0.1,
-            label="FWH-LWH območje"
-        )
-
-    # ---------------------------------------------------------
-    # FWH / LWH JUTRI
-    # ---------------------------------------------------------
-    if (
-        fwh_tom is not None
-        and lwh_tom is not None
-        and tomorrow_date is not None
-    ):
-
-        fwh_tom_hm = wh_to_hm(fwh_tom)
-        lwh_tom_hm = wh_to_hm(lwh_tom)
-
-        fwh_tom_time = pd.to_datetime(
-            f"{tomorrow_date.strftime('%Y-%m-%d')} {fwh_tom_hm}"
-        )
-
-        lwh_tom_time = pd.to_datetime(
-            f"{tomorrow_date.strftime('%Y-%m-%d')} {lwh_tom_hm}"
-        )
-
-        fwh_tom_x = min(
-            range(len(timestamps)),
-            key=lambda i: abs(
-                timestamps[i].replace(tzinfo=None) - fwh_tom_time
-            )
-        )
-
-        lwh_tom_x = min(
-            range(len(timestamps)),
-            key=lambda i: abs(
-                timestamps[i].replace(tzinfo=None) - lwh_tom_time
-            )
-        )
-
-        ax.axvline(
-            fwh_tom_x,
-            color="purple",
-            linestyle=":",
-            linewidth=0.8,
-            alpha=0.35,
-            label=f"FWH jutri {fwh_tom_hm}"
-        )
-
-        ax.axvline(
-            lwh_tom_x,
-            color="purple",
-            linestyle=":",
-            linewidth=0.8,
-            alpha=0.35,
-            label=f"LWH jutri {lwh_tom_hm}"
-        )
-
-        ax.axvspan(
-            fwh_tom_x,
-            lwh_tom_x,
-            alpha=0.1,
-            label="FWH-LWH območje (jutri)"
-        )
-
-    # ---------------------------------------------------------
-    # MEJA DNEVA
-    # ---------------------------------------------------------
-    if day_boundary is not None:
-
-        ax.axvline(
-            day_boundary - 0.5,
-            color="gray",
-            linestyle="--",
-            alpha=0.6,
-            label="Meja dneva"
-        )
-
-    # ---------------------------------------------------------
-    # NASLOVI
-    # ---------------------------------------------------------
-    ax.set_xlabel("Čas")
-    ax.set_ylabel("Cena (EUR/MWh)")
-
-    title = (
-        f"Day-ahead cene za {country_code} — "
-        f"{start.strftime('%Y-%m-%d')}"
-    )
-
-    if end_date is not None:
-        title += (
-            f" in {end_date.strftime('%Y-%m-%d')}"
-        )
-
-    ax.set_title(title)
-
-    # ---------------------------------------------------------
-    # X OS
-    # ---------------------------------------------------------
-    ax.set_xticks(
-        range(0, len(times_labels), 4)
-    )
-
-    ax.set_xticklabels(
-        times_labels[::4],
-        rotation=45,
-        ha="right"
-    )
-
-    # ---------------------------------------------------------
-    # GRID
-    # ---------------------------------------------------------
-    ax.grid(
-        True,
-        alpha=0.3
-    )
-
-    # ---------------------------------------------------------
-    # LEGENDA
-    # ---------------------------------------------------------
-    ax.legend(
-        loc="upper left",
-        fontsize=8
-    )
-
-    # ---------------------------------------------------------
-    # SHRANI GRAF
-    # ---------------------------------------------------------
-    fig.tight_layout()
-
-    graph_file = Path(filename_png)
-
-    os.makedirs(
-        graph_file.parent,
-        exist_ok=True
-    )
-
-    fd, tmp_path = tempfile.mkstemp(
-        dir=str(graph_file.parent),
-        suffix=".png.tmp"
-    )
-
-    os.close(fd)
-
-    try:
-
-        fig.savefig(
-            tmp_path,
-            dpi=80,
-            format="png"
-        )
-
-        os.replace(
-            tmp_path,
-            graph_file
-        )
-
-    except Exception:
-
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
-
-        raise
-
-    print(
-        "Graf shranjen:",
-        graph_file
-    )
-
-
 def getwh(date, lat, lng):
     loc_key = f"{lat}_{lng}"
     path = "cache/sun_data/sun_data.json"
@@ -495,12 +104,12 @@ def getwh(date, lat, lng):
     return fwh, lwh
 
 
-def load_price_data(filename: str, country_code: str, start: pd.Timestamp, end: pd.Timestamp) -> List[Tuple[pd.Timestamp, float]]:
+def load_price_data(filename: str, start: pd.Timestamp, end: pd.Timestamp) -> List[Tuple[pd.Timestamp, float]]:
     filepath = Path(filename)
     lock_path = filename + ".lock"
 
     if not filepath.exists():
-        scrap_data(filename, country_code, start, end)
+        scrap_data(filename, start, end)
 
     with FileLock(lock_path, timeout=60):
         df = pd.read_excel(filename)
@@ -522,10 +131,6 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
     from_hour, from_minute = from_time.split(":")
     from_t = int(from_hour) * 4 + int(from_minute) // 15
 
-    # print("Potrebnih intervalov:", intervals_needed)
-    # print("Že kupljenih intervalov (SOC):", initial_position)
-    # print("Trgovanje dovoljeno od intervala:", from_t)
-
     now = pd.Timestamp(date, tz="Europe/Ljubljana")
 
     start = now + pd.Timedelta(days=0)
@@ -534,19 +139,17 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
     tomorrow_start = now + pd.Timedelta(days=1)
     tomorrow_end = now + pd.Timedelta(days=2)
 
-    country_code = "SI"
-
     filename = "cache/prices_data/prices_" + start.strftime("%Y-%m-%d") + ".xlsx"
 
     filename_tomorrow = "cache/prices_data/prices_" + tomorrow_start.strftime("%Y-%m-%d") + ".xlsx"
-    data_today = load_price_data(filename, country_code, start, end)
+    data_today = load_price_data(filename, start, end)
 
     have_tomorrow = False
     data_tomorrow: List[Tuple[pd.Timestamp, float]] = []
 
     if include_next_day:
         try:
-            data_tomorrow = load_price_data(filename_tomorrow, country_code, tomorrow_start, tomorrow_end)
+            data_tomorrow = load_price_data(filename_tomorrow, tomorrow_start, tomorrow_end)
             if len(data_tomorrow) > 0:
                 have_tomorrow = True
         except Exception as e:
@@ -611,11 +214,28 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
         charging_times = [o["time"] for o in orders if o["order"] == "buy"]
         discharging_times = [o["time"] for o in orders if o["order"] == "sell"]
 
+        #za mqtt
         result = {
             "charging_intervals": charging_times,
             "discharging_intervals": discharging_times,
             "combined_with_tomorrow": have_tomorrow,
         }
+
+        #za database
+        database_data = []
+        for order in orders:
+            if order["order"] == "buy":
+                action = 1
+            elif order["order"] == "sell":
+                action = -1
+            else:
+                action = 0
+
+            database_data.append({
+                "device_id": "",
+                "timestamp": order["time"],
+                "value": action
+            })
 
         fd, tmp_path = tempfile.mkstemp(dir=str(filepath_json.parent), suffix=".json.tmp")
         os.close(fd)
@@ -630,12 +250,10 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
 
         timestamps = [c[0] for c in combined]
         prices_all = [c[1] for c in combined]
-        print("graf")
         graph_plot(
             timestamps,
             prices_all,
             orders,
-            country_code,
             start,
             filename_png,
             day_boundary=n_today if have_tomorrow else None,
@@ -646,7 +264,6 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
             lwh_tom=lwh_tom,
             tomorrow_date=tomorrow_start if have_tomorrow else None,
 
-            # INPUT PODATKI ZA GRAF
             capacity=capacity,
             power=power,
             intervals_needed=intervals_needed,
@@ -657,12 +274,12 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
             include_next_day=include_next_day
         )
 
-    return result
-
+    return database_data
 
 if __name__ == "__main__":
 
     try:
+        
         result = main(capacity=10, power=5, minimum_profit=10, date="2026-05-14", lat=46.8894, lng=15.458, from_time="00:00", soc="0.0", include_next_day=False)
         print("uspelo")
     except Exception as e:

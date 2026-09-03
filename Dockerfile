@@ -8,6 +8,7 @@ RUN pip install -r requirements.txt
 COPY algo.py .
 COPY client.py .
 COPY api_client.py .
+COPY graph.py .
 
 COPY cache ./cache
 COPY graph_imgs ./graph_imgs

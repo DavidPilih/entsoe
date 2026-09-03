@@ -27,9 +27,9 @@ def generate_data():
 
 
     
-    ratio = random.choice([2.1, 4])
+    ratio = random.choice([1,2,3])
 
-    power = round(random.uniform(1, 10), 2)
+    power = round(random.uniform(2, 4), 2)
     capacity = round(power * ratio, 2)
 
 
@@ -55,11 +55,11 @@ i = 1
 def sendData():
     global i
 
-    # with open("req_data.json", "r") as file:
-    #     data = json.load(file)
-    data = generate_data()
-    data["unique_id"] = i
-    i += 1
+    with open("req_data.json", "r") as file:
+        data = json.load(file)
+    # data = generate_data()
+    # data["unique_id"] = i
+    # i += 1
 
     data = json.dumps(data, ensure_ascii=False)
 
@@ -67,7 +67,7 @@ def sendData():
 
     print("poslano:", data)
 
-    threading.Timer(0.1, sendData).start()
+    threading.Timer(10, sendData).start()
 
 
 def main():

@@ -1,6 +1,14 @@
+[
     {
         "unique_id": "02-1756723456789-Vilion EnerArk2.1",
         "capacity": 14.56,
         "power": 2.44,
         "minimum_profit": 1.6
+    },
+    {
+        "unique_id": "02-1756723456790-Druga naprava",
+        "capacity": 10,
+        "power": 3,
+        "minimum_profit": 1.2
     }
+]

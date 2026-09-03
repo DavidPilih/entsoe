@@ -18,7 +18,7 @@ if not API_KEY:
 entsoe_client = EntsoePandasClient(api_key=API_KEY)
 
 
-def scrap_data(filename, country_code, start, end):
+def scrap_data(filename, start, end):
     lock_path = filename + ".lock"
     os.makedirs(os.path.dirname(filename), exist_ok=True)
 
@@ -28,19 +28,57 @@ def scrap_data(filename, country_code, start, end):
             print("Podatki že obstajajo (pridobil drug worker):", filename)
             return
 
-        print("Pridobivam cene iz ENTSO-E..." + str(start))
+        df = None
 
-        prices = entsoe_client.query_day_ahead_prices(country_code, start, end)
+        try:
+            print("Pridobivam cene iz Energy-Charts..." + str(start))
 
-        print("Število cen:", len(prices))
+            start_str = pd.Timestamp(start).strftime("%Y-%m-%d")
+            end_str = pd.Timestamp(end).strftime("%Y-%m-%d")
 
-        if prices.empty:
-            raise ValueError("ENTSO-E ni vrnil nobenih podatkov.")
+            url = "https://api.energy-charts.info/v2/price"
+            params = {
+                "bzn": "SI",
+                "start": start_str,
+                "end": end_str
+            }
 
-        df = prices.reset_index()
-        df.columns = ["time", "price"]
-        df["time"] = df["time"].dt.tz_localize(None)
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            data = response.json()
 
+            records = []
+            for item in data.get("data", []):
+                ts = item["timestamp"]
+                price = item["values"].get("day_ahead_price")
+                records.append({"time": ts, "price": price})
+
+            if not records:
+                raise ValueError("Energy-Charts ni vrnil nobenih podatkov.")
+
+            df = pd.DataFrame(records)
+            df["time"] = pd.to_datetime(df["time"]).dt.tz_localize(None)
+
+            print("Število cen (Energy-Charts):", len(df))
+
+        except Exception as e:
+            print(f"Energy-Charts ni uspel ({e}), poskušam ENTSO-E...")
+
+            #ENTSO-E
+            print("Pridobivam cene iz ENTSO-E..." + str(start))
+            country_code = "SI"
+            prices = entsoe_client.query_day_ahead_prices(country_code, start, end)
+
+            print("Število cen (ENTSO-E):", len(prices))
+
+            if prices.empty:
+                raise ValueError("Niti Energy-Charts niti ENTSO-E nista vrnila podatkov.")
+
+            df = prices.reset_index()
+            df.columns = ["time", "price"]
+            df["time"] = df["time"].dt.tz_localize(None)
+
+        # Shranjevanje
         target_dir = os.path.dirname(os.path.abspath(filename))
         fd, tmp_path = tempfile.mkstemp(dir=target_dir, suffix=".xlsx")
         os.close(fd)
@@ -55,12 +93,9 @@ def scrap_data(filename, country_code, start, end):
         print("Cene shranjene v:", filename)
 
 
+
+
 def scrap_data_sun(lat, lng, date_start, date_end):
-    """
-    sun_data.json je EN skupni file za vse workerje in vse (lat,lng,date)
-    kombinacije -> potreben je read-modify-write pod istim lockom,
-    sicer se writei enega workerja pobrišejo z writei drugega.
-    """
     path = "cache/sun_data/sun_data.json"
     lock_path = path + ".lock"
     os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -120,3 +155,4 @@ def scrap_data_sun(lat, lng, date_start, date_end):
             raise
 
         print("Sun podatki shranjeni.")
+
