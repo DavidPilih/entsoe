@@ -1,96 +1,193 @@
+import os
+import sys
 import json
-import math
+import random
+import threading
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import time
+import psycopg2
+import paho.mqtt.client as mqtt
+from dotenv import load_dotenv
 
-from algo import main
+load_dotenv()
 
-INPUT_FILE = "requests.json"      # tukaj vpišeš pot do svoje JSON datoteke
-OUTPUT_FILE = "results.json"      # sem se shranijo rezultati
-MAX_WORKERS = 20
+db_username = os.getenv("USER_DB")
+db_password = os.getenv("PASSWORD_DB")
+
+mqtt_username = os.getenv("USER_MQTT")
+mqtt_password = os.getenv("PASSWORD_MQTT")
+
+if not db_username or not db_password:
+    sys.exit(
+        "NAPAKA: manjkata USER_DB in/ali PASSWORD_DB.\n"
+        "Preveri, da obstaja .env datoteka v isti mapi kot client.py z vsebino:\n"
+        "  USER_DB=ime_uporabnika\n"
+        "  PASSWORD_DB=geslo"
+    )
+
+DB_CONFIG = {
+    "host": "10.188.20.3",
+    "port": 5432,
+    "dbname": "thingsboard",
+    "user": db_username,
+    "password": db_password,
+}
+
+# CAPACITY_KEY = "total_capacity[kWh]"
+# POWER_KEY = "max_charge_power[kW]"
+
+CAPACITY_KEY = "total_capacity[kWh]"
+POWER_KEY = "max_charge_power[kW]"
+SOC_KEY = "SOC[%]"
+
+DEVICES_QUERY = """
+SELECT DISTINCT ON (name, kd.key)
+       name,
+       long_v,
+       dbl_v,
+       kd.key
+FROM ts_kv_latest tkl
+JOIN key_dictionary kd ON kd.key_id = tkl."key"
+JOIN device d ON tkl.entity_id = d.id
+where (kd.key like %s
+or kd.key like %s
+or kd.key like %s)
+and name like '%%Agg%%'
+ORDER BY name, kd.key, tkl.ts DESC
+"""
+
+client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+MQTT_USER = mqtt_username
+MQTT_PASS = mqtt_password
+MQTT_HOST = "10.188.20.3"
+MQTT_PORT = 1884
+
+topic_inp = "controllers/IQFleks/Entsoe/energy_prices/req"
+
+SEND_INTERVAL_SECONDS = 1
 
 
-def process_one(payload):
-    unique_id = payload.get("unique_id")
+def on_connect(client, userdata, flags, reason_code, properties=None):
+    print("Connected to MQTT, reason code:", reason_code)
+
+
+def connect_to_mqtt():
+    client.username_pw_set(MQTT_USER, MQTT_PASS)
+    client.on_connect = on_connect
+    client.connect(MQTT_HOST, MQTT_PORT, 60)
+    client.loop_start()
+
+
+def fetch_devices_power_capacity():
+    devices = {}
 
     try:
-        required = ["capacity", "power", "minimum_profit", "unique_id"]
-        missing = [key for key in required if key not in payload]
-
-        if missing:
-            raise ValueError(f"Manjkajoči podatki: {', '.join(missing)}.")
-
-        now = datetime.now()
-        rounded_minute = math.ceil(now.minute / 15) * 15
-
-        if rounded_minute == 60:
-            now = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
-        else:
-            now = now.replace(minute=rounded_minute, second=0, microsecond=0)
-
-        def_date = now.strftime("%Y-%m-%d")
-        def_time = now.strftime("%H:%M")
-
-        capacity = payload["capacity"]
-        power = payload["power"]
-        minimum_profit = payload["minimum_profit"]
-        date = payload.get("date", def_date)
-        lat = payload.get("latitude", 46.0569)
-        lng = payload.get("longitude", 14.5058)
-        from_time = payload.get("start_time", def_time)
-        soc = payload.get("soc", 0)
-        next_day = payload.get("next_day", False)
-
-        power_factor = payload.get("power_factor", 1)
-        power *= power_factor
-
-        print(f"Začenjam zahtevek: {unique_id}")
-
-        result = main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day)
-
-        if not isinstance(result, dict):
-            result = {"result": result}
-
-        result["success"] = True
-        result["unique_id"] = unique_id
-
-        print(f"Končan zahtevek: {unique_id}")
-
-        return result
-
+        conn = psycopg2.connect(**DB_CONFIG)
     except Exception as e:
-        print("NAPAKA:", type(e).__name__, "-", str(e), "- unique_id:", unique_id)
+        sys.exit(f"NAPAKA pri povezavi na bazo: {e}")
 
-        return {
-            "success": False,
-            "unique_id": unique_id,
-            "error": type(e).__name__,
-            "message": str(e)
-        }
+    try:
+        with conn.cursor() as cur:
+            params = (CAPACITY_KEY, POWER_KEY, SOC_KEY)
+
+            print("SQL QUERY:")
+            print(cur.mogrify(DEVICES_QUERY, params).decode())
+
+            cur.execute(DEVICES_QUERY, params)
+            rows = cur.fetchall()
+
+            print("REZULTAT IZ DB:")
+            for row in rows:
+                print(f"  name={row[0]}, long_v={row[1]}, dbl_v={row[2]}, key={row[3]}")
+            print(f"Skupaj vrstic iz DB: {len(rows)}")
+
+    finally:
+        conn.close()
+
+    for name, long_v, dbl_v, key in rows:
+        if name not in devices:
+            devices[name] = {"power": None, "capacity": None, "soc": None}
+
+        value = long_v if long_v is not None else dbl_v
+
+        if key == CAPACITY_KEY:
+            devices[name]["capacity"] = value
+        elif key == POWER_KEY:
+            devices[name]["power"] = value
+        elif key == SOC_KEY:
+            devices[name]["soc"] = float(value) / 100 if value is not None else None
+
+    print("PROCESIRANE NAPRAVE:")
+    for name, vals in devices.items():
+        print(f"  {name}: {vals}")
+
+    devices = {
+        name: vals
+        for name, vals in devices.items()
+        if vals["power"] not in (None, 0)
+        and vals["capacity"] not in (None, 0)
+        and vals["soc"] is not None
+    }
+
+    print("NAPRAVE PO FILTRU:")
+    for name, vals in devices.items():
+        print(f"  {name}: {vals}")
+
+    return devices
+
+def generate_data(name, power, capacity, soc):
+    data = {
+        "unique_id": name,
+        "capacity": capacity,
+        "power": power,
+        "soc": soc
+    }
+
+    return data
 
 
-def run_batch():
-    with open(INPUT_FILE, "r", encoding="utf-8") as f:
-        requests = json.load(f)
+def send_for_device(name, power, capacity, soc):
+    data = generate_data(name, power, capacity, soc)
+    payload = json.dumps(data, ensure_ascii=False)
 
-    if not isinstance(requests, list):
-        requests = [requests]
+    client.publish(topic_inp, payload)
+    print(f"poslano na {topic_inp}:", payload)
 
-    print(f"Nalagam {len(requests)} zahtevkov iz {INPUT_FILE} ...")
 
-    results = []
+def start_sending_all(devices):
+    for name, vals in devices.items():
+        delay = random.uniform(0, 1)
+        threading.Timer(3 + delay, send_for_device, args=(name, vals["power"], vals["capacity"], vals["soc"])).start()
 
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-        future_to_id = {
-            executor.submit(process_one, req): req.get("unique_id")
-            for req in requests
-        }
 
-        for future in as_completed(future_to_id):
-            results.append(future.result())
+def seconds_until_next_hour():
+    now = datetime.now()
+    next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+    return (next_hour - now).total_seconds()
 
-    order = {req.get("unique_id"): i for i, req in enumerate(requests)}
-    results.sort(key=lambda r: order.get(r.get("unique_id"), 0))
-    
+
+def main():
+    connect_to_mqtt()
+
+    while True:
+        print("Branje naprav iz baze...")
+        devices = fetch_devices_power_capacity()
+
+        if not devices:
+            print("Ni najdenih naprav s power in capacity vrednostmi.")
+        else:
+            print(f"Najdenih {len(devices)} naprav:")
+            for name, vals in devices.items():
+                print(f"  {name}: power={vals['power']}, capacity={vals['capacity']}, soc={vals['soc']}")
+
+            start_sending_all(devices)
+            print("Pošiljanje podatkov zagnano za vse naprave.")
+            time.sleep(3 + 1 + 2)
+
+        wait_seconds = seconds_until_next_hour()
+        next_run = datetime.now() + timedelta(seconds=wait_seconds)
+        print(f"Čakam do naslednje polne ure ({next_run.strftime('%H:%M:%S')}), to je {wait_seconds:.0f}s...")
+        time.sleep(wait_seconds)
+
 if __name__ == "__main__":
-    run_batch()
+    main()

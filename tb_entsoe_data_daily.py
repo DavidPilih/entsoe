@@ -18,12 +18,16 @@ def get_prices_json(start, end, base_dir="cache/prices_data"):
 
     if not os.path.exists(filename):
         print("error")
-        # scrap_data(filename, start, end)
+        scrap_data(filename, start, end)
 
     df = pd.read_excel(filename, engine="openpyxl")
 
     if "time" in df.columns:
-        df["time"] = pd.to_datetime(df["time"]).astype("datetime64[ms]").astype("int64")
+        df["time"] = (
+            pd.to_datetime(df["time"])
+            .dt.tz_localize("Europe/Ljubljana", ambiguous="infer", nonexistent="shift_forward")
+            .astype("int64") // 10**6
+        )
 
     return json.loads(df.to_json(orient="records"))
 

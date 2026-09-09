@@ -1,6 +1,6 @@
-    {
-        "unique_id": "02-1756723456789-Vilion EnerArk2.1",
-        "capacity": 14.56,
-        "power": 2.44,
-        "minimum_profit": 1.6
-    }
+{
+"unique_id": "py_sim-device_Agg",
+ "capacity": 7230, 
+ "power": 3600, 
+ "start_time": "00:00"
+}

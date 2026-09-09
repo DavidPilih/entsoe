@@ -7,7 +7,6 @@ from api_client import scrap_data
 from api_client import scrap_data_sun
 import time
 from filelock import FileLock
-import tempfile
 import os
 
 from graph import graph_plot
@@ -182,99 +181,83 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
             buy_mask.append(fwh_tom <= t_of_day <= lwh_tom)
             trade_mask.append(True)
 
-    trade_data = [{"time": ts.strftime("%m-%d %H:%M"), "price": price} for ts, price in combined]
+    trade_data = [{"time": ts.strftime("%Y-%m-%d %H:%M"), "price": price} for ts, price in combined]
+
+    orders = optimize_trades(
+        trade_data,
+        max_positions=intervals_needed,
+        minimum_profit=minimum_profit,
+        buy_mask=buy_mask,
+        trade_mask=trade_mask,
+        initial_position=initial_position,
+        force_flat_end=True,
+    )
+
+    charging_times = [o["time"] for o in orders if o["order"] == "buy"]
+    discharging_times = [o["time"] for o in orders if o["order"] == "sell"]
+
+    #za mqtt
+    result = {
+        "charging_intervals": charging_times,
+        "discharging_intervals": discharging_times,
+        "combined_with_tomorrow": have_tomorrow,
+    }
+
+    #za database
+    from_dt = pd.Timestamp(f"{date} {from_time}", tz="Europe/Ljubljana")
+
+    database_data = []
+    for order in orders:
+        order_time = pd.Timestamp(order["time"], tz="Europe/Ljubljana")
+
+        if order_time < from_dt:
+            continue
+
+        if order["order"] == "buy":
+            action = 1
+        elif order["order"] == "sell":
+            action = -1
+        else:
+            action = 0
+
+        database_data.append({
+            "device_id": "",
+            "timestamp": order["time"],
+            "value": action
+        })
 
     suffix_2day = "_2day" if have_tomorrow else ""
 
-    filename_json = "cache/intervals_json/intervals_" + str(intervals_needed) + "_minprofit_" + str(minimum_profit) + "_date_" + start.strftime("%Y-%m-%d") + f"_lat_{lat}_lng_{lng}" + f"_from_{from_time.replace(':', '')}" + f"_soc_{soc}" + suffix_2day + ".json"
-
     filename_png = "graph_imgs/intervals_" + str(intervals_needed) + "_minprofit_" + str(minimum_profit) + "_date_" + start.strftime("%Y-%m-%d") + suffix_2day + ".png"
+    os.makedirs(Path(filename_png).parent, exist_ok=True)
 
-    filepath_json = Path(filename_json)
-    lock_path_json = filename_json + ".lock"
-    os.makedirs(filepath_json.parent, exist_ok=True)
+    timestamps = [c[0] for c in combined]
+    prices_all = [c[1] for c in combined]
+    graph_plot(
+        timestamps,
+        prices_all,
+        orders,
+        start,
+        filename_png,
+        day_boundary=n_today if have_tomorrow else None,
+        end_date=tomorrow_start if have_tomorrow else None,
+        fwh=fwh,
+        lwh=lwh,
+        fwh_tom=fwh_tom,
+        lwh_tom=lwh_tom,
+        tomorrow_date=tomorrow_start if have_tomorrow else None,
 
-    with FileLock(lock_path_json, timeout=300):
+        capacity=capacity,
+        power=power,
+        intervals_needed=intervals_needed,
+        minimum_profit=minimum_profit,
+        soc=soc,
+        initial_position=initial_position,
+        from_time=from_time,
+        include_next_day=include_next_day
+    )
 
-        if filepath_json.exists():
-            with open(filepath_json, "r", encoding="utf-8") as file:
-                print("cached json")
-                return json.load(file)
-
-        orders = optimize_trades(
-            trade_data,
-            max_positions=intervals_needed,
-            minimum_profit=minimum_profit,
-            buy_mask=buy_mask,
-            trade_mask=trade_mask,
-            initial_position=initial_position,
-            force_flat_end=True,
-        )
-
-        charging_times = [o["time"] for o in orders if o["order"] == "buy"]
-        discharging_times = [o["time"] for o in orders if o["order"] == "sell"]
-
-        #za mqtt
-        result = {
-            "charging_intervals": charging_times,
-            "discharging_intervals": discharging_times,
-            "combined_with_tomorrow": have_tomorrow,
-        }
-
-        #za database
-        database_data = []
-        for order in orders:
-            if order["order"] == "buy":
-                action = 1
-            elif order["order"] == "sell":
-                action = -1
-            else:
-                action = 0
-
-            database_data.append({
-                "device_id": "",
-                "timestamp": order["time"],
-                "value": action
-            })
-
-        fd, tmp_path = tempfile.mkstemp(dir=str(filepath_json.parent), suffix=".json.tmp")
-        os.close(fd)
-        try:
-            with open(tmp_path, "w", encoding="utf-8") as file:
-                json.dump(result, file, indent=4)
-            os.replace(tmp_path, filepath_json)
-        except Exception:
-            if os.path.exists(tmp_path):
-                os.remove(tmp_path)
-            raise
-
-        timestamps = [c[0] for c in combined]
-        prices_all = [c[1] for c in combined]
-        graph_plot(
-            timestamps,
-            prices_all,
-            orders,
-            start,
-            filename_png,
-            day_boundary=n_today if have_tomorrow else None,
-            end_date=tomorrow_start if have_tomorrow else None,
-            fwh=fwh,
-            lwh=lwh,
-            fwh_tom=fwh_tom,
-            lwh_tom=lwh_tom,
-            tomorrow_date=tomorrow_start if have_tomorrow else None,
-
-            capacity=capacity,
-            power=power,
-            intervals_needed=intervals_needed,
-            minimum_profit=minimum_profit,
-            soc=soc,
-            initial_position=initial_position,
-            from_time=from_time,
-            include_next_day=include_next_day
-        )
-
-    return database_data
+    return result, database_data
 
 if __name__ == "__main__":
 
