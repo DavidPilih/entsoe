@@ -4,75 +4,91 @@ import json
 from typing import List, Dict, Any, Tuple
 import traceback
 from api_client import scrap_data
-from api_client import scrap_data_sun
+from api_client import scrap_data_sun, get_sun_forecast
 import time
 from filelock import FileLock
 import os
 
 from graph import graph_plot
 
-MARGIN = 0.1  # V PROCENTIH 0.1=10
 
 
-def optimize_trades(data: List[Dict[str, Any]], max_positions: int, minimum_profit: float, buy_mask: List[bool], trade_mask: List[bool], initial_position: int = 0, force_flat_end: bool = False) -> List[Dict[str, Any]]:
+# Ocena: 1000 W/m² pomeni polno razpoložljivo moč polnjenja.
+SOLAR_REFERENCE_W_M2 = 1000.0
+ENERGY_STEPS = 100  # Ločljivost: 1 % energije enega 15-minutnega intervala.
 
+
+def solar_percentages(forecast, timestamps):
+    radiation = pd.to_numeric(forecast["shortwave_radiation"], errors="coerce")
+    # Open-Meteo podaja povprečje PRETEKLE ure; 13:00 velja za 12:00–13:00.
+    hour_starts = pd.to_datetime(forecast["time"]) - pd.Timedelta(hours=1)
+    hourly = pd.Series(radiation.to_numpy(), index=hour_starts)
+    values = hourly.reindex(pd.DatetimeIndex(timestamps).floor("h"))
+    if values.isna().any():
+        raise ValueError("Sončna napoved ne vsebuje veljavnega obsevanja za vse intervale.")
+    return (values.clip(lower=0, upper=SOLAR_REFERENCE_W_M2)
+            / SOLAR_REFERENCE_W_M2 * 100).round().astype(int).tolist()
+
+
+def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_profit: float, buy_mask: List[bool], trade_mask: List[bool], initial_position: float = 0, force_flat_end: bool = False, sun_percent=None, *, margin: float) -> List[Dict[str, Any]]:
+    if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not 0 <= margin <= 1:
+        raise ValueError("margin mora biti število med 0 in 1 (0.1 = 10 %).")
     prices = [float(d["price"]) for d in data]
-    times = [d["time"] for d in data]
-
     T = len(prices)
-    K = max_positions
-    NEG = float("-inf")
-
-    dp = [[0.0] * (K + 1) for _ in range(T + 1)]
-    decision = [[None] * (K + 1) for _ in range(T + 1)]
-
-    for k in range(K + 1):
-        if force_flat_end and k != 0:
-            dp[T][k] = NEG
-        else:
-            dp[T][k] = 0.0
+    scale = ENERGY_STEPS
+    K = round(max_positions * scale)
+    initial = round(initial_position * scale)
+    if K < 0 or not 0 <= initial <= K:
+        raise ValueError("Začetna energija mora biti znotraj kapacitete.")
+    if sun_percent is None:
+        sun_percent = [100] * T
+    if not (len(sun_percent) == len(buy_mask) == len(trade_mask) == T):
+        raise ValueError("Maske in sončna napoved morajo ustrezati številu intervalov.")
+    if any(not 0 <= value <= 100 for value in sun_percent):
+        raise ValueError("Odstotek sonca mora biti med 0 in 100.")
+    charge_steps = [round(value * scale / 100) for value in sun_percent]
+    neg = float("-inf")
+    future = [0.0 if not force_flat_end or k == 0 else neg for k in range(K + 1)]
+    decision = [bytearray(K + 1) for _ in range(T)]
 
     for t in range(T - 1, -1, -1):
+        current = future.copy()
+        if trade_mask[t]:
+            for k in range(K + 1):
+                # Ob polni bateriji se zadnji polnilni interval skrajša.
+                added = min(charge_steps[t], K - k)
+                if buy_mask[t] and added > 0:
+                    value = (-(prices[t] * (1 + margin) + minimum_profit)
+                             * added / scale + future[k + added])
+                    if value > current[k]:
+                        current[k] = value
+                        decision[t][k] = 1
+                # Zadnji praznilni interval lahko izprazni manj kot poln interval.
+                removed = min(scale, k)
+                if removed > 0:
+                    value = prices[t] * (1 - margin) * removed / scale + future[k - removed]
+                    if value > current[k]:
+                        current[k] = value
+                        decision[t][k] = 2
+        future = current
 
-        price = prices[t]
-
-        can_trade = trade_mask[t]
-        can_buy = can_trade and buy_mask[t]
-        can_sell = can_trade
-
-        for k in range(K + 1):
-
-            best_value = dp[t + 1][k]
-            best_action = "hold"
-
-            if can_buy and k < K:
-                value = -price * (1 + MARGIN) - minimum_profit + dp[t + 1][k + 1]
-                if value > best_value:
-                    best_value = value
-                    best_action = "buy"
-
-            if can_sell and k > 0:
-                value = price * (1 - MARGIN) + dp[t + 1][k - 1]
-                if value > best_value:
-                    best_value = value
-                    best_action = "sell"
-
-            dp[t][k] = best_value
-            decision[t][k] = best_action
-
-    actions = []
-    k = initial_position
-
+    if future[initial] == neg:
+        raise ValueError("Baterije v razpoložljivih intervalih ni mogoče izprazniti.")
+    orders = []
+    k = initial
     for t in range(T):
-        act = decision[t][k]
-        actions.append(act)
-
-        if act == "buy":
-            k += 1
-        elif act == "sell":
-            k -= 1
-
-    return [{"time": times[i], "price": prices[i], "order": actions[i]} for i in range(T)]
+        action = decision[t][k]
+        amount = 0
+        if action == 1:
+            amount = min(charge_steps[t], K - k)
+            k += amount
+        elif action == 2:
+            amount = min(scale, k)
+            k -= amount
+        orders.append({"time": data[t]["time"], "price": prices[t],
+                       "order": ("hold", "buy", "sell")[action],
+                       "sun_percent": sun_percent[t], "energy_fraction": amount / scale})
+    return orders
 
 
 def getwh(date, lat, lng):
@@ -117,15 +133,22 @@ def load_price_data(filename: str, start: pd.Timestamp, end: pd.Timestamp) -> Li
     return [(row["time"], float(row["price"])) for _, row in df.iterrows()]
 
 
-def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True):
+def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True, use_sun_data: bool = False, *, margin: float):
+
+    if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not 0 <= margin <= 1:
+        raise ValueError("margin mora biti število med 0 in 1 (0.1 = 10 %).")
+    if not isinstance(use_sun_data, bool):
+        raise ValueError("use_sun_data mora biti boolean.")
 
     capacity = float(capacity)
     power = float(power)
     minimum_profit = float(minimum_profit)
     soc = float(soc)
 
-    intervals_needed = int(capacity / power * 4)
-    initial_position = round(intervals_needed * soc)
+    if capacity <= 0 or power <= 0 or not 0 <= soc <= 1:
+        raise ValueError("Kapaciteta in moč morata biti pozitivni, SOC pa med 0 in 1.")
+    intervals_needed = capacity / power * 4
+    initial_position = intervals_needed * soc
 
     from_hour, from_minute = from_time.split(":")
     from_t = int(from_hour) * 4 + int(from_minute) // 15
@@ -168,6 +191,14 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
     if have_tomorrow:
         fwh_tom, lwh_tom = getwh(date_tomorrow, lat, lng)
 
+    sun_percent = None  # Brez napovedi: polna moč v dovoljenih dnevnih intervalih.
+    if use_sun_data:
+        # Dodatni dan zagotovi tudi povprečje za zadnjo uro izbranega dneva.
+        forecast_end = ((pd.Timestamp(date_tomorrow) if have_tomorrow else pd.Timestamp(date))
+                        + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+        forecast = get_sun_forecast(lat, lng, date, forecast_end)
+        sun_percent = solar_percentages(forecast, [ts for ts, _ in combined])
+
     buy_mask = []
     trade_mask = []
 
@@ -191,6 +222,8 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
         trade_mask=trade_mask,
         initial_position=initial_position,
         force_flat_end=True,
+        sun_percent=sun_percent,
+        margin=margin,
     )
 
     charging_times = [o["time"] for o in orders if o["order"] == "buy"]
@@ -201,6 +234,7 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
         "charging_intervals": charging_times,
         "discharging_intervals": discharging_times,
         "combined_with_tomorrow": have_tomorrow,
+        "use_sun_data": use_sun_data,
     }
 
     #za database
@@ -228,7 +262,8 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
 
     suffix_2day = "_2day" if have_tomorrow else ""
 
-    filename_png = "graph_imgs/intervals_" + str(intervals_needed) + "_minprofit_" + str(minimum_profit) + "_date_" + start.strftime("%Y-%m-%d") + suffix_2day + ".png"
+    sun_suffix = "_sun" if use_sun_data else ""
+    filename_png = "graph_imgs/intervals_" + str(intervals_needed) + "_minprofit_" + str(minimum_profit) + "_date_" + start.strftime("%Y-%m-%d") + suffix_2day + sun_suffix + ".png"
     os.makedirs(Path(filename_png).parent, exist_ok=True)
 
     timestamps = [c[0] for c in combined]
@@ -254,7 +289,8 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
         soc=soc,
         initial_position=initial_position,
         from_time=from_time,
-        include_next_day=include_next_day
+        include_next_day=include_next_day,
+        use_sun_data=use_sun_data,
     )
 
     return result, database_data
@@ -263,7 +299,7 @@ if __name__ == "__main__":
 
     try:
         
-        result = main(capacity=10, power=5, minimum_profit=10, date="2026-05-14", lat=46.8894, lng=15.458, from_time="00:00", soc="0.0", include_next_day=False)
+        result = main(capacity=10, power=5, minimum_profit=10, date="2026-05-14", lat=46.8894, lng=15.458, from_time="00:00", soc="0.0", include_next_day=False, margin=0.1)
         print("uspelo")
     except Exception as e:
         print("neuspelo")

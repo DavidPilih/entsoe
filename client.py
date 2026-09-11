@@ -1,13 +1,8 @@
-import json
 import math
 import os
 import sys
-import threading
 import queue
-from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
-import paho.mqtt.client as mqtt
 import psycopg2
 from psycopg2.extras import execute_values
 from dotenv import load_dotenv
@@ -15,9 +10,6 @@ from thingsboard_send_data import send_tb_device
 from algo import main
 
 load_dotenv()
-
-topic_inp = "controllers/IQFleks/Entsoe/energy_prices/req"
-topic_res = "controllers/IQFleks/Entsoe/energy_prices/res"
 
 db_username = os.getenv("USER_DB")
 db_password = os.getenv("PASSWORD_DB")
@@ -33,7 +25,6 @@ DB_CONFIG = {
     "password": db_password,
 }
 
-executor = ThreadPoolExecutor(max_workers=20)
 db_queue = queue.Queue()
 
 def init_db():
@@ -88,125 +79,89 @@ def to_data_points(data):
     return [{"ts": convert_timestamp(item["timestamp"]), "values": {"schedule_auto": item["value"]}} for item in data]
 
 def process_request(payload):
+    """Izračuna in odda zapis v vrsto; izjeme obravnava klicatelj."""
+    if not isinstance(payload, dict):
+        raise ValueError("Zahtevek mora biti slovar.")
     unique_id = payload.get("unique_id")
+    required = ["capacity", "power", "unique_id"]
+    missing = [key for key in required if key not in payload]
+
+    if missing:
+        raise ValueError(f"Manjkajoči podatki: {', '.join(missing)}.")
+
+    # Zaokroževanje v UTC pravilno obravnava tudi prehode ure.
+    now = pd.Timestamp.now(tz="UTC").ceil("15min").tz_convert("Europe/Ljubljana")
+    def_date = now.strftime("%Y-%m-%d")
+    def_time = now.strftime("%H:%M")
+
+    capacity = payload["capacity"]
+    power = payload["power"]
+    minimum_profit = payload.get("minimum_profit", 0.8)
+    date = payload.get("date", def_date)
+    lat = payload.get("latitude", 46.0569)
+    lng = payload.get("longitude", 14.5058)
+    from_time = payload.get("start_time", def_time)
+    soc = payload.get("soc", 0)
+    next_day = payload.get("next_day", False)
+    use_sun_data = payload.get("use_sun_data", False)
+
+    if not isinstance(use_sun_data, bool):
+        raise ValueError("use_sun_data mora biti JSON boolean (true ali false).")
+    power_factor = payload.get("power_factor", 1)
+    margin = payload.get("margin", 0.1)
+    if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not 0 <= margin <= 1:
+        raise ValueError("margin mora biti število med 0 in 1 (0.1 = 10 %).")
+
+    power *= power_factor
+
+    print(f"Začenjam zahtevek: {unique_id}")
+
+    _, database_data = main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day, use_sun_data=use_sun_data, margin=margin)
+
+    # Rezultat za neposrednega klicatelja; zapisovanje uporablja dosedanjo vrsto.
+    result = {
+        "success": True,
+        "unique_id": unique_id,
+        "data": [
+            {"timestamp": convert_timestamp(item["timestamp"]), "value": item["value"]}
+            for item in database_data
+        ],
+    }
+
+    device_id = fetch_device_id(unique_id)
+    save_result(device_id, database_data)
+    send_tb_device(to_data_points(database_data), device_id)
+    print(f"Končan zahtevek: {unique_id}")
+    return result
+
+
+def fetch_device_parameters(device_id):
+    keys = ("total_capacity[kWh]", "max_charge_power[kW]", "SOC[%]")
+    conn = psycopg2.connect(**DB_CONFIG)
     try:
-        if "help" in payload:
-            sendData({"success": True, "unique_id": unique_id, "help": {"required": ["unique_id", "capacity", "power"], "optional": ["minimum_profit", "date", "latitude", "longitude", "start_time", "soc", "next_day", "power_factor"]}})
-            return
-
-        required = ["capacity", "power", "unique_id"]
-        missing = [key for key in required if key not in payload]
-
-        if missing:
-            raise ValueError(f"Manjkajoči podatki: {', '.join(missing)}.")
-
-        now = datetime.now()
-        rounded_minute = math.ceil(now.minute / 15) * 15
-
-        if rounded_minute == 60:
-            now = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
-        else:
-            now = now.replace(minute=rounded_minute, second=0, microsecond=0)
-
-        def_date = now.strftime("%Y-%m-%d")
-        def_time = now.strftime("%H:%M")
-
-        capacity = payload["capacity"]
-        power = payload["power"]
-        minimum_profit = payload.get("minimum_profit", 0.8)
-        date = payload.get("date", def_date)
-        lat = payload.get("latitude", 46.0569)
-        lng = payload.get("longitude", 14.5058)
-        from_time = payload.get("start_time", def_time)
-        soc = payload.get("soc", 0)
-        next_day = payload.get("next_day", False)
-        power_factor = payload.get("power_factor", 1)
-
-        power *= power_factor
-
-        print(f"Začenjam zahtevek: {unique_id}")
-
-        result, database_data = main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day)
-
-        if not isinstance(result, dict):
-            result = {"result": result}
-
-        result["success"] = True
-        result["unique_id"] = unique_id
-
-        sendData(result)
-
-        device_id = fetch_device_id(unique_id)
-        save_result(device_id, database_data)
-
-        database_data = to_data_points(database_data)
-
-        send_tb_device(database_data, device_id)
-
-        print(f"Končan zahtevek: {unique_id}")
-
-    except Exception as e:
-        print("NAPAKA:", type(e).__name__, "-", str(e), "- unique_id:", unique_id)
-        error = {"success": False, "unique_id": unique_id, "error": type(e).__name__, "message": str(e)}
-        try:
-            sendData(error)
-        except Exception as send_error:
-            print("Napaka pri pošiljanju napake:", type(send_error).__name__, "-", str(send_error))
-
-def on_connect(client, userdata, flags, reason_code, properties=None):
-    if reason_code == 0:
-        client.subscribe(topic_inp)
-        print("Uspešno povezan na MQTT")
-        print("Poslušam:", topic_inp)
-    else:
-        print("Napaka pri povezavi z MQTT:", reason_code)
-
-def sendData(result):
-    data = json.dumps(result, ensure_ascii=False)
-    info = client.publish(topic_res, data)
-    if info.rc == mqtt.MQTT_ERR_SUCCESS:
-        print("Poslano:", data)
-    else:
-        print("NAPAKA pri pošiljanju:", mqtt.error_string(info.rc))
-
-def on_message(client, userdata, msg):
-    try:
-        raw_message = msg.payload.decode()
-        print("Prejeto sporočilo:", raw_message)
-        payload = json.loads(raw_message)
-        executor.submit(process_request, payload)
-    except Exception as e:
-        print("NAPAKA pri sprejemu:", type(e).__name__, "-", str(e))
-        error = {"success": False, "unique_id": None, "error": type(e).__name__, "message": str(e)}
-        try:
-            sendData(error)
-        except Exception as send_error:
-            print("Napaka pri pošiljanju napake:", type(send_error).__name__, "-", str(send_error))
-
-client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-client.username_pw_set("iqfleks_mqtt", "iqfleks_pass")
-client.on_connect = on_connect
-client.on_message = on_message
-
-if __name__ == "__main__":
-    init_db()
-    db_writer_thread = threading.Thread(target=db_writer_loop, daemon=True)
-    db_writer_thread.start()
-    try:
-        client.connect("10.188.20.3", 1884, 60)
-        print("MQTT program zagnan")
-        client.loop_forever()
-    except KeyboardInterrupt:
-        print("Ustavljen")
-    except Exception as e:
-        print("MQTT program se je ustavil:", type(e).__name__, "-", str(e))
+        with conn.cursor() as cur:
+            cur.execute(
+                'SELECT DISTINCT ON (kd.key) kd.key, tkl.long_v, tkl.dbl_v '
+                'FROM ts_kv_latest tkl JOIN key_dictionary kd ON kd.key_id = tkl."key" '
+                'WHERE tkl.entity_id = %s AND kd.key IN (%s, %s, %s) '
+                'ORDER BY kd.key, tkl.ts DESC',
+                (device_id, *keys),
+            )
+            values = {key: long_v if long_v is not None else dbl_v
+                      for key, long_v, dbl_v in cur.fetchall()}
     finally:
-        print("Ustavljam ThreadPool...")
-        executor.shutdown(wait=True)
-        db_queue.put(None)
-        db_writer_thread.join(timeout=5)
-        try:
-            client.disconnect()
-        except Exception:
-            pass
-        print("Program ustavljen")
+        conn.close()
+    problems = []
+    for key in keys:
+        value = values.get(key)
+        if value is None:
+            problems.append(f"{key}: podatek manjka ali je NULL")
+        elif not isinstance(value, (int, float)) or not math.isfinite(value):
+            problems.append(f"{key}: neveljavna številčna vrednost")
+        elif key == "SOC[%]" and not 0 <= value <= 100:
+            problems.append(f"{key}: mora biti med 0 in 100")
+        elif key != "SOC[%]" and value <= 0:
+            problems.append(f"{key}: mora biti večje od 0")
+    if problems:
+        raise ValueError("; ".join(problems))
+    return values[keys[0]], values[keys[1]], float(values[keys[2]]) / 100

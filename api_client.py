@@ -157,22 +157,22 @@ def scrap_data_sun(lat, lng, date_start, date_end):
         print("Sun podatki shranjeni.")
 
 
-    def get_sun_forecast(lat, lng, date_start, date_end):
-        response = requests.get(
-            "https://api.open-meteo.com/v1/forecast",
-            params={
-                "latitude": lat,
-                "longitude": lng,
-                "start_date": date_start,
-                "end_date": date_end,
-                "hourly": "cloud_cover,shortwave_radiation,sunshine_duration",
-                "timezone": "Europe/Ljubljana",
-            },
-            timeout=30,
-        )
-        response.raise_for_status()
+def get_sun_forecast(lat, lng, date_start, date_end):
+    response = requests.get(
+        "https://api.open-meteo.com/v1/forecast",
+        params={
+            "latitude": lat,
+            "longitude": lng,
+            "start_date": date_start,
+            "end_date": date_end,
+            "hourly": "cloud_cover,shortwave_radiation,sunshine_duration",
+            "timezone": "Europe/Ljubljana",
+        },
+        timeout=30,
+    )
+    response.raise_for_status()
 
-        df = pd.DataFrame(response.json()["hourly"])
-        df["time"] = pd.to_datetime(df["time"])
-        df["sunshine_minutes"] = df["sunshine_duration"] / 60
-        return df
+    df = pd.DataFrame(response.json()["hourly"])
+    df["time"] = pd.to_datetime(df["time"])
+    df["sunshine_minutes"] = df["sunshine_duration"] / 60
+    return df

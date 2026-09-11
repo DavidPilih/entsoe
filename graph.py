@@ -34,7 +34,8 @@ def graph_plot(
     soc: float = None,
     initial_position: int = None,
     from_time: str = None,
-    include_next_day: bool = False
+    include_next_day: bool = False,
+    use_sun_data: bool = False,
 ):
     times_labels = [ts.strftime("%m-%d %H:%M") for ts in timestamps]
 
@@ -56,8 +57,32 @@ def graph_plot(
         for i in sell_x
     ]
 
-    fig = Figure(figsize=(16, 8))
-    ax = fig.add_subplot(111)
+    has_sun = use_sun_data and bool(orders) and all("sun_percent" in order for order in orders)
+    fig = Figure(figsize=(16, 10 if has_sun else 8))
+    if has_sun:
+        ax, sun_ax = fig.subplots(2, 1, sharex=True, height_ratios=[3, 1])
+        sun_values = [order["sun_percent"] for order in orders]
+        # Vsaka vrednost velja za celoten 15-minutni interval.
+        edges = [i - 0.5 for i in range(len(sun_values) + 1)]
+        sun_ax.stairs(sun_values, edges, color="darkorange", linewidth=1.8,
+                      label="Napoved sonca")
+        sun_ax.stairs(sun_values, edges, color="orange", alpha=0.18, fill=True)
+        sun_ax.scatter(buy_x, [sun_values[i] for i in buy_x], color="green",
+                       s=30, zorder=5, label="Polnjenje")
+        sun_ax.axhline(50, color="gray", linestyle=":", linewidth=1)
+        sun_ax.set_ylim(-3, 105)
+        sun_ax.set_yticks([0, 25, 50, 75, 100])
+        sun_ax.set_ylabel("Sonce (%)")
+        sun_ax.set_title("Ocena moči iz obsevanja: 1000 W/m² = 100 % | 50 % = 2× čas polnjenja",
+                         fontsize=10)
+        sun_ax.grid(True, alpha=0.25)
+        sun_ax.legend(loc="upper left", fontsize=8)
+        if day_boundary is not None:
+            sun_ax.axvline(day_boundary - 0.5, color="gray", linestyle="--", alpha=0.6)
+        time_ax = sun_ax
+    else:
+        ax = fig.add_subplot(111)
+        time_ax = ax
 
     input_lines = [
         "INPUT PODATKI",
@@ -176,7 +201,7 @@ def graph_plot(
             linestyle=":",
             linewidth=0.8,
             alpha=0.35,
-            label="FWH jutri"
+            label="FWH danes"
         )
 
         ax.axvline(
@@ -185,7 +210,7 @@ def graph_plot(
             linestyle=":",
             linewidth=0.8,
             alpha=0.35,
-            label="LWH jutri"
+            label="LWH danes"
         )
 
         ax.axvspan(
@@ -261,11 +286,11 @@ def graph_plot(
             label="Meja dneva"
         )
 
-    ax.set_xlabel("Čas")
+    time_ax.set_xlabel("Čas")
     ax.set_ylabel("Cena (EUR/MWh)")
 
     title = (
-        f"Day-ahead cene za {"SLOVENIJO"} — "
+        f"Day-ahead cene za SLOVENIJO — "
         f"{start.strftime('%Y-%m-%d')}"
     )
 
@@ -274,13 +299,14 @@ def graph_plot(
             f" in {end_date.strftime('%Y-%m-%d')}"
         )
 
+    title += " | Sončna napoved: " + ("vključena" if use_sun_data else "izključena")
     ax.set_title(title)
 
-    ax.set_xticks(
+    time_ax.set_xticks(
         range(0, len(times_labels), 4)
     )
 
-    ax.set_xticklabels(
+    time_ax.set_xticklabels(
         times_labels[::4],
         rotation=45,
         ha="right"
