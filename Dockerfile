@@ -1,18 +1,22 @@
-FROM python
+FROM python:3.12-slim-bookworm
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    TZ=Europe/Ljubljana
 
 WORKDIR /dockApp
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements.txt
 
-COPY algo.py .
-COPY client.py .
-COPY api_client.py .
-COPY graph.py .
+COPY client_params.py algo.py api_client.py graph.py ./
 
-COPY cache ./cache
-COPY graph_imgs ./graph_imgs
+RUN mkdir -p cache sun_data graph_imgs
 
-CMD ["python", "-u", "client.py"]
+CMD ["python", "-u", "client_params.py"]
 
-#docker run -v "C:\DockerData\entsoe\graph_imgs:/dockApp/graph_imgs" entsoe
+# docker run --env-file .env -v "C:\DockerData\entsoe\graph_imgs:/dockApp/graph_imgs" entsoe

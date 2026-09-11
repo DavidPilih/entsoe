@@ -2,7 +2,7 @@ entsoe-py
 pandas
 python-dotenv
 matplotlib
-paho-mqtt
+paho-mqtt>=2.0,<3.0
 openpyxl
 filelock
 requests
