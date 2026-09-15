@@ -8,6 +8,7 @@ from api_client import scrap_data_sun, get_sun_forecast
 import time
 from filelock import FileLock
 import os
+import math
 
 from graph import graph_plot
 
@@ -30,9 +31,15 @@ def solar_percentages(forecast, timestamps):
             / SOLAR_REFERENCE_W_M2 * 100).round().astype(int).tolist()
 
 
-def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_profit: float, buy_mask: List[bool], trade_mask: List[bool], initial_position: float = 0, force_flat_end: bool = False, sun_percent=None, *, margin: float) -> List[Dict[str, Any]]:
+def charge_fraction(sun_percent, sun_factor):
+    return min(1.0, sun_percent / 100 * sun_factor)
+
+
+def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_profit: float, buy_mask: List[bool], trade_mask: List[bool], initial_position: float = 0, force_flat_end: bool = False, sun_percent=None, *, margin: float, sun_factor: float = 1.2) -> List[Dict[str, Any]]:
     if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not 0 <= margin <= 1:
         raise ValueError("margin mora biti število med 0 in 1 (0.1 = 10 %).")
+    if isinstance(sun_factor, bool) or not isinstance(sun_factor, (int, float)) or not math.isfinite(sun_factor) or sun_factor < 0:
+        raise ValueError("sun_factor mora biti končno nenegativno število.")
     prices = [float(d["price"]) for d in data]
     T = len(prices)
     scale = ENERGY_STEPS
@@ -46,7 +53,8 @@ def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_pr
         raise ValueError("Maske in sončna napoved morajo ustrezati številu intervalov.")
     if any(not 0 <= value <= 100 for value in sun_percent):
         raise ValueError("Odstotek sonca mora biti med 0 in 100.")
-    charge_steps = [round(value * scale / 100) for value in sun_percent]
+    charge_fractions = [charge_fraction(value, sun_factor) for value in sun_percent]
+    charge_steps = [round(value * scale) for value in charge_fractions]
     neg = float("-inf")
     future = [0.0 if not force_flat_end or k == 0 else neg for k in range(K + 1)]
     decision = [bytearray(K + 1) for _ in range(T)]
@@ -87,7 +95,8 @@ def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_pr
             k -= amount
         orders.append({"time": data[t]["time"], "price": prices[t],
                        "order": ("hold", "buy", "sell")[action],
-                       "sun_percent": sun_percent[t], "energy_fraction": amount / scale})
+                       "sun_percent": sun_percent[t], "charge_fraction": charge_fractions[t],
+                       "energy_fraction": amount / scale})
     return orders
 
 
@@ -133,12 +142,14 @@ def load_price_data(filename: str, start: pd.Timestamp, end: pd.Timestamp) -> Li
     return [(row["time"], float(row["price"])) for _, row in df.iterrows()]
 
 
-def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True, use_sun_data: bool = False, *, margin: float):
+def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True, use_sun_data: bool = False, *, margin: float, sun_factor: float = 1.2):
 
     if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not 0 <= margin <= 1:
         raise ValueError("margin mora biti število med 0 in 1 (0.1 = 10 %).")
     if not isinstance(use_sun_data, bool):
         raise ValueError("use_sun_data mora biti boolean.")
+    if isinstance(sun_factor, bool) or not isinstance(sun_factor, (int, float)) or not math.isfinite(sun_factor) or sun_factor < 0:
+        raise ValueError("sun_factor mora biti končno nenegativno število.")
 
     capacity = float(capacity)
     power = float(power)
@@ -224,17 +235,18 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
         force_flat_end=True,
         sun_percent=sun_percent,
         margin=margin,
+        sun_factor=sun_factor,
     )
 
-    charging_times = [o["time"] for o in orders if o["order"] == "buy"]
-    discharging_times = [o["time"] for o in orders if o["order"] == "sell"]
+    charging_times = [{"time": o["time"], "value": o["charge_fraction"]}
+                      for o in orders if o["order"] == "buy"]
+    discharging_times = [{"time": o["time"], "value": -1}
+                         for o in orders if o["order"] == "sell"]
 
     #za mqtt
     result = {
-        "charging_intervals": charging_times,
-        "discharging_intervals": discharging_times,
-        "combined_with_tomorrow": have_tomorrow,
-        "use_sun_data": use_sun_data,
+        "charging": charging_times,
+        "discharging": discharging_times,
     }
 
     #za database
@@ -248,7 +260,7 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
             continue
 
         if order["order"] == "buy":
-            action = 1
+            action = order["charge_fraction"]
         elif order["order"] == "sell":
             action = -1
         else:

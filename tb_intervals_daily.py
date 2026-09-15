@@ -23,8 +23,7 @@ result = None
 
 
 def interval_to_timestamp(interval):
-    year = datetime.now().year
-    dt = datetime.strptime(f"{year}-{interval}", "%Y-%m-%d %H:%M")
+    dt = datetime.strptime(interval, "%Y-%m-%d %H:%M")
     dt = dt.replace(tzinfo=ZoneInfo("Europe/Ljubljana"))
     return int(dt.timestamp() * 1000)
 
@@ -38,8 +37,10 @@ def get_day_start_ts(all_ts):
 
 
 def convert_intervals(data):
-    charging_ts = {interval_to_timestamp(i) for i in data.get("charging_intervals", [])}
-    discharging_ts = {interval_to_timestamp(i) for i in data.get("discharging_intervals", [])}
+    charging_ts = {interval_to_timestamp(item["time"]): item["value"]
+                   for item in data.get("charging", [])}
+    discharging_ts = {interval_to_timestamp(item["time"]): item["value"]
+                      for item in data.get("discharging", [])}
 
     all_ts = charging_ts | discharging_ts
     if not all_ts:
@@ -52,9 +53,9 @@ def convert_intervals(data):
         slot_ts = day_start_ts + i * STEP_MS
 
         if slot_ts in charging_ts:
-            value = 1
+            value = charging_ts[slot_ts]
         elif slot_ts in discharging_ts:
-            value = -1
+            value = discharging_ts[slot_ts]
         else:
             value = 0
 

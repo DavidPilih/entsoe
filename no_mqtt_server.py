@@ -29,7 +29,7 @@ def fetch_device_names():
     conn = psycopg2.connect(**DB_CONFIG)
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT DISTINCT name FROM device WHERE name LIKE %s AND name not LIKE %s ORDER BY name", ("%Agg%", "%controllers%"))
+            cur.execute("SELECT DISTINCT name FROM device WHERE name LIKE %s AND name LIKE %s AND name NOT LIKE %s ORDER BY name", ("%02%", "%Agg%", "%controllers%"))
             return [row[0] for row in cur.fetchall()]
     finally:
         conn.close()
@@ -45,7 +45,7 @@ def fetch_today_schedule(device_id, start, end):
                 "ORDER BY timestamp",
                 (device_id, int(start.timestamp() * 1000), int(end.timestamp() * 1000)),
             )
-            return [{"ts": int(ts), "value": int(value)} for ts, value in cur.fetchall()
+            return [{"ts": int(ts), "value": float(value)} for ts, value in cur.fetchall()
                     if value is not None]
     finally:
         conn.close()
@@ -73,7 +73,8 @@ def update_device(name, device_id, writer_thread):
 
 
 def refresh_all_devices(writer_thread, stopping):
-    for name in fetch_device_names():
+    device_names = fetch_device_names()
+    for name in device_names:
         if stopping.is_set():
             break
         try:

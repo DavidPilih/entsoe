@@ -79,7 +79,6 @@ def to_data_points(data):
     return [{"ts": convert_timestamp(item["timestamp"]), "values": {"schedule_auto": item["value"]}} for item in data]
 
 def process_request(payload):
-    """Izračuna in odda zapis v vrsto; izjeme obravnava klicatelj."""
     if not isinstance(payload, dict):
         raise ValueError("Zahtevek mora biti slovar.")
     unique_id = payload.get("unique_id")
@@ -89,7 +88,7 @@ def process_request(payload):
     if missing:
         raise ValueError(f"Manjkajoči podatki: {', '.join(missing)}.")
 
-    # Zaokroževanje v UTC pravilno obravnava tudi prehode ure.
+
     now = pd.Timestamp.now(tz="UTC").ceil("15min").tz_convert("Europe/Ljubljana")
     def_date = now.strftime("%Y-%m-%d")
     def_time = now.strftime("%H:%M")
@@ -103,22 +102,16 @@ def process_request(payload):
     from_time = payload.get("start_time", def_time)
     soc = payload.get("soc", 0)
     next_day = payload.get("next_day", False)
-    use_sun_data = payload.get("use_sun_data", False)
-
-    if not isinstance(use_sun_data, bool):
-        raise ValueError("use_sun_data mora biti JSON boolean (true ali false).")
+    use_sun_data = payload.get("use_sun_data", True)
+    sun_factor = payload.get("sun_factor", 1.2)
     power_factor = payload.get("power_factor", 1)
     margin = payload.get("margin", 0.1)
-    if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not 0 <= margin <= 1:
-        raise ValueError("margin mora biti število med 0 in 1 (0.1 = 10 %).")
-
     power *= power_factor
 
     print(f"Začenjam zahtevek: {unique_id}")
 
-    _, database_data = main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day, use_sun_data=use_sun_data, margin=margin)
+    _, database_data = main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day, use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor)
 
-    # Rezultat za neposrednega klicatelja; zapisovanje uporablja dosedanjo vrsto.
     result = {
         "success": True,
         "unique_id": unique_id,

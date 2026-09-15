@@ -2,6 +2,59 @@
 var FUTURE_DATA_OPACITY = 0.55;
 var FULL_BATTERY_INTERVALS = 8;
 var SOC_INTERVAL_MS = 15 * 60 * 1000;
+var MIN_ZOOM_MS = 15 * 60 * 1000;
+var MAX_ZOOM_MS = 7 * 24 * 60 * 60 * 1000;
+
+// Koledarski dan v lokalnem časovnem pasu, kot pri ostalih časovnih oznakah.
+function selectedDayBounds(ctx) {
+    var reference = ctx.timeWindow && ctx.timeWindow.minTime;
+    if (reference == null || !isFinite(Number(reference))) {
+        reference = Infinity;
+        (ctx.data || []).forEach(function (entry) {
+            validTelemetryPoints(entry.data).forEach(function (p) { reference = Math.min(reference, p[0]); });
+        });
+        if (!isFinite(reference)) reference = Date.now();
+    }
+    var start = new Date(Number(reference));
+    start.setHours(0, 0, 0, 0);
+    var end = new Date(start.getTime());
+    end.setDate(end.getDate() + 1);
+    return { min: start.getTime(), max: end.getTime() };
+}
+
+function fullDayTicks(min, max, width) {
+    var maxLabels = Math.max(2, Math.floor(width / 65) + 1);
+    var steps = [1, 2, 3, 4, 6, 8, 12, 24];
+    var hours = steps.find(function (step) { return 24 / step + 1 <= maxLabels; }) || 24;
+    var ticks = [{ value: min }];
+    for (var hour = hours; hour < 24; hour += hours) {
+        var date = new Date(min);
+        date.setHours(hour, 0, 0, 0);
+        var time = date.getTime();
+        if (time > ticks[ticks.length - 1].value && time < max) ticks.push({ value: time });
+    }
+    ticks.push({ value: max });
+    return ticks;
+}
+
+function zoomTicks(min, max, width) {
+    var labelWidth = max - min > 24 * 60 * 60 * 1000 ? 100 : 65;
+    var maxLabels = Math.max(2, Math.floor(width / labelWidth) + 1);
+    var steps = [15, 30, 60, 120, 180, 240, 360, 480, 720, 1440, 2880, 4320];
+    var step = steps[steps.length - 1] * 60000;
+    for (var i = 0; i < steps.length; i++) {
+        if ((max - min) / (steps[i] * 60000) <= maxLabels - 1) {
+            step = steps[i] * 60000;
+            break;
+        }
+    }
+    var ticks = [{ value: min }];
+    for (var t = Math.ceil(min / step) * step; t < max; t += step) {
+        if (t > min) ticks.push({ value: t });
+    }
+    ticks.push({ value: max });
+    return ticks;
+}
 
 function canonicalSchedule(items) {
     var sorted = items.map(function (iv) {
@@ -61,30 +114,36 @@ function mergeSocMeasurements(history, live, min, max) {
 }
 
 // Čista računska funkcija: urnik in sonce veljata do naslednje spremembe.
-function calculateSocForecast(soc, sun, schedule, end, now) {
+function calculateSocForecast(soc, sun, schedule, end, now, scheduleValues) {
     var measured = validTelemetryPoints(soc).filter(function (p) { return p[0] <= now; });
     if (!measured.length || !(FULL_BATTERY_INTERVALS > 0)) return [];
     var last = measured[measured.length - 1];
     var time = last[0], value = Math.max(0, Math.min(100, last[1]));
     if (!(end > time)) return [];
-    var solar = validTelemetryPoints(sun);
+    // Manjkajoče ali neveljavno sonce ne sme prekiniti celotne SOC črte.
+    // Uporabimo zadnji veljavni odstotek; pred prvim podatkom predpostavimo 0 %.
+    var solar = validTelemetryPoints(sun).filter(function (p) { return p[1] >= 0 && p[1] <= 100; });
+    var power = validTelemetryPoints(scheduleValues);
     var boundaries = [time, end];
     for (var t = (Math.floor(time / SOC_INTERVAL_MS) + 1) * SOC_INTERVAL_MS; t < end; t += SOC_INTERVAL_MS) boundaries.push(t);
     solar.forEach(function (p) { if (p[0] > time && p[0] < end) boundaries.push(p[0]); });
+    power.forEach(function (p) { if (p[0] > time && p[0] < end) boundaries.push(p[0]); });
     schedule.forEach(function (iv) {
         [iv.xMin, iv.xMax].forEach(function (ts) { if (ts > time && ts < end) boundaries.push(ts); });
     });
     boundaries.sort(function (a, b) { return a - b; });
-    var points = [{ x: time, y: value }], sunIndex = -1;
+    var points = [{ x: time, y: value }], sunIndex = -1, powerIndex = -1;
     for (var i = 1; i < boundaries.length; i++) {
         var next = boundaries[i];
         if (next <= time) continue;
         while (sunIndex + 1 < solar.length && solar[sunIndex + 1][0] <= time) sunIndex++;
+        while (powerIndex + 1 < power.length && power[powerIndex + 1][0] <= time) powerIndex++;
         var active = schedule.find(function (iv) { return iv.xMin <= time && time < iv.xMax; });
         var rate = 0;
         if (active && active.type === 'polnjenje') {
-            if (sunIndex < 0 || solar[sunIndex][1] < 0 || solar[sunIndex][1] > 100) break;
-            rate = (100 / FULL_BATTERY_INTERVALS) * solar[sunIndex][1] / 100;
+            var sunPercent = sunIndex >= 0 ? solar[sunIndex][1] : 0;
+            var chargePower = powerIndex >= 0 ? power[powerIndex][1] : sunPercent / 100;
+            rate = (100 / FULL_BATTERY_INTERVALS) * Math.max(0, Math.min(1, chargePower));
         } else if (active && active.type === 'praznjenje') rate = -100 / FULL_BATTERY_INTERVALS;
         var delta = rate * (next - time) / SOC_INTERVAL_MS;
         var raw = value + delta;
@@ -157,17 +216,22 @@ self.onInit = function () {
     var ctx = self.ctx;
     var container = ctx.$container[0];
     container.innerHTML =
-        '<div style="display:flex; flex-direction:column; height:100%; gap:6px;">' +
-        '  <div style="display:flex; align-items:center;">' +
+        '<div style="display:flex; flex-direction:column; width:100%; min-width:0; max-width:100%; height:100%; gap:6px;">' +
+        '  <div style="display:flex; flex-wrap:wrap; min-width:0; align-items:center;">' +
         '    <button id="saveSchedule" type="button" style="display:none; background:#1976d2; color:white; border:0; border-radius:4px; padding:6px 14px; cursor:pointer;">Shrani</button>' +
         '    <span id="saveScheduleStatus" role="status" style="font-size:12px; margin-left:8px;"></span>' +
+        '    <span style="display:flex; gap:4px; margin-left:8px;">' +
+        '      <button id="zoomOut" type="button" title="Oddalji" aria-label="Oddalji">−</button>' +
+        '      <button id="zoomIn" type="button" title="Približaj" aria-label="Približaj">+</button>' +
+        '      <button id="zoomReset" type="button" title="Pokaži cel dan">Cel dan</button>' +
+        '    </span>' +
         '    <span id="rangeLabel" style="font-size:12px; color:#555; margin-left:auto;"></span>' +
         '  </div>' +
-        '  <div id="chartWrap" style="position:relative; flex:1; min-height:0;">' +
-        '    <canvas id="myChart" style="width:100%; height:100%;"></canvas>' +
+        '  <div id="chartWrap" style="position:relative; flex:1; min-height:0; min-width:0; width:100%;">' +
+        '    <canvas id="myChart" style="display:block; max-width:100%; width:100%; height:100%; cursor:grab;"></canvas>' +
         '  </div>' +
-        '  <div id="trackWrap" style="position:relative; height:96px; flex-shrink:0;">' +
-        '    <canvas id="scheduleTrack" style="width:100%; height:100%; touch-action:none;"></canvas>' +
+        '  <div id="trackWrap" style="position:relative; height:96px; flex-shrink:0; min-width:0; width:100%;">' +
+        '    <canvas id="scheduleTrack" style="display:block; max-width:100%; width:100%; height:100%; touch-action:none;"></canvas>' +
         '    <div id="dragTooltip" style="position:absolute; display:none; pointer-events:none; background:rgba(0,0,0,0.75); color:white; padding:4px 8px; border-radius:4px; font-size:12px; white-space:nowrap; z-index:10;"></div>' +
         '  </div>' +
         '</div>';
@@ -180,6 +244,18 @@ self.onInit = function () {
     var trackCtx       = trackCanvas.getContext('2d');
     var saveButton = container.querySelector('#saveSchedule');
     var saveStatus = container.querySelector('#saveScheduleStatus');
+    var zoomOutButton = container.querySelector('#zoomOut');
+    var zoomInButton = container.querySelector('#zoomIn');
+    var zoomResetButton = container.querySelector('#zoomReset');
+    var zoomRange = null;
+    var panState = null;
+    var baseDay = selectedDayBounds(ctx);
+    var loadedWindow = {
+        min: Number(ctx.timeWindow && ctx.timeWindow.minTime),
+        max: Number(ctx.timeWindow && ctx.timeWindow.maxTime)
+    };
+    var requestedWindows = [];
+    var zoomRequestTimer = null;
 
     var hoverTime = null;
 
@@ -229,6 +305,34 @@ self.onInit = function () {
         type: 'line',
         data: { datasets: [] },
         plugins: [{
+            id: 'fullDayRange',
+            beforeUpdate: function (activeChart) {
+                var currentMin = Number(ctx.timeWindow && ctx.timeWindow.minTime);
+                var currentMax = Number(ctx.timeWindow && ctx.timeWindow.maxTime);
+                if (isFinite(currentMin) && isFinite(currentMax) &&
+                    (currentMin !== loadedWindow.min || currentMax !== loadedWindow.max)) {
+                    var requestIndex = requestedWindows.findIndex(function (request) {
+                        return Math.abs(currentMin - request.min) < 60000 &&
+                            Math.abs(currentMax - request.max) < 60000;
+                    });
+                    if (requestIndex < 0) {
+                        var sameDay = selectedDayBounds(ctx).min === baseDay.min;
+                        var sameDuration = Math.abs((currentMax - currentMin) -
+                            (loadedWindow.max - loadedWindow.min)) < 60000;
+                        if (!sameDay || !sameDuration) {
+                            baseDay = selectedDayBounds(ctx);
+                            zoomRange = null;
+                        }
+                        requestedWindows = [];
+                    } else {
+                        requestedWindows.splice(0, requestIndex + 1);
+                    }
+                    loadedWindow = { min: currentMin, max: currentMax };
+                }
+                activeChart.options.scales.x.min = zoomRange ? zoomRange.min : baseDay.min;
+                activeChart.options.scales.x.max = zoomRange ? zoomRange.max : baseDay.max;
+            }
+        }, {
             id: 'futureDataOpacity',
             beforeDatasetsDraw: function (activeChart) {
                 // Ista časovna meja za vse podatkovne serije v tem izrisu.
@@ -287,22 +391,25 @@ self.onInit = function () {
                 x: {
                     type: 'time',
                     time: { unit: 'minute', displayFormats: { minute: 'HH:mm' } },
-                    ticks: { maxRotation: 0 },
-                    afterBuildTicks: function (axis) {
-                        var rangeMs = axis.max - axis.min;
-                        var pxWidth = axis.width || (axis.chart && axis.chart.width) || 600;
-                        var minPxPerTick = 70;
-                        var maxTicks = Math.max(2, Math.floor(pxWidth / minPxPerTick));
-                        var niceStepsMin = [15, 30, 45, 60, 90, 120, 180, 240, 360, 480, 720, 1440];
-                        var stepMin = niceStepsMin[niceStepsMin.length - 1];
-                        for (var i = 0; i < niceStepsMin.length; i++) {
-                            if (rangeMs / (niceStepsMin[i] * 60000) <= maxTicks) { stepMin = niceStepsMin[i]; break; }
+                    ticks: {
+                        maxRotation: 0, autoSkip: false,
+                        callback: function (value) {
+                            if (Number(value) === this.max && this.min === baseDay.min &&
+                                this.max === baseDay.max) return '24:00';
+                            var date = new Date(Number(value));
+                            var hour = String(date.getHours()).padStart(2, '0') + ':' +
+                                String(date.getMinutes()).padStart(2, '0');
+                            return this.max - this.min > 24 * 60 * 60 * 1000
+                                ? String(date.getDate()).padStart(2, '0') + '.' +
+                                  String(date.getMonth() + 1).padStart(2, '0') + ' ' + hour
+                                : hour;
                         }
-                        var STEP = stepMin * 60 * 1000;
-                        var start = Math.ceil(axis.min / STEP) * STEP;
-                        var ticks = [];
-                        for (var t = start; t <= axis.max; t += STEP) ticks.push({ value: t });
-                        axis.ticks = ticks;
+                    },
+                    afterBuildTicks: function (axis) {
+                        var width = axis.width || (axis.chart && axis.chart.width) || 600;
+                        axis.ticks = axis.min === baseDay.min && axis.max === baseDay.max
+                            ? fullDayTicks(axis.min, axis.max, width)
+                            : zoomTicks(axis.min, axis.max, width);
                     }
                 },
                 y: {
@@ -346,6 +453,135 @@ self.onInit = function () {
     });
 
     var chart = self.ctx.myChart;
+    function updateZoomButtons() {
+        var span = chart.scales.x.max - chart.scales.x.min;
+        zoomInButton.disabled = span <= MIN_ZOOM_MS + 1;
+        zoomOutButton.disabled = span >= MAX_ZOOM_MS - 1;
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var tomorrow = new Date(today.getTime());
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        zoomResetButton.disabled = Math.abs(chart.scales.x.min - today.getTime()) < 1 &&
+            Math.abs(chart.scales.x.max - tomorrow.getTime()) < 1;
+    }
+    function requestVisibleData() {
+        if (zoomRequestTimer) clearTimeout(zoomRequestTimer);
+        zoomRequestTimer = setTimeout(function () {
+            zoomRequestTimer = null;
+            if (!zoomRange || !ctx.timewindowFunctions ||
+                !ctx.timewindowFunctions.onUpdateTimewindow) return;
+            var min = Number(ctx.timeWindow && ctx.timeWindow.minTime);
+            var max = Number(ctx.timeWindow && ctx.timeWindow.maxTime);
+            if (!isFinite(min) || !isFinite(max) || zoomRange.min < min || zoomRange.max > max) {
+                requestedWindows.push({ min: zoomRange.min, max: zoomRange.max });
+                ctx.timewindowFunctions.onUpdateTimewindow(zoomRange.min, zoomRange.max);
+            }
+        }, 200);
+    }
+    function applyZoom(anchor, factor) {
+        var axis = chart.scales.x;
+        var span = axis.max - axis.min;
+        var nextSpan = Math.max(MIN_ZOOM_MS, Math.min(MAX_ZOOM_MS, span * factor));
+        if (Math.abs(nextSpan - span) < 1) return;
+        var fraction = Math.max(0, Math.min(1, (anchor - axis.min) / span));
+        var nextMin = anchor - fraction * nextSpan;
+        zoomRange = { min: nextMin, max: nextMin + nextSpan };
+        chart.update('none');
+        updateZoomButtons();
+        requestVisibleData();
+        if (ctx._renderTrack) ctx._renderTrack();
+    }
+    function zoomAtPointer(event) {
+        var area = chart.chartArea;
+        var rect = event.currentTarget.getBoundingClientRect();
+        if (!area || !rect.width || !rect.height || area.right <= area.left) return;
+        var x = (event.clientX - rect.left) * chart.width / rect.width;
+        if (x < area.left || x > area.right) return;
+        event.preventDefault();
+        applyZoom(chart.scales.x.getValueForPixel(x), event.deltaY < 0 ? 0.8 : 1.25);
+    }
+    function startPan(event) {
+        if (event.button !== 0 || panState) return;
+        var area = chart.chartArea;
+        var rect = canvasElement.getBoundingClientRect();
+        if (!area || !rect.width || !rect.height || area.right <= area.left) return;
+        var x = (event.clientX - rect.left) * chart.width / rect.width;
+        var y = (event.clientY - rect.top) * chart.height / rect.height;
+        if (x < area.left || x > area.right || y < area.top || y > area.bottom) return;
+        panState = {
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            min: chart.scales.x.min,
+            max: chart.scales.x.max,
+            plotWidth: (area.right - area.left) * rect.width / chart.width,
+            moved: false
+        };
+        hoverTime = null;
+        canvasElement.style.cursor = 'grabbing';
+        canvasElement.setPointerCapture(event.pointerId);
+    }
+    function movePan(event) {
+        if (!panState || event.pointerId !== panState.pointerId) return;
+        if (Math.abs(event.clientX - panState.startX) < 3 && !panState.moved) return;
+        panState.moved = true;
+        var offset = (event.clientX - panState.startX) /
+            panState.plotWidth * (panState.max - panState.min);
+        zoomRange = { min: panState.min - offset, max: panState.max - offset };
+        chart.update('none');
+        updateZoomButtons();
+        if (ctx._renderTrack) ctx._renderTrack(true);
+        event.preventDefault();
+    }
+    function endPan(event) {
+        if (!panState || event.pointerId !== panState.pointerId) return;
+        var moved = panState.moved;
+        panState = null;
+        canvasElement.style.cursor = 'grab';
+        if (canvasElement.hasPointerCapture(event.pointerId)) {
+            canvasElement.releasePointerCapture(event.pointerId);
+        }
+        if (moved) {
+            requestVisibleData();
+            if (ctx._renderTrack) ctx._renderTrack();
+        }
+    }
+    canvasElement.addEventListener('wheel', zoomAtPointer, { passive: false });
+    trackCanvas.addEventListener('wheel', zoomAtPointer, { passive: false });
+    canvasElement.addEventListener('pointerdown', startPan);
+    canvasElement.addEventListener('pointermove', movePan);
+    canvasElement.addEventListener('pointerup', endPan);
+    canvasElement.addEventListener('pointercancel', endPan);
+    zoomInButton.addEventListener('click', function () {
+        applyZoom((chart.scales.x.min + chart.scales.x.max) / 2, 0.5);
+    });
+    zoomOutButton.addEventListener('click', function () {
+        applyZoom((chart.scales.x.min + chart.scales.x.max) / 2, 2);
+    });
+    zoomResetButton.addEventListener('click', function () {
+        if (zoomRequestTimer) clearTimeout(zoomRequestTimer);
+        zoomRequestTimer = null;
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var tomorrow = new Date(today.getTime());
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        baseDay = { min: today.getTime(), max: tomorrow.getTime() };
+        zoomRange = { min: baseDay.min, max: baseDay.max };
+        chart.update('none');
+        updateZoomButtons();
+        requestVisibleData();
+        if (ctx._renderTrack) ctx._renderTrack();
+    });
+    ctx._removeZoomListeners = function () {
+        if (zoomRequestTimer) clearTimeout(zoomRequestTimer);
+        canvasElement.removeEventListener('wheel', zoomAtPointer);
+        trackCanvas.removeEventListener('wheel', zoomAtPointer);
+        canvasElement.removeEventListener('pointerdown', startPan);
+        canvasElement.removeEventListener('pointermove', movePan);
+        canvasElement.removeEventListener('pointerup', endPan);
+        canvasElement.removeEventListener('pointercancel', endPan);
+    };
+    ctx._updateZoomButtons = updateZoomButtons;
+    updateZoomButtons();
     var liveSoc = [];
     var liveSubscription = null;
     var liveRequest = null;
@@ -400,18 +636,14 @@ self.onInit = function () {
         var data = ctx.data || [];
         var soc = data.find(function (d) { return telemetryMatches(d.dataKey, ['soc[%]', 'soc']); });
         var sun = data.find(function (d) { return telemetryMatches(d.dataKey, ['sun_data', 'sun_percent']); });
-        var end = ctx.timeWindow && Number(ctx.timeWindow.maxTime);
-        if (end == null || !isFinite(end)) {
-            end = -Infinity;
-            data.forEach(function (d) {
-                validTelemetryPoints(d.data).forEach(function (p) { end = Math.max(end, p[0]); });
-            });
-        }
+        var autoSchedule = data.find(function (d) { return telemetryMatches(d.dataKey, ['schedule_auto']); });
+        var end = chart.scales.x.max;
         var now = Date.now();
-        var min = ctx.timeWindow && ctx.timeWindow.minTime;
+        var min = chart.scales.x.min;
         var measurements = mergeSocMeasurements(soc && soc.data, liveSoc,
             min == null ? -Infinity : Number(min), Math.min(now, end));
-        var points = calculateSocForecast(measurements, sun && sun.data, intervals, end, now);
+        var points = calculateSocForecast(measurements, sun && sun.data, intervals, end, now,
+            ctx._scheduleEdited || ctx._scheduleLocalOverride ? [] : autoSchedule && autoSchedule.data);
         var socSeries = chart.data.datasets.find(function (d) { return d._socSeries; });
         if (socSeries) {
             // Vedno izhajamo iz meritev, da se napoved pri ponovnem izrisu ne podvaja.
@@ -421,6 +653,7 @@ self.onInit = function () {
             // Prva napovedana točka je zadnja meritev, zato je ne dodamo dvakrat.
             socSeries.data = measured.concat(points.slice(1));
             socSeries.stepped = false;
+            socSeries.tension = 0;
             socSeries.borderDash = [];
             socSeries.yAxisID = 'yPercent';
         }
@@ -712,7 +945,7 @@ self.onInit = function () {
             var ts = scheduleData[i][0];
             var val = Number(scheduleData[i][1]);
             var type = null;
-            if (val === 1) type = 'polnjenje';
+            if (val > 0) type = 'polnjenje';
             else if (val === -1) type = 'praznjenje';
 
             if (type !== currentType) {
@@ -935,6 +1168,7 @@ self.onInit = function () {
 
     // Skupna oznaka časa pod miško na grafu in urniku.
     function moveHoverLine(e) {
+        if (panState && e.currentTarget === canvasElement) return;
         var rect = e.currentTarget.getBoundingClientRect();
         var area = chart.chartArea;
         if (!area || !chart.scales.x || !rect.width) return;
@@ -988,11 +1222,13 @@ self.onDataUpdated = function () {
     var datasets = [];
     for (var i = 0; i < (ctx.data || []).length; i++) {
         var dataKey = ctx.data[i].dataKey;
+        var isSoc = telemetryMatches(dataKey, ['soc[%]', 'soc']);
+        var isStepped = telemetryMatches(dataKey, ['price', 'bsp cena', 'sun_data']);
         // Urnik prikazujemo samo v spodnjem traku.
         if (telemetryMatches(dataKey, ['schedule_auto'])) continue;
         var values = ctx.data[i].data || [];
         datasets.push({
-            _socSeries: telemetryMatches(dataKey, ['soc[%]', 'soc']),
+            _socSeries: isSoc,
             label: dataKey ? dataKey.label : ('ds' + i),
             yAxisID: isPercentDataKey(dataKey) ? 'yPercent' : 'y',
             data: values.map(function (point) { return { x: Number(point[0]), y: point[1] }; })
@@ -1001,7 +1237,7 @@ self.onDataUpdated = function () {
             backgroundColor: dataKey ? dataKey.color : '#999',
             fill: false,
             tension: 0,
-            stepped: 'before',
+            stepped: isStepped ? 'before' : false,
             pointRadius: 0,
             pointHoverRadius: 4,
             pointHoverBackgroundColor: dataKey ? dataKey.color : '#999',
@@ -1011,6 +1247,7 @@ self.onDataUpdated = function () {
     }
     chart.data.datasets = datasets;
     chart.update();
+    if (ctx._updateZoomButtons) ctx._updateZoomButtons();
 
     if (self.ctx._renderTrack) self.ctx._renderTrack();
 
@@ -1037,6 +1274,7 @@ self.onResize = function () {
 };
 
 self.onDestroy = function () {
+    if (self.ctx._removeZoomListeners) self.ctx._removeZoomListeners();
     if (self.ctx._destroyScheduleSave) self.ctx._destroyScheduleSave();
     if (self.ctx._destroyLiveSoc) self.ctx._destroyLiveSoc();
     if (self.ctx._removeHoverListeners) self.ctx._removeHoverListeners();
@@ -1044,6 +1282,3 @@ self.onDestroy = function () {
     if (self.ctx.myChart) self.ctx.myChart.destroy();
     if (self.ctx._trackResizeObserver) self.ctx._trackResizeObserver.disconnect();
 };
-
-
-

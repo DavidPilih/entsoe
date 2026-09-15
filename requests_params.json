@@ -1,15 +1,14 @@
 {
-    "unique_id": "params-test-001",
+    "unique_id": "params",
     "capacity": 10,
     "power": 5,
     "minimum_profit": 0.8,
-    "date": "2026-09-10",
     "start_time": "00:00",
     "soc": 0.5,
     "next_day": false,
     "latitude": 46.0569,
     "longitude": 14.5058,
     "power_factor": 1,
-    "use_sun_data": false,
+    "use_sun_data": true,
     "margin": 0.1
 }

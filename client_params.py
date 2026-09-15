@@ -17,7 +17,7 @@ def process_request(payload):
     unique_id = payload.get("unique_id")
     try:
         if "help" in payload:
-            sendData({"success": True, "unique_id": unique_id, "help": {"required": ["unique_id", "capacity", "power"], "optional": ["minimum_profit", "date", "latitude", "longitude", "start_time", "soc", "next_day", "power_factor", "use_sun_data", "margin"], "defaults": {"use_sun_data": False, "margin": 0.1}}})
+            sendData({"success": True, "unique_id": unique_id, "help": {"required": ["unique_id", "capacity", "power"], "optional": ["minimum_profit", "date", "latitude", "longitude", "start_time", "soc", "next_day", "power_factor", "use_sun_data", "sun_factor", "margin"], "defaults": {"use_sun_data": False, "sun_factor": 1.2, "margin": 0.1}}})
             return
 
         required = ["capacity", "power", "unique_id"]
@@ -47,6 +47,7 @@ def process_request(payload):
         soc = payload.get("soc", 0)
         next_day = payload.get("next_day", False)
         use_sun_data = payload.get("use_sun_data", False)
+        sun_factor = payload.get("sun_factor", 100)
 
         if not isinstance(use_sun_data, bool):
             raise ValueError("use_sun_data mora biti JSON boolean (true ali false).")
@@ -59,7 +60,7 @@ def process_request(payload):
 
         print(f"Začenjam zahtevek: {unique_id}")
 
-        result, _ = main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day, use_sun_data=use_sun_data, margin=margin)
+        result, _ = main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day, use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor)
 
         if not isinstance(result, dict):
             result = {"result": result}

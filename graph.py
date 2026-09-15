@@ -6,6 +6,52 @@ matplotlib.use("Agg")
 from matplotlib.figure import Figure
 import tempfile
 import os
+import math
+
+
+def forecast_soc(timestamps, orders, soc, intervals_needed, forecast_start, use_sun_data=False):
+    """SOC (%) na mejah prihodnjih intervalov; vhodni soc je delež 0–1."""
+    soc = float(soc)
+    intervals_needed = float(intervals_needed)
+    if not math.isfinite(soc) or not 0 <= soc <= 1:
+        raise ValueError("soc mora biti delež med 0 in 1.")
+    if not math.isfinite(intervals_needed) or intervals_needed <= 0:
+        raise ValueError("intervals_needed mora biti večji od 0.")
+    if len(timestamps) != len(orders):
+        raise ValueError("Urnik in časovne oznake morajo imeti enako dolžino.")
+    value = soc * 100
+    step = 100 / intervals_needed
+    xs, ys = [], []
+    for i, (timestamp, order) in enumerate(zip(timestamps, orders)):
+        interval_start = pd.Timestamp(timestamp)
+        interval_end = interval_start + pd.Timedelta(minutes=15)
+        if interval_end <= forecast_start:
+            continue
+        begin = max(interval_start, forecast_start)
+        fraction = float((interval_end - begin) / pd.Timedelta(minutes=15))
+        x = i + 1 - fraction
+        if not xs:
+            xs.append(x)
+            ys.append(value)
+        rate = 0
+        if order["order"] == "buy":
+            sun = float(order.get("sun_percent", 100)) if use_sun_data else 100
+            if not math.isfinite(sun) or not 0 <= sun <= 100:
+                raise ValueError("sun_percent mora biti med 0 in 100.")
+            rate = step * float(order.get("charge_fraction", sun / 100))
+        elif order["order"] == "sell":
+            rate = -step
+        raw = value + rate * fraction
+        if rate and (raw > 100 or raw < 0):
+            limit = 100 if raw > 100 else 0
+            hit = x + (limit - value) / rate
+            if x < hit < i + 1:
+                xs.append(hit)
+                ys.append(limit)
+        value = min(100, max(0, raw))
+        xs.append(i + 1)
+        ys.append(value)
+    return xs, ys
 
 
 def wh_to_hm(interval):
@@ -73,8 +119,7 @@ def graph_plot(
         sun_ax.set_ylim(-3, 105)
         sun_ax.set_yticks([0, 25, 50, 75, 100])
         sun_ax.set_ylabel("Sonce (%)")
-        sun_ax.set_title("Ocena moči iz obsevanja: 1000 W/m² = 100 % | 50 % = 2× čas polnjenja",
-                         fontsize=10)
+        sun_ax.set_title("Sonce linearrn?", fontsize=10)
         sun_ax.grid(True, alpha=0.25)
         sun_ax.legend(loc="upper left", fontsize=8)
         if day_boundary is not None:
@@ -167,6 +212,31 @@ def graph_plot(
         s=50,
         label="Prodaja (praznjenje)"
     )
+
+    # Začetni SOC velja ob from_time; zgodovinskega SOC ne rišemo.
+    if soc is not None and intervals_needed is not None and len(timestamps):
+        forecast_start = pd.Timestamp(start).normalize()
+        if from_time:
+            hour, minute = map(int, from_time.split(":"))
+            forecast_start = forecast_start.replace(hour=hour, minute=minute)
+        timestamp_tz = pd.Timestamp(timestamps[0]).tz
+        if timestamp_tz is None:
+            forecast_start = forecast_start.tz_localize(None)
+        elif forecast_start.tz is None:
+            forecast_start = forecast_start.tz_localize(timestamp_tz)
+        else:
+            forecast_start = forecast_start.tz_convert(timestamp_tz)
+        soc_x, soc_y = forecast_soc(
+            timestamps, orders, soc, intervals_needed, forecast_start, use_sun_data
+        )
+        if soc_x:
+            soc_ax = ax.twinx()
+            soc_ax.plot(soc_x, soc_y, color="#e5ac00", linewidth=2, label="SOC napoved")
+            soc_ax.set_ylim(0, 100)
+            soc_ax.set_yticks([0, 20, 40, 60, 80, 100])
+            soc_ax.set_ylabel("SOC (%)")
+            soc_ax.grid(False)
+            soc_ax.legend(loc="upper right", fontsize=8)
 
     if fwh is not None and lwh is not None:
 

@@ -59,7 +59,7 @@ next_day
     true: poskusi vključiti še naslednji dan.
     false: izračun samo za izbrani dan. Privzeto: false.
     Če jutrišnjih cen ni, se lahko izračun izvede samo za izbrani dan.
-    Dejanski rezultat preveri v combined_with_tomorrow.
+    Če jutrišnjih cen ni, odgovor vsebuje le intervale izbranega dneva.
 
 latitude
     Geografska širina v decimalnih stopinjah (°). Privzeto: 46.0569°.
@@ -83,6 +83,11 @@ use_sun_data
     dva intervala namesto enega. Če zahtevana napoved ni dostopna,
     lahko storitev vrne napako.
 
+sun_factor
+    Nenegativen končen množilnik sončne napovedi. Privzeto: 1.2.
+    Vrednost polnjenja je min(1, sun_percent / 100 × sun_factor).
+    Brez sončne napovedi je sun_percent = 100.
+
 Števila pošiljaj brez narekovajev. Logične vrednosti pošiljaj kot true ali
 false, brez narekovajev. Datume, ure in unique_id pošiljaj kot nize.
 Enote so navedene samo v navodilih: v JSON pošlji npr. "power": 5,
@@ -105,7 +110,8 @@ Datum zamenjaj z želenim dnevom, za katerega so podatki dostopni.
     "latitude": 46.0569,
     "longitude": 14.5058,
     "power_factor": 1,
-    "use_sun_data": true
+    "use_sun_data": true,
+    "sun_factor": 1.2
 }
 
 
@@ -114,23 +120,19 @@ Datum zamenjaj z želenim dnevom, za katerega so podatki dostopni.
 Primer oblike odgovora; navedeni intervali so samo ilustracija:
 
 {
-    "charging_intervals": [
-        "2026-09-10 12:00",
-        "2026-09-10 12:15"
+    "charging": [
+        {"time": "2026-09-10 12:00", "value": 0.6},
+        {"time": "2026-09-10 12:15", "value": 1}
     ],
-    "discharging_intervals": [
-        "2026-09-10 18:00"
+    "discharging": [
+        {"time": "2026-09-10 18:00", "value": -1}
     ],
-    "combined_with_tomorrow": false,
-    "use_sun_data": true,
     "success": true,
     "unique_id": "moja-naprava-zahtevek-002"
 }
 
-charging_intervals       - Seznam začetkov intervalov polnjenja.
-discharging_intervals    - Seznam začetkov intervalov praznjenja.
-combined_with_tomorrow   - Ali je naslednji dan dejansko vključen.
-use_sun_data             - Ali je bila sončna napoved upoštevana.
+charging                - Seznam intervalov polnjenja z relativno močjo od 0 do 1.
+discharging             - Seznam intervalov praznjenja z vrednostjo -1.
 success                 - true pomeni uspešno izveden izračun.
 unique_id               - Isti identifikator kot v zahtevku.
 
