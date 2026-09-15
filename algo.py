@@ -139,6 +139,10 @@ def load_price_data(filename: str, start: pd.Timestamp, end: pd.Timestamp) -> Li
         df = pd.read_excel(filename)
         df["time"] = pd.to_datetime(df["time"])
 
+    start_local = start.tz_localize(None)
+    end_local = end.tz_localize(None)
+    df = df[(df["time"] >= start_local) & (df["time"] < end_local)]
+
     return [(row["time"], float(row["price"])) for _, row in df.iterrows()]
 
 
