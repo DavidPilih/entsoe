@@ -7,7 +7,7 @@ from matplotlib.figure import Figure
 import tempfile
 import os
 import math
-
+import matplotlib.pyplot as plt
 
 def forecast_soc(timestamps, orders, soc, intervals_needed, forecast_start, use_sun_data=False):
     """SOC (%) na mejah prihodnjih intervalov; vhodni soc je delež 0–1."""
@@ -38,9 +38,9 @@ def forecast_soc(timestamps, orders, soc, intervals_needed, forecast_start, use_
             sun = float(order.get("sun_percent", 100)) if use_sun_data else 100
             if not math.isfinite(sun) or not 0 <= sun <= 100:
                 raise ValueError("sun_percent mora biti med 0 in 100.")
-            rate = step * float(order.get("charge_fraction", sun / 100))
+            rate = step * float(order.get("energy_fraction", order.get("charge_fraction", sun / 100)))
         elif order["order"] == "sell":
-            rate = -step
+            rate = -step * float(order.get("energy_fraction", 1))
         raw = value + rate * fraction
         if rate and (raw > 100 or raw < 0):
             limit = 100 if raw > 100 else 0
@@ -115,6 +115,8 @@ def graph_plot(
         sun_ax.stairs(sun_values, edges, color="orange", alpha=0.18, fill=True)
         sun_ax.scatter(buy_x, [sun_values[i] for i in buy_x], color="green",
                        s=30, zorder=5, label="Polnjenje")
+        sun_ax.scatter(sell_x, [sun_values[i] for i in sell_x], color="red",
+                       s=30, zorder=5, label="Praznjenje")
         sun_ax.axhline(50, color="gray", linestyle=":", linewidth=1)
         sun_ax.set_ylim(-3, 105)
         sun_ax.set_yticks([0, 25, 50, 75, 100])
@@ -427,7 +429,6 @@ def graph_plot(
             os.remove(tmp_path)
 
         raise
-
     print(
         "Graf shranjen:",
         graph_file

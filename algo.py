@@ -35,18 +35,27 @@ def charge_fraction(sun_percent, sun_factor):
     return min(1.0, sun_percent / 100 * sun_factor)
 
 
-def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_profit: float, buy_mask: List[bool], trade_mask: List[bool], initial_position: float = 0, force_flat_end: bool = False, sun_percent=None, *, margin: float, sun_factor: float = 1.2) -> List[Dict[str, Any]]:
+def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_profit: float, buy_mask: List[bool], trade_mask: List[bool], initial_position: float = 0, force_flat_end: bool = False, sun_percent=None, *, margin: float, sun_factor: float = 1.2, min_soc: float = 0, max_soc: float = 1) -> List[Dict[str, Any]]:
     if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not 0 <= margin <= 1:
         raise ValueError("margin mora biti število med 0 in 1 (0.1 = 10 %).")
     if isinstance(sun_factor, bool) or not isinstance(sun_factor, (int, float)) or not math.isfinite(sun_factor) or sun_factor < 0:
         raise ValueError("sun_factor mora biti končno nenegativno število.")
+    if (isinstance(min_soc, bool) or isinstance(max_soc, bool)
+            or not isinstance(min_soc, (int, float)) or not isinstance(max_soc, (int, float))
+            or not math.isfinite(min_soc) or not math.isfinite(max_soc)
+            or not 0 <= min_soc <= max_soc <= 1):
+        raise ValueError("Veljati mora 0 <= min_soc <= max_soc <= 1.")
     prices = [float(d["price"]) for d in data]
     T = len(prices)
     scale = ENERGY_STEPS
-    K = round(max_positions * scale)
-    initial = round(initial_position * scale)
-    if K < 0 or not 0 <= initial <= K:
-        raise ValueError("Začetna energija mora biti znotraj kapacitete.")
+    total_k = round(max_positions * scale)
+    # Stanje predstavlja samo energijo nad spodnjo mejo. Tako delni zadnji
+    # interval ni razlika dveh ločeno zaokroženih absolutnih SOC vrednosti.
+    K = round(max_positions * (max_soc - min_soc) * scale)
+    initial = round((initial_position - max_positions * min_soc) * scale)
+    initial = min(max(initial, 0), K)
+    if total_k < 0 or K < 0 or K > total_k:
+        raise ValueError("Meji SOC morata biti znotraj kapacitete.")
     if sun_percent is None:
         sun_percent = [100] * T
     if not (len(sun_percent) == len(buy_mask) == len(trade_mask) == T):
@@ -63,7 +72,7 @@ def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_pr
         current = future.copy()
         if trade_mask[t]:
             for k in range(K + 1):
-                # Ob polni bateriji se zadnji polnilni interval skrajša.
+                # Ob zgornji meji SOC se zadnji polnilni interval skrajša.
                 added = min(charge_steps[t], K - k)
                 if buy_mask[t] and added > 0:
                     value = (-(prices[t] * (1 + margin) + minimum_profit)
@@ -71,7 +80,7 @@ def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_pr
                     if value > current[k]:
                         current[k] = value
                         decision[t][k] = 1
-                # Zadnji praznilni interval lahko izprazni manj kot poln interval.
+                # Ob spodnji meji SOC se zadnji praznilni interval skrajša.
                 removed = min(scale, k)
                 if removed > 0:
                     value = prices[t] * (1 - margin) * removed / scale + future[k - removed]
@@ -81,7 +90,7 @@ def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_pr
         future = current
 
     if future[initial] == neg:
-        raise ValueError("Baterije v razpoložljivih intervalih ni mogoče izprazniti.")
+        raise ValueError("Baterije v razpoložljivih intervalih ni mogoče spraviti do spodnje meje SOC.")
     orders = []
     k = initial
     for t in range(T):
@@ -146,7 +155,7 @@ def load_price_data(filename: str, start: pd.Timestamp, end: pd.Timestamp) -> Li
     return [(row["time"], float(row["price"])) for _, row in df.iterrows()]
 
 
-def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True, use_sun_data: bool = False, *, margin: float, sun_factor: float = 1.2):
+def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True, use_sun_data: bool = False, *, margin: float, sun_factor: float = 1.2, min_soc: float = 0, max_soc: float = 1):
 
     if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not 0 <= margin <= 1:
         raise ValueError("margin mora biti število med 0 in 1 (0.1 = 10 %).")
@@ -155,13 +164,23 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
     if isinstance(sun_factor, bool) or not isinstance(sun_factor, (int, float)) or not math.isfinite(sun_factor) or sun_factor < 0:
         raise ValueError("sun_factor mora biti končno nenegativno število.")
 
+    if isinstance(min_soc, bool) or isinstance(max_soc, bool):
+        raise ValueError("min_soc in max_soc morata biti števili med 0 in 1.")
+
     capacity = float(capacity)
     power = float(power)
     minimum_profit = float(minimum_profit)
     soc = float(soc)
+    min_soc = float(min_soc)
+    max_soc = float(max_soc)
 
+    if not all(math.isfinite(value) for value in (capacity, power, minimum_profit, soc, min_soc, max_soc)):
+        raise ValueError("Številčni parametri morajo biti končne vrednosti.")
     if capacity <= 0 or power <= 0 or not 0 <= soc <= 1:
         raise ValueError("Kapaciteta in moč morata biti pozitivni, SOC pa med 0 in 1.")
+    if not 0 <= min_soc <= max_soc <= 1:
+        raise ValueError("Veljati mora 0 <= min_soc <= max_soc <= 1.")
+    soc = min(max(soc, min_soc), max_soc)
     intervals_needed = capacity / power * 4
     initial_position = intervals_needed * soc
 
@@ -240,11 +259,13 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
         sun_percent=sun_percent,
         margin=margin,
         sun_factor=sun_factor,
+        min_soc=min_soc,
+        max_soc=max_soc,
     )
 
-    charging_times = [{"time": o["time"], "value": o["charge_fraction"]}
+    charging_times = [{"time": o["time"], "value": o["energy_fraction"]}
                       for o in orders if o["order"] == "buy"]
-    discharging_times = [{"time": o["time"], "value": -1}
+    discharging_times = [{"time": o["time"], "value": -o["energy_fraction"]}
                          for o in orders if o["order"] == "sell"]
 
     #za mqtt
@@ -264,9 +285,9 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
             continue
 
         if order["order"] == "buy":
-            action = order["charge_fraction"]
+            action = order["energy_fraction"]
         elif order["order"] == "sell":
-            action = -1
+            action = -order["energy_fraction"]
         else:
             action = 0
 

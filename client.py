@@ -101,6 +101,8 @@ def process_request(payload):
     lng = payload.get("longitude", 14.5058)
     from_time = payload.get("start_time", def_time)
     soc = payload.get("soc", 0)
+    min_soc = payload.get("min_soc", 0)
+    max_soc = payload.get("max_soc", 1)
     next_day = payload.get("next_day", False)
     use_sun_data = payload.get("use_sun_data", True)
     sun_factor = payload.get("sun_factor", 1.2)
@@ -110,7 +112,11 @@ def process_request(payload):
 
     print(f"Začenjam zahtevek: {unique_id}")
 
-    _, database_data = main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day, use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor)
+    _, database_data = main(
+        capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day,
+        use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor,
+        min_soc=min_soc, max_soc=max_soc,
+    )
 
     result = {
         "success": True,
