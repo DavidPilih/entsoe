@@ -3,21 +3,29 @@ import math
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import paho.mqtt.client as mqtt
+import pandas as pd
 from dotenv import load_dotenv
 from algo import main
 
 load_dotenv()
 
-topic_inp = "controllers/IQFleks/Entsoe/energy_prices/params/req"
-topic_res = "controllers/IQFleks/Entsoe/energy_prices/params/res"
+topic_inp = "controllers/IQFleks/Entsoe/energy_prices/paramss/req"
+topic_res = "controllers/IQFleks/Entsoe/energy_prices/paramss/res"
 
 executor = ThreadPoolExecutor(max_workers=20)
+
+
+def convert_timestamp(timestamp):
+    ts = pd.to_datetime(timestamp)
+    if ts.tzinfo is None:
+        ts = ts.tz_localize("Europe/Ljubljana")
+    return int(ts.timestamp() * 1000)
 
 def process_request(payload):
     unique_id = payload.get("unique_id")
     try:
         if "help" in payload:
-            sendData({"success": True, "unique_id": unique_id, "help": {"required": ["unique_id", "capacity", "power"], "optional": ["minimum_profit", "date", "latitude", "longitude", "start_time", "soc", "next_day", "power_factor", "use_sun_data", "sun_factor", "margin"], "defaults": {"use_sun_data": False, "sun_factor": 1.2, "margin": 0.1}}})
+            sendData({"success": True, "unique_id": unique_id, "help": {"required": ["unique_id", "capacity", "power"], "optional": ["minimum_profit", "date", "latitude", "longitude", "start_time", "soc", "min_soc", "max_soc", "next_day", "power_factor", "use_sun_data", "sun_factor", "margin"], "defaults": {"min_soc": 0, "max_soc": 1, "use_sun_data": False, "sun_factor": 1.2, "margin": 0.1}}})
             return
 
         required = ["capacity", "power", "unique_id"]
@@ -45,9 +53,11 @@ def process_request(payload):
         lng = payload.get("longitude", 14.5058)
         from_time = payload.get("start_time", def_time)
         soc = payload.get("soc", 0)
+        min_soc = payload.get("min_soc", 0)
+        max_soc = payload.get("max_soc", 1)
         next_day = payload.get("next_day", False)
         use_sun_data = payload.get("use_sun_data", False)
-        sun_factor = payload.get("sun_factor", 100)
+        sun_factor = payload.get("sun_factor", 1.2)
 
         if not isinstance(use_sun_data, bool):
             raise ValueError("use_sun_data mora biti JSON boolean (true ali false).")
@@ -60,13 +70,20 @@ def process_request(payload):
 
         print(f"Začenjam zahtevek: {unique_id}")
 
-        result, _ = main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day, use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor)
+        _, database_data = main(
+            capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day,
+            use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor,
+            min_soc=min_soc, max_soc=max_soc,
+        )
 
-        if not isinstance(result, dict):
-            result = {"result": result}
-
-        result["success"] = True
-        result["unique_id"] = unique_id
+        result = {
+            "success": True,
+            "unique_id": unique_id,
+            "data": [
+                {"timestamp": convert_timestamp(item["timestamp"]), "value": item["value"]}
+                for item in database_data
+            ],
+        }
 
         sendData(result)
 

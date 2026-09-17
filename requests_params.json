@@ -2,13 +2,13 @@
     "unique_id": "123",
     "capacity": 10,
     "power": 5,
-    "minimum_profit": 0.8,
-    "start_time": "00:00",
+    "minimum_profit": 0,
+    "start_time": "23:15",
     "soc": 0.5,
     "next_day": false,
     "latitude": 46.0569,
     "longitude": 14.5058,
     "power_factor": 1,
     "use_sun_data": true,
-    "margin": 0.1
+    "margin": 0
 }
