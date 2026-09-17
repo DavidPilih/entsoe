@@ -9,8 +9,8 @@ from algo import main
 
 load_dotenv()
 
-topic_inp = "controllers/IQFleks/Entsoe/energy_prices/paramss/req"
-topic_res = "controllers/IQFleks/Entsoe/energy_prices/paramss/res"
+topic_inp = "controllers/IQFleks/Entsoe/energy_prices/params/req"
+topic_res = "controllers/IQFleks/Entsoe/energy_prices/params/res"
 
 executor = ThreadPoolExecutor(max_workers=20)
 

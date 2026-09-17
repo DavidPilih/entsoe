@@ -6,7 +6,7 @@ import paho.mqtt.client as mqtt
 
 
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-topic = "controllers/IQFleks/Entsoe/energy_prices/paramss/req"
+topic = "controllers/IQFleks/Entsoe/energy_prices/params/req"
 REQUESTS_FILE = Path(__file__).with_name("requests_params.json")
 
 
