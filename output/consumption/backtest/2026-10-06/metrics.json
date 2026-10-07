@@ -1,0 +1,17 @@
+{
+  "expected_minutes": 1440,
+  "valid_actual_minutes": 1431,
+  "compared_minutes": 1431,
+  "coverage_percent": 99.375,
+  "old_exceeded_minutes": 219,
+  "old_exceeded_percent": 15.30398322851153,
+  "old_max_exceedance_kw": 34.754,
+  "new_exceeded_minutes": 23,
+  "new_exceeded_percent": 1.6072676450034942,
+  "new_max_exceedance_kw": 14.299999999999997,
+  "mean_upper_increase_kw": 18.611145833333335,
+  "training_valid_minutes": 42936,
+  "training_expected_minutes": 43200,
+  "training_complete_peak_intervals": 2627,
+  "training_expected_peak_intervals": 2880
+}

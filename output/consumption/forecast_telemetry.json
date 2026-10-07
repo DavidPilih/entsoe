@@ -1,0 +1,5378 @@
+[
+  {
+    "ts": 1791353700000,
+    "values": {
+      "forecast_consumption": 34.393935064935064,
+      "forecast_consumption_lower": 29.815999999999995,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791354600000,
+    "values": {
+      "forecast_consumption": 35.88997835497835,
+      "forecast_consumption_lower": 31.762999999999998,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791355500000,
+    "values": {
+      "forecast_consumption": 39.4659025974026,
+      "forecast_consumption_lower": 29.349266666666665,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791356400000,
+    "values": {
+      "forecast_consumption": 38.93094155844156,
+      "forecast_consumption_lower": 31.487,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791357300000,
+    "values": {
+      "forecast_consumption": 37.374958874458876,
+      "forecast_consumption_lower": 31.832666666666668,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791358200000,
+    "values": {
+      "forecast_consumption": 33.21833766233766,
+      "forecast_consumption_lower": 29.4364,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791359100000,
+    "values": {
+      "forecast_consumption": 32.527359307359305,
+      "forecast_consumption_lower": 26.687333333333335,
+      "forecast_consumption_upper": 71.95799999999998
+    }
+  },
+  {
+    "ts": 1791360000000,
+    "values": {
+      "forecast_consumption": 33.10135064935065,
+      "forecast_consumption_lower": 28.911999999999995,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791360900000,
+    "values": {
+      "forecast_consumption": 39.1633354978355,
+      "forecast_consumption_lower": 31.13885714285714,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791361800000,
+    "values": {
+      "forecast_consumption": 39.28412987012987,
+      "forecast_consumption_lower": 31.215999999999998,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791362700000,
+    "values": {
+      "forecast_consumption": 37.610580086580086,
+      "forecast_consumption_lower": 31.179142857142853,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791363600000,
+    "values": {
+      "forecast_consumption": 37.44477489177489,
+      "forecast_consumption_lower": 32.50699999999999,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791364500000,
+    "values": {
+      "forecast_consumption": 36.590878787878786,
+      "forecast_consumption_lower": 29.550000000000008,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791365400000,
+    "values": {
+      "forecast_consumption": 37.46841558441558,
+      "forecast_consumption_lower": 32.771266666666655,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791366300000,
+    "values": {
+      "forecast_consumption": 38.13059523809524,
+      "forecast_consumption_lower": 32.11879999999999,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791367200000,
+    "values": {
+      "forecast_consumption": 35.82397835497836,
+      "forecast_consumption_lower": 28.829599999999985,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791368100000,
+    "values": {
+      "forecast_consumption": 37.200917748917746,
+      "forecast_consumption_lower": 27.736,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791369000000,
+    "values": {
+      "forecast_consumption": 36.05848051948052,
+      "forecast_consumption_lower": 28.507333333333342,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791369900000,
+    "values": {
+      "forecast_consumption": 34.016006493506495,
+      "forecast_consumption_lower": 23.192666666666668,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791370800000,
+    "values": {
+      "forecast_consumption": 33.62578787878788,
+      "forecast_consumption_lower": 16.44466666666667,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791371700000,
+    "values": {
+      "forecast_consumption": 31.42029004329004,
+      "forecast_consumption_lower": 17.052666666666664,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791372600000,
+    "values": {
+      "forecast_consumption": 27.24438528138528,
+      "forecast_consumption_lower": 20.215333333333326,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791373500000,
+    "values": {
+      "forecast_consumption": 21.229575757575756,
+      "forecast_consumption_lower": 16.248676190476207,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791374400000,
+    "values": {
+      "forecast_consumption": 15.362177489177487,
+      "forecast_consumption_lower": 10.203333333333333,
+      "forecast_consumption_upper": 59.92
+    }
+  },
+  {
+    "ts": 1791375300000,
+    "values": {
+      "forecast_consumption": 13.591253246753247,
+      "forecast_consumption_lower": 5.747238095238096,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791376200000,
+    "values": {
+      "forecast_consumption": 14.763510822510822,
+      "forecast_consumption_lower": 5.6213333333333395,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791377100000,
+    "values": {
+      "forecast_consumption": 14.84262337662338,
+      "forecast_consumption_lower": 5.718666666666671,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791378000000,
+    "values": {
+      "forecast_consumption": 14.653493506493506,
+      "forecast_consumption_lower": 5.710000000000001,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791378900000,
+    "values": {
+      "forecast_consumption": 11.415629870129873,
+      "forecast_consumption_lower": 4.838000000000008,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791379800000,
+    "values": {
+      "forecast_consumption": 10.203212121212122,
+      "forecast_consumption_lower": 4.8613333333333415,
+      "forecast_consumption_upper": 43.67
+    }
+  },
+  {
+    "ts": 1791380700000,
+    "values": {
+      "forecast_consumption": 10.316848484848485,
+      "forecast_consumption_lower": 3.906666666666659,
+      "forecast_consumption_upper": 35.802
+    }
+  },
+  {
+    "ts": 1791381600000,
+    "values": {
+      "forecast_consumption": 9.40781818181818,
+      "forecast_consumption_lower": 2.829333333333331,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791382500000,
+    "values": {
+      "forecast_consumption": 8.2065670995671,
+      "forecast_consumption_lower": 3.173333333333332,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791383400000,
+    "values": {
+      "forecast_consumption": 9.40096536796537,
+      "forecast_consumption_lower": 2.6999999999999957,
+      "forecast_consumption_upper": 25.34200000000001
+    }
+  },
+  {
+    "ts": 1791384300000,
+    "values": {
+      "forecast_consumption": 7.934296536796538,
+      "forecast_consumption_lower": 3.836666666666666,
+      "forecast_consumption_upper": 24.181999999999995
+    }
+  },
+  {
+    "ts": 1791385200000,
+    "values": {
+      "forecast_consumption": 8.492541125541127,
+      "forecast_consumption_lower": 3.636000000000001,
+      "forecast_consumption_upper": 23.634000000000007
+    }
+  },
+  {
+    "ts": 1791386100000,
+    "values": {
+      "forecast_consumption": 7.876162337662337,
+      "forecast_consumption_lower": 3.371904761904761,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791387000000,
+    "values": {
+      "forecast_consumption": 8.18032683982684,
+      "forecast_consumption_lower": 3.225400000000001,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791387900000,
+    "values": {
+      "forecast_consumption": 10.07782251082251,
+      "forecast_consumption_lower": 2.601333333333334,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791388800000,
+    "values": {
+      "forecast_consumption": 9.495878787878787,
+      "forecast_consumption_lower": 3.217199999999999,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791389700000,
+    "values": {
+      "forecast_consumption": 9.08024025974026,
+      "forecast_consumption_lower": 2.7379999999999995,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791390600000,
+    "values": {
+      "forecast_consumption": 8.37343722943723,
+      "forecast_consumption_lower": 2.64,
+      "forecast_consumption_upper": 30.04
+    }
+  },
+  {
+    "ts": 1791391500000,
+    "values": {
+      "forecast_consumption": 8.484376623376624,
+      "forecast_consumption_lower": 3.190666666666667,
+      "forecast_consumption_upper": 29.07
+    }
+  },
+  {
+    "ts": 1791392400000,
+    "values": {
+      "forecast_consumption": 8.35778354978355,
+      "forecast_consumption_lower": 3.2800000000000007,
+      "forecast_consumption_upper": 27.669999999999998
+    }
+  },
+  {
+    "ts": 1791393300000,
+    "values": {
+      "forecast_consumption": 6.9755670995671,
+      "forecast_consumption_lower": 3.329333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791394200000,
+    "values": {
+      "forecast_consumption": 6.559212121212121,
+      "forecast_consumption_lower": 3.4157333333333337,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791395100000,
+    "values": {
+      "forecast_consumption": 8.33495670995671,
+      "forecast_consumption_lower": 3.155333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791396000000,
+    "values": {
+      "forecast_consumption": 8.046666666666667,
+      "forecast_consumption_lower": 2.7533333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791396900000,
+    "values": {
+      "forecast_consumption": 7.414939393939394,
+      "forecast_consumption_lower": 2.796666666666666,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791397800000,
+    "values": {
+      "forecast_consumption": 7.017909090909091,
+      "forecast_consumption_lower": 2.9220000000000006,
+      "forecast_consumption_upper": 28.11
+    }
+  },
+  {
+    "ts": 1791398700000,
+    "values": {
+      "forecast_consumption": 7.840212121212121,
+      "forecast_consumption_lower": 2.9466666666666663,
+      "forecast_consumption_upper": 28.006
+    }
+  },
+  {
+    "ts": 1791399600000,
+    "values": {
+      "forecast_consumption": 9.129787878787878,
+      "forecast_consumption_lower": 3.1326666666666663,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791400500000,
+    "values": {
+      "forecast_consumption": 9.263214285714286,
+      "forecast_consumption_lower": 3.0905333333333336,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791401400000,
+    "values": {
+      "forecast_consumption": 9.053670995670997,
+      "forecast_consumption_lower": 3.249066666666667,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791402300000,
+    "values": {
+      "forecast_consumption": 7.905969696969697,
+      "forecast_consumption_lower": 3.482,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791403200000,
+    "values": {
+      "forecast_consumption": 7.6570909090909085,
+      "forecast_consumption_lower": 3.0279999999999996,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791404100000,
+    "values": {
+      "forecast_consumption": 6.472974025974026,
+      "forecast_consumption_lower": 3.0340000000000003,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791405000000,
+    "values": {
+      "forecast_consumption": 7.278287878787879,
+      "forecast_consumption_lower": 2.9613333333333336,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791405900000,
+    "values": {
+      "forecast_consumption": 7.703696969696969,
+      "forecast_consumption_lower": 2.8613333333333335,
+      "forecast_consumption_upper": 19.503999999999994
+    }
+  },
+  {
+    "ts": 1791406800000,
+    "values": {
+      "forecast_consumption": 7.7892012987012995,
+      "forecast_consumption_lower": 3.0406666666666675,
+      "forecast_consumption_upper": 26.455000000000002
+    }
+  },
+  {
+    "ts": 1791407700000,
+    "values": {
+      "forecast_consumption": 7.5711818181818185,
+      "forecast_consumption_lower": 3.0379999999999994,
+      "forecast_consumption_upper": 32.1
+    }
+  },
+  {
+    "ts": 1791408600000,
+    "values": {
+      "forecast_consumption": 6.864123376623376,
+      "forecast_consumption_lower": 2.8988,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791409500000,
+    "values": {
+      "forecast_consumption": 9.719647186147187,
+      "forecast_consumption_lower": 3.54,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791410400000,
+    "values": {
+      "forecast_consumption": 9.802997835497836,
+      "forecast_consumption_lower": 3.3654666666666664,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791411300000,
+    "values": {
+      "forecast_consumption": 8.32777922077922,
+      "forecast_consumption_lower": 3.1773333333333227,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791412200000,
+    "values": {
+      "forecast_consumption": 8.292939393939394,
+      "forecast_consumption_lower": 2.8913333333333338,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791413100000,
+    "values": {
+      "forecast_consumption": 6.519056277056276,
+      "forecast_consumption_lower": 2.9813333333333336,
+      "forecast_consumption_upper": 28.43
+    }
+  },
+  {
+    "ts": 1791414000000,
+    "values": {
+      "forecast_consumption": 6.803969696969698,
+      "forecast_consumption_lower": 3.009999999999998,
+      "forecast_consumption_upper": 25.630000000000003
+    }
+  },
+  {
+    "ts": 1791414900000,
+    "values": {
+      "forecast_consumption": 7.105961038961038,
+      "forecast_consumption_lower": 3.192,
+      "forecast_consumption_upper": 27.019000000000002
+    }
+  },
+  {
+    "ts": 1791415800000,
+    "values": {
+      "forecast_consumption": 8.060140692640692,
+      "forecast_consumption_lower": 3.2273333333333323,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791416700000,
+    "values": {
+      "forecast_consumption": 7.947025974025976,
+      "forecast_consumption_lower": 2.921133333333346,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791417600000,
+    "values": {
+      "forecast_consumption": 7.936670995670995,
+      "forecast_consumption_lower": 2.962000000000001,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791418500000,
+    "values": {
+      "forecast_consumption": 9.241757575757577,
+      "forecast_consumption_lower": 2.9728000000000008,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791419400000,
+    "values": {
+      "forecast_consumption": 8.620051948051948,
+      "forecast_consumption_lower": 3.233714285714286,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791420300000,
+    "values": {
+      "forecast_consumption": 9.199783549783549,
+      "forecast_consumption_lower": 3.1306666666666665,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791421200000,
+    "values": {
+      "forecast_consumption": 8.592991341991342,
+      "forecast_consumption_lower": 3.054666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791422100000,
+    "values": {
+      "forecast_consumption": 7.981290043290044,
+      "forecast_consumption_lower": 2.990666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791423000000,
+    "values": {
+      "forecast_consumption": 6.963316017316018,
+      "forecast_consumption_lower": 3.2526666666666664,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791423900000,
+    "values": {
+      "forecast_consumption": 7.884196969696969,
+      "forecast_consumption_lower": 3.469533333333335,
+      "forecast_consumption_upper": 32.410000000000004
+    }
+  },
+  {
+    "ts": 1791424800000,
+    "values": {
+      "forecast_consumption": 8.277186147186148,
+      "forecast_consumption_lower": 3.331733333333333,
+      "forecast_consumption_upper": 35.230000000000004
+    }
+  },
+  {
+    "ts": 1791425700000,
+    "values": {
+      "forecast_consumption": 10.305361471861472,
+      "forecast_consumption_lower": 3.935933333333333,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791426600000,
+    "values": {
+      "forecast_consumption": 14.494365800865802,
+      "forecast_consumption_lower": 7.956666666666666,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791427500000,
+    "values": {
+      "forecast_consumption": 15.947792207792208,
+      "forecast_consumption_lower": 8.694666666666667,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791428400000,
+    "values": {
+      "forecast_consumption": 17.20181168831169,
+      "forecast_consumption_lower": 9.364666666666665,
+      "forecast_consumption_upper": 41.766000000000005
+    }
+  },
+  {
+    "ts": 1791429300000,
+    "values": {
+      "forecast_consumption": 18.796515151515152,
+      "forecast_consumption_lower": 12.076266666666667,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791430200000,
+    "values": {
+      "forecast_consumption": 24.402320346320344,
+      "forecast_consumption_lower": 13.434,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791431100000,
+    "values": {
+      "forecast_consumption": 27.644512987012988,
+      "forecast_consumption_lower": 19.772000000000002,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791432000000,
+    "values": {
+      "forecast_consumption": 30.647103896103896,
+      "forecast_consumption_lower": 25.4514,
+      "forecast_consumption_upper": 66.62
+    }
+  },
+  {
+    "ts": 1791432900000,
+    "values": {
+      "forecast_consumption": 32.50030735930736,
+      "forecast_consumption_lower": 26.655533333333338,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791433800000,
+    "values": {
+      "forecast_consumption": 34.02149134199134,
+      "forecast_consumption_lower": 26.710933333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791434700000,
+    "values": {
+      "forecast_consumption": 34.9053658008658,
+      "forecast_consumption_lower": 27.021938095238102,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791435600000,
+    "values": {
+      "forecast_consumption": 36.027545454545454,
+      "forecast_consumption_lower": 28.30533333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791436500000,
+    "values": {
+      "forecast_consumption": 35.839666666666666,
+      "forecast_consumption_lower": 29.511999999999997,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791437400000,
+    "values": {
+      "forecast_consumption": 36.511746753246754,
+      "forecast_consumption_lower": 28.325999999999997,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791438300000,
+    "values": {
+      "forecast_consumption": 36.90702813852813,
+      "forecast_consumption_lower": 29.935333333333332,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791439200000,
+    "values": {
+      "forecast_consumption": 32.90765367965368,
+      "forecast_consumption_lower": 28.86266666666667,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791440100000,
+    "values": {
+      "forecast_consumption": 34.393935064935064,
+      "forecast_consumption_lower": 29.815999999999995,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791441000000,
+    "values": {
+      "forecast_consumption": 35.88997835497835,
+      "forecast_consumption_lower": 31.762999999999998,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791441900000,
+    "values": {
+      "forecast_consumption": 39.4659025974026,
+      "forecast_consumption_lower": 29.349266666666665,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791442800000,
+    "values": {
+      "forecast_consumption": 38.93094155844156,
+      "forecast_consumption_lower": 31.487,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791443700000,
+    "values": {
+      "forecast_consumption": 37.374958874458876,
+      "forecast_consumption_lower": 31.832666666666668,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791444600000,
+    "values": {
+      "forecast_consumption": 33.21833766233766,
+      "forecast_consumption_lower": 29.4364,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791445500000,
+    "values": {
+      "forecast_consumption": 32.527359307359305,
+      "forecast_consumption_lower": 26.687333333333335,
+      "forecast_consumption_upper": 71.95799999999998
+    }
+  },
+  {
+    "ts": 1791446400000,
+    "values": {
+      "forecast_consumption": 33.10135064935065,
+      "forecast_consumption_lower": 28.911999999999995,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791447300000,
+    "values": {
+      "forecast_consumption": 39.1633354978355,
+      "forecast_consumption_lower": 31.13885714285714,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791448200000,
+    "values": {
+      "forecast_consumption": 39.28412987012987,
+      "forecast_consumption_lower": 31.215999999999998,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791449100000,
+    "values": {
+      "forecast_consumption": 37.610580086580086,
+      "forecast_consumption_lower": 31.179142857142853,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791450000000,
+    "values": {
+      "forecast_consumption": 37.44477489177489,
+      "forecast_consumption_lower": 32.50699999999999,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791450900000,
+    "values": {
+      "forecast_consumption": 36.590878787878786,
+      "forecast_consumption_lower": 29.550000000000008,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791451800000,
+    "values": {
+      "forecast_consumption": 37.46841558441558,
+      "forecast_consumption_lower": 32.771266666666655,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791452700000,
+    "values": {
+      "forecast_consumption": 38.13059523809524,
+      "forecast_consumption_lower": 32.11879999999999,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791453600000,
+    "values": {
+      "forecast_consumption": 35.82397835497836,
+      "forecast_consumption_lower": 28.829599999999985,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791454500000,
+    "values": {
+      "forecast_consumption": 37.200917748917746,
+      "forecast_consumption_lower": 27.736,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791455400000,
+    "values": {
+      "forecast_consumption": 36.05848051948052,
+      "forecast_consumption_lower": 28.507333333333342,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791456300000,
+    "values": {
+      "forecast_consumption": 34.016006493506495,
+      "forecast_consumption_lower": 23.192666666666668,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791457200000,
+    "values": {
+      "forecast_consumption": 33.62578787878788,
+      "forecast_consumption_lower": 16.44466666666667,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791458100000,
+    "values": {
+      "forecast_consumption": 31.42029004329004,
+      "forecast_consumption_lower": 17.052666666666664,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791459000000,
+    "values": {
+      "forecast_consumption": 27.24438528138528,
+      "forecast_consumption_lower": 20.215333333333326,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791459900000,
+    "values": {
+      "forecast_consumption": 21.229575757575756,
+      "forecast_consumption_lower": 16.248676190476207,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791460800000,
+    "values": {
+      "forecast_consumption": 15.362177489177487,
+      "forecast_consumption_lower": 10.203333333333333,
+      "forecast_consumption_upper": 59.92
+    }
+  },
+  {
+    "ts": 1791461700000,
+    "values": {
+      "forecast_consumption": 13.591253246753247,
+      "forecast_consumption_lower": 5.747238095238096,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791462600000,
+    "values": {
+      "forecast_consumption": 14.763510822510822,
+      "forecast_consumption_lower": 5.6213333333333395,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791463500000,
+    "values": {
+      "forecast_consumption": 14.84262337662338,
+      "forecast_consumption_lower": 5.718666666666671,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791464400000,
+    "values": {
+      "forecast_consumption": 14.653493506493506,
+      "forecast_consumption_lower": 5.710000000000001,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791465300000,
+    "values": {
+      "forecast_consumption": 11.415629870129873,
+      "forecast_consumption_lower": 4.838000000000008,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791466200000,
+    "values": {
+      "forecast_consumption": 10.203212121212122,
+      "forecast_consumption_lower": 4.8613333333333415,
+      "forecast_consumption_upper": 43.67
+    }
+  },
+  {
+    "ts": 1791467100000,
+    "values": {
+      "forecast_consumption": 10.316848484848485,
+      "forecast_consumption_lower": 3.906666666666659,
+      "forecast_consumption_upper": 35.802
+    }
+  },
+  {
+    "ts": 1791468000000,
+    "values": {
+      "forecast_consumption": 9.40781818181818,
+      "forecast_consumption_lower": 2.829333333333331,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791468900000,
+    "values": {
+      "forecast_consumption": 8.2065670995671,
+      "forecast_consumption_lower": 3.173333333333332,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791469800000,
+    "values": {
+      "forecast_consumption": 9.40096536796537,
+      "forecast_consumption_lower": 2.6999999999999957,
+      "forecast_consumption_upper": 25.34200000000001
+    }
+  },
+  {
+    "ts": 1791470700000,
+    "values": {
+      "forecast_consumption": 7.934296536796538,
+      "forecast_consumption_lower": 3.836666666666666,
+      "forecast_consumption_upper": 24.181999999999995
+    }
+  },
+  {
+    "ts": 1791471600000,
+    "values": {
+      "forecast_consumption": 8.492541125541127,
+      "forecast_consumption_lower": 3.636000000000001,
+      "forecast_consumption_upper": 23.634000000000007
+    }
+  },
+  {
+    "ts": 1791472500000,
+    "values": {
+      "forecast_consumption": 7.876162337662337,
+      "forecast_consumption_lower": 3.371904761904761,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791473400000,
+    "values": {
+      "forecast_consumption": 8.18032683982684,
+      "forecast_consumption_lower": 3.225400000000001,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791474300000,
+    "values": {
+      "forecast_consumption": 10.07782251082251,
+      "forecast_consumption_lower": 2.601333333333334,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791475200000,
+    "values": {
+      "forecast_consumption": 9.495878787878787,
+      "forecast_consumption_lower": 3.217199999999999,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791476100000,
+    "values": {
+      "forecast_consumption": 9.08024025974026,
+      "forecast_consumption_lower": 2.7379999999999995,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791477000000,
+    "values": {
+      "forecast_consumption": 8.37343722943723,
+      "forecast_consumption_lower": 2.64,
+      "forecast_consumption_upper": 30.04
+    }
+  },
+  {
+    "ts": 1791477900000,
+    "values": {
+      "forecast_consumption": 8.484376623376624,
+      "forecast_consumption_lower": 3.190666666666667,
+      "forecast_consumption_upper": 29.07
+    }
+  },
+  {
+    "ts": 1791478800000,
+    "values": {
+      "forecast_consumption": 8.35778354978355,
+      "forecast_consumption_lower": 3.2800000000000007,
+      "forecast_consumption_upper": 27.669999999999998
+    }
+  },
+  {
+    "ts": 1791479700000,
+    "values": {
+      "forecast_consumption": 6.9755670995671,
+      "forecast_consumption_lower": 3.329333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791480600000,
+    "values": {
+      "forecast_consumption": 6.559212121212121,
+      "forecast_consumption_lower": 3.4157333333333337,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791481500000,
+    "values": {
+      "forecast_consumption": 8.33495670995671,
+      "forecast_consumption_lower": 3.155333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791482400000,
+    "values": {
+      "forecast_consumption": 8.046666666666667,
+      "forecast_consumption_lower": 2.7533333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791483300000,
+    "values": {
+      "forecast_consumption": 7.414939393939394,
+      "forecast_consumption_lower": 2.796666666666666,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791484200000,
+    "values": {
+      "forecast_consumption": 7.017909090909091,
+      "forecast_consumption_lower": 2.9220000000000006,
+      "forecast_consumption_upper": 28.11
+    }
+  },
+  {
+    "ts": 1791485100000,
+    "values": {
+      "forecast_consumption": 7.840212121212121,
+      "forecast_consumption_lower": 2.9466666666666663,
+      "forecast_consumption_upper": 28.006
+    }
+  },
+  {
+    "ts": 1791486000000,
+    "values": {
+      "forecast_consumption": 9.129787878787878,
+      "forecast_consumption_lower": 3.1326666666666663,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791486900000,
+    "values": {
+      "forecast_consumption": 9.263214285714286,
+      "forecast_consumption_lower": 3.0905333333333336,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791487800000,
+    "values": {
+      "forecast_consumption": 9.053670995670997,
+      "forecast_consumption_lower": 3.249066666666667,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791488700000,
+    "values": {
+      "forecast_consumption": 7.905969696969697,
+      "forecast_consumption_lower": 3.482,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791489600000,
+    "values": {
+      "forecast_consumption": 7.6570909090909085,
+      "forecast_consumption_lower": 3.0279999999999996,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791490500000,
+    "values": {
+      "forecast_consumption": 6.472974025974026,
+      "forecast_consumption_lower": 3.0340000000000003,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791491400000,
+    "values": {
+      "forecast_consumption": 7.278287878787879,
+      "forecast_consumption_lower": 2.9613333333333336,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791492300000,
+    "values": {
+      "forecast_consumption": 7.703696969696969,
+      "forecast_consumption_lower": 2.8613333333333335,
+      "forecast_consumption_upper": 19.503999999999994
+    }
+  },
+  {
+    "ts": 1791493200000,
+    "values": {
+      "forecast_consumption": 7.7892012987012995,
+      "forecast_consumption_lower": 3.0406666666666675,
+      "forecast_consumption_upper": 26.455000000000002
+    }
+  },
+  {
+    "ts": 1791494100000,
+    "values": {
+      "forecast_consumption": 7.5711818181818185,
+      "forecast_consumption_lower": 3.0379999999999994,
+      "forecast_consumption_upper": 32.1
+    }
+  },
+  {
+    "ts": 1791495000000,
+    "values": {
+      "forecast_consumption": 6.864123376623376,
+      "forecast_consumption_lower": 2.8988,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791495900000,
+    "values": {
+      "forecast_consumption": 9.719647186147187,
+      "forecast_consumption_lower": 3.54,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791496800000,
+    "values": {
+      "forecast_consumption": 9.802997835497836,
+      "forecast_consumption_lower": 3.3654666666666664,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791497700000,
+    "values": {
+      "forecast_consumption": 8.32777922077922,
+      "forecast_consumption_lower": 3.1773333333333227,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791498600000,
+    "values": {
+      "forecast_consumption": 8.292939393939394,
+      "forecast_consumption_lower": 2.8913333333333338,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791499500000,
+    "values": {
+      "forecast_consumption": 6.519056277056276,
+      "forecast_consumption_lower": 2.9813333333333336,
+      "forecast_consumption_upper": 28.43
+    }
+  },
+  {
+    "ts": 1791500400000,
+    "values": {
+      "forecast_consumption": 6.803969696969698,
+      "forecast_consumption_lower": 3.009999999999998,
+      "forecast_consumption_upper": 25.630000000000003
+    }
+  },
+  {
+    "ts": 1791501300000,
+    "values": {
+      "forecast_consumption": 7.105961038961038,
+      "forecast_consumption_lower": 3.192,
+      "forecast_consumption_upper": 27.019000000000002
+    }
+  },
+  {
+    "ts": 1791502200000,
+    "values": {
+      "forecast_consumption": 8.060140692640692,
+      "forecast_consumption_lower": 3.2273333333333323,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791503100000,
+    "values": {
+      "forecast_consumption": 7.947025974025976,
+      "forecast_consumption_lower": 2.921133333333346,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791504000000,
+    "values": {
+      "forecast_consumption": 7.936670995670995,
+      "forecast_consumption_lower": 2.962000000000001,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791504900000,
+    "values": {
+      "forecast_consumption": 9.241757575757577,
+      "forecast_consumption_lower": 2.9728000000000008,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791505800000,
+    "values": {
+      "forecast_consumption": 8.620051948051948,
+      "forecast_consumption_lower": 3.233714285714286,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791506700000,
+    "values": {
+      "forecast_consumption": 9.199783549783549,
+      "forecast_consumption_lower": 3.1306666666666665,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791507600000,
+    "values": {
+      "forecast_consumption": 8.592991341991342,
+      "forecast_consumption_lower": 3.054666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791508500000,
+    "values": {
+      "forecast_consumption": 7.981290043290044,
+      "forecast_consumption_lower": 2.990666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791509400000,
+    "values": {
+      "forecast_consumption": 6.963316017316018,
+      "forecast_consumption_lower": 3.2526666666666664,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791510300000,
+    "values": {
+      "forecast_consumption": 7.884196969696969,
+      "forecast_consumption_lower": 3.469533333333335,
+      "forecast_consumption_upper": 32.410000000000004
+    }
+  },
+  {
+    "ts": 1791511200000,
+    "values": {
+      "forecast_consumption": 8.277186147186148,
+      "forecast_consumption_lower": 3.331733333333333,
+      "forecast_consumption_upper": 35.230000000000004
+    }
+  },
+  {
+    "ts": 1791512100000,
+    "values": {
+      "forecast_consumption": 10.305361471861472,
+      "forecast_consumption_lower": 3.935933333333333,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791513000000,
+    "values": {
+      "forecast_consumption": 14.494365800865802,
+      "forecast_consumption_lower": 7.956666666666666,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791513900000,
+    "values": {
+      "forecast_consumption": 15.947792207792208,
+      "forecast_consumption_lower": 8.694666666666667,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791514800000,
+    "values": {
+      "forecast_consumption": 17.20181168831169,
+      "forecast_consumption_lower": 9.364666666666665,
+      "forecast_consumption_upper": 41.766000000000005
+    }
+  },
+  {
+    "ts": 1791515700000,
+    "values": {
+      "forecast_consumption": 18.796515151515152,
+      "forecast_consumption_lower": 12.076266666666667,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791516600000,
+    "values": {
+      "forecast_consumption": 24.402320346320344,
+      "forecast_consumption_lower": 13.434,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791517500000,
+    "values": {
+      "forecast_consumption": 27.644512987012988,
+      "forecast_consumption_lower": 19.772000000000002,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791518400000,
+    "values": {
+      "forecast_consumption": 30.647103896103896,
+      "forecast_consumption_lower": 25.4514,
+      "forecast_consumption_upper": 66.62
+    }
+  },
+  {
+    "ts": 1791519300000,
+    "values": {
+      "forecast_consumption": 32.50030735930736,
+      "forecast_consumption_lower": 26.655533333333338,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791520200000,
+    "values": {
+      "forecast_consumption": 34.02149134199134,
+      "forecast_consumption_lower": 26.710933333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791521100000,
+    "values": {
+      "forecast_consumption": 34.9053658008658,
+      "forecast_consumption_lower": 27.021938095238102,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791522000000,
+    "values": {
+      "forecast_consumption": 36.027545454545454,
+      "forecast_consumption_lower": 28.30533333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791522900000,
+    "values": {
+      "forecast_consumption": 35.839666666666666,
+      "forecast_consumption_lower": 29.511999999999997,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791523800000,
+    "values": {
+      "forecast_consumption": 36.511746753246754,
+      "forecast_consumption_lower": 28.325999999999997,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791524700000,
+    "values": {
+      "forecast_consumption": 36.90702813852813,
+      "forecast_consumption_lower": 29.935333333333332,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791525600000,
+    "values": {
+      "forecast_consumption": 32.90765367965368,
+      "forecast_consumption_lower": 28.86266666666667,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791526500000,
+    "values": {
+      "forecast_consumption": 34.393935064935064,
+      "forecast_consumption_lower": 29.815999999999995,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791527400000,
+    "values": {
+      "forecast_consumption": 35.88997835497835,
+      "forecast_consumption_lower": 31.762999999999998,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791528300000,
+    "values": {
+      "forecast_consumption": 39.4659025974026,
+      "forecast_consumption_lower": 29.349266666666665,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791529200000,
+    "values": {
+      "forecast_consumption": 38.93094155844156,
+      "forecast_consumption_lower": 31.487,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791530100000,
+    "values": {
+      "forecast_consumption": 37.374958874458876,
+      "forecast_consumption_lower": 31.832666666666668,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791531000000,
+    "values": {
+      "forecast_consumption": 33.21833766233766,
+      "forecast_consumption_lower": 29.4364,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791531900000,
+    "values": {
+      "forecast_consumption": 32.527359307359305,
+      "forecast_consumption_lower": 26.687333333333335,
+      "forecast_consumption_upper": 71.95799999999998
+    }
+  },
+  {
+    "ts": 1791532800000,
+    "values": {
+      "forecast_consumption": 33.10135064935065,
+      "forecast_consumption_lower": 28.911999999999995,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791533700000,
+    "values": {
+      "forecast_consumption": 39.1633354978355,
+      "forecast_consumption_lower": 31.13885714285714,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791534600000,
+    "values": {
+      "forecast_consumption": 39.28412987012987,
+      "forecast_consumption_lower": 31.215999999999998,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791535500000,
+    "values": {
+      "forecast_consumption": 37.610580086580086,
+      "forecast_consumption_lower": 31.179142857142853,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791536400000,
+    "values": {
+      "forecast_consumption": 37.44477489177489,
+      "forecast_consumption_lower": 32.50699999999999,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791537300000,
+    "values": {
+      "forecast_consumption": 36.590878787878786,
+      "forecast_consumption_lower": 29.550000000000008,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791538200000,
+    "values": {
+      "forecast_consumption": 37.46841558441558,
+      "forecast_consumption_lower": 32.771266666666655,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791539100000,
+    "values": {
+      "forecast_consumption": 38.13059523809524,
+      "forecast_consumption_lower": 32.11879999999999,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791540000000,
+    "values": {
+      "forecast_consumption": 35.82397835497836,
+      "forecast_consumption_lower": 28.829599999999985,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791540900000,
+    "values": {
+      "forecast_consumption": 37.200917748917746,
+      "forecast_consumption_lower": 27.736,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791541800000,
+    "values": {
+      "forecast_consumption": 36.05848051948052,
+      "forecast_consumption_lower": 28.507333333333342,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791542700000,
+    "values": {
+      "forecast_consumption": 34.016006493506495,
+      "forecast_consumption_lower": 23.192666666666668,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791543600000,
+    "values": {
+      "forecast_consumption": 33.62578787878788,
+      "forecast_consumption_lower": 16.44466666666667,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791544500000,
+    "values": {
+      "forecast_consumption": 31.42029004329004,
+      "forecast_consumption_lower": 17.052666666666664,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791545400000,
+    "values": {
+      "forecast_consumption": 27.24438528138528,
+      "forecast_consumption_lower": 20.215333333333326,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791546300000,
+    "values": {
+      "forecast_consumption": 21.229575757575756,
+      "forecast_consumption_lower": 16.248676190476207,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791547200000,
+    "values": {
+      "forecast_consumption": 15.362177489177487,
+      "forecast_consumption_lower": 10.203333333333333,
+      "forecast_consumption_upper": 59.92
+    }
+  },
+  {
+    "ts": 1791548100000,
+    "values": {
+      "forecast_consumption": 13.591253246753247,
+      "forecast_consumption_lower": 5.747238095238096,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791549000000,
+    "values": {
+      "forecast_consumption": 14.763510822510822,
+      "forecast_consumption_lower": 5.6213333333333395,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791549900000,
+    "values": {
+      "forecast_consumption": 14.84262337662338,
+      "forecast_consumption_lower": 5.718666666666671,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791550800000,
+    "values": {
+      "forecast_consumption": 14.653493506493506,
+      "forecast_consumption_lower": 5.710000000000001,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791551700000,
+    "values": {
+      "forecast_consumption": 11.415629870129873,
+      "forecast_consumption_lower": 4.838000000000008,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791552600000,
+    "values": {
+      "forecast_consumption": 10.203212121212122,
+      "forecast_consumption_lower": 4.8613333333333415,
+      "forecast_consumption_upper": 43.67
+    }
+  },
+  {
+    "ts": 1791553500000,
+    "values": {
+      "forecast_consumption": 10.316848484848485,
+      "forecast_consumption_lower": 3.906666666666659,
+      "forecast_consumption_upper": 35.802
+    }
+  },
+  {
+    "ts": 1791554400000,
+    "values": {
+      "forecast_consumption": 9.40781818181818,
+      "forecast_consumption_lower": 2.829333333333331,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791555300000,
+    "values": {
+      "forecast_consumption": 8.2065670995671,
+      "forecast_consumption_lower": 3.173333333333332,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791556200000,
+    "values": {
+      "forecast_consumption": 9.40096536796537,
+      "forecast_consumption_lower": 2.6999999999999957,
+      "forecast_consumption_upper": 25.34200000000001
+    }
+  },
+  {
+    "ts": 1791557100000,
+    "values": {
+      "forecast_consumption": 7.934296536796538,
+      "forecast_consumption_lower": 3.836666666666666,
+      "forecast_consumption_upper": 24.181999999999995
+    }
+  },
+  {
+    "ts": 1791558000000,
+    "values": {
+      "forecast_consumption": 8.492541125541127,
+      "forecast_consumption_lower": 3.636000000000001,
+      "forecast_consumption_upper": 23.634000000000007
+    }
+  },
+  {
+    "ts": 1791558900000,
+    "values": {
+      "forecast_consumption": 7.876162337662337,
+      "forecast_consumption_lower": 3.371904761904761,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791559800000,
+    "values": {
+      "forecast_consumption": 8.18032683982684,
+      "forecast_consumption_lower": 3.225400000000001,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791560700000,
+    "values": {
+      "forecast_consumption": 10.07782251082251,
+      "forecast_consumption_lower": 2.601333333333334,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791561600000,
+    "values": {
+      "forecast_consumption": 9.495878787878787,
+      "forecast_consumption_lower": 3.217199999999999,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791562500000,
+    "values": {
+      "forecast_consumption": 9.08024025974026,
+      "forecast_consumption_lower": 2.7379999999999995,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791563400000,
+    "values": {
+      "forecast_consumption": 8.37343722943723,
+      "forecast_consumption_lower": 2.64,
+      "forecast_consumption_upper": 30.04
+    }
+  },
+  {
+    "ts": 1791564300000,
+    "values": {
+      "forecast_consumption": 8.484376623376624,
+      "forecast_consumption_lower": 3.190666666666667,
+      "forecast_consumption_upper": 29.07
+    }
+  },
+  {
+    "ts": 1791565200000,
+    "values": {
+      "forecast_consumption": 8.35778354978355,
+      "forecast_consumption_lower": 3.2800000000000007,
+      "forecast_consumption_upper": 27.669999999999998
+    }
+  },
+  {
+    "ts": 1791566100000,
+    "values": {
+      "forecast_consumption": 6.9755670995671,
+      "forecast_consumption_lower": 3.329333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791567000000,
+    "values": {
+      "forecast_consumption": 6.559212121212121,
+      "forecast_consumption_lower": 3.4157333333333337,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791567900000,
+    "values": {
+      "forecast_consumption": 8.33495670995671,
+      "forecast_consumption_lower": 3.155333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791568800000,
+    "values": {
+      "forecast_consumption": 8.046666666666667,
+      "forecast_consumption_lower": 2.7533333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791569700000,
+    "values": {
+      "forecast_consumption": 7.414939393939394,
+      "forecast_consumption_lower": 2.796666666666666,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791570600000,
+    "values": {
+      "forecast_consumption": 7.017909090909091,
+      "forecast_consumption_lower": 2.9220000000000006,
+      "forecast_consumption_upper": 28.11
+    }
+  },
+  {
+    "ts": 1791571500000,
+    "values": {
+      "forecast_consumption": 7.840212121212121,
+      "forecast_consumption_lower": 2.9466666666666663,
+      "forecast_consumption_upper": 28.006
+    }
+  },
+  {
+    "ts": 1791572400000,
+    "values": {
+      "forecast_consumption": 9.129787878787878,
+      "forecast_consumption_lower": 3.1326666666666663,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791573300000,
+    "values": {
+      "forecast_consumption": 9.263214285714286,
+      "forecast_consumption_lower": 3.0905333333333336,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791574200000,
+    "values": {
+      "forecast_consumption": 9.053670995670997,
+      "forecast_consumption_lower": 3.249066666666667,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791575100000,
+    "values": {
+      "forecast_consumption": 7.905969696969697,
+      "forecast_consumption_lower": 3.482,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791576000000,
+    "values": {
+      "forecast_consumption": 7.6570909090909085,
+      "forecast_consumption_lower": 3.0279999999999996,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791576900000,
+    "values": {
+      "forecast_consumption": 6.472974025974026,
+      "forecast_consumption_lower": 3.0340000000000003,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791577800000,
+    "values": {
+      "forecast_consumption": 7.278287878787879,
+      "forecast_consumption_lower": 2.9613333333333336,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791578700000,
+    "values": {
+      "forecast_consumption": 7.703696969696969,
+      "forecast_consumption_lower": 2.8613333333333335,
+      "forecast_consumption_upper": 19.503999999999994
+    }
+  },
+  {
+    "ts": 1791579600000,
+    "values": {
+      "forecast_consumption": 7.7892012987012995,
+      "forecast_consumption_lower": 3.0406666666666675,
+      "forecast_consumption_upper": 26.455000000000002
+    }
+  },
+  {
+    "ts": 1791580500000,
+    "values": {
+      "forecast_consumption": 7.5711818181818185,
+      "forecast_consumption_lower": 3.0379999999999994,
+      "forecast_consumption_upper": 32.1
+    }
+  },
+  {
+    "ts": 1791581400000,
+    "values": {
+      "forecast_consumption": 6.864123376623376,
+      "forecast_consumption_lower": 2.8988,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791582300000,
+    "values": {
+      "forecast_consumption": 9.719647186147187,
+      "forecast_consumption_lower": 3.54,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791583200000,
+    "values": {
+      "forecast_consumption": 11.258166666666668,
+      "forecast_consumption_lower": 3.3164666666666665,
+      "forecast_consumption_upper": 28.003999999999998
+    }
+  },
+  {
+    "ts": 1791584100000,
+    "values": {
+      "forecast_consumption": 10.239583333333334,
+      "forecast_consumption_lower": 3.3792666666666666,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791585000000,
+    "values": {
+      "forecast_consumption": 10.435238095238095,
+      "forecast_consumption_lower": 2.800571428571429,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791585900000,
+    "values": {
+      "forecast_consumption": 9.517642857142857,
+      "forecast_consumption_lower": 3.0306666666666673,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791586800000,
+    "values": {
+      "forecast_consumption": 6.276601190476191,
+      "forecast_consumption_lower": 2.9154761904761903,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791587700000,
+    "values": {
+      "forecast_consumption": 4.349178571428571,
+      "forecast_consumption_lower": 3.0860000000000003,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791588600000,
+    "values": {
+      "forecast_consumption": 10.415154761904763,
+      "forecast_consumption_lower": 3.0860000000000007,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791589500000,
+    "values": {
+      "forecast_consumption": 10.446214285714285,
+      "forecast_consumption_lower": 3.5080000000000005,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791590400000,
+    "values": {
+      "forecast_consumption": 14.348880952380954,
+      "forecast_consumption_lower": 4.2942,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791591300000,
+    "values": {
+      "forecast_consumption": 13.499250000000002,
+      "forecast_consumption_lower": 3.0491333333333346,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791592200000,
+    "values": {
+      "forecast_consumption": 7.609333333333334,
+      "forecast_consumption_lower": 3.4960666666666667,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791593100000,
+    "values": {
+      "forecast_consumption": 4.8144880952380955,
+      "forecast_consumption_lower": 2.9357333333333337,
+      "forecast_consumption_upper": 28.480999999999998
+    }
+  },
+  {
+    "ts": 1791594000000,
+    "values": {
+      "forecast_consumption": 11.916529761904762,
+      "forecast_consumption_lower": 2.9727333333333332,
+      "forecast_consumption_upper": 28.480999999999998
+    }
+  },
+  {
+    "ts": 1791594900000,
+    "values": {
+      "forecast_consumption": 10.2915,
+      "forecast_consumption_lower": 3.1370000000000005,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791595800000,
+    "values": {
+      "forecast_consumption": 9.768488095238094,
+      "forecast_consumption_lower": 2.9593333333333325,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791596700000,
+    "values": {
+      "forecast_consumption": 9.614220238095239,
+      "forecast_consumption_lower": 2.8100000000000005,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791597600000,
+    "values": {
+      "forecast_consumption": 4.599916666666667,
+      "forecast_consumption_lower": 2.9300000000000006,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791598500000,
+    "values": {
+      "forecast_consumption": 7.516416666666667,
+      "forecast_consumption_lower": 3.049333333333334,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791599400000,
+    "values": {
+      "forecast_consumption": 13.160732142857142,
+      "forecast_consumption_lower": 3.45,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791600300000,
+    "values": {
+      "forecast_consumption": 10.389833333333334,
+      "forecast_consumption_lower": 3.3753333333333333,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791601200000,
+    "values": {
+      "forecast_consumption": 12.586666666666666,
+      "forecast_consumption_lower": 2.7910666666666666,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791602100000,
+    "values": {
+      "forecast_consumption": 9.572666666666667,
+      "forecast_consumption_lower": 3.0469333333333335,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791603000000,
+    "values": {
+      "forecast_consumption": 4.281583333333334,
+      "forecast_consumption_lower": 3.094866666666667,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791603900000,
+    "values": {
+      "forecast_consumption": 8.739416666666667,
+      "forecast_consumption_lower": 3.120066666666666,
+      "forecast_consumption_upper": 27.85
+    }
+  },
+  {
+    "ts": 1791604800000,
+    "values": {
+      "forecast_consumption": 11.843583333333335,
+      "forecast_consumption_lower": 3.0860000000000003,
+      "forecast_consumption_upper": 33.3
+    }
+  },
+  {
+    "ts": 1791605700000,
+    "values": {
+      "forecast_consumption": 12.212416666666666,
+      "forecast_consumption_lower": 3.1206666666666667,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791606600000,
+    "values": {
+      "forecast_consumption": 13.257333333333335,
+      "forecast_consumption_lower": 2.8600000000000003,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791607500000,
+    "values": {
+      "forecast_consumption": 10.7265,
+      "forecast_consumption_lower": 3.711133333333333,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791608400000,
+    "values": {
+      "forecast_consumption": 8.424166666666668,
+      "forecast_consumption_lower": 3.180266666666667,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791609300000,
+    "values": {
+      "forecast_consumption": 11.450464285714286,
+      "forecast_consumption_lower": 3.9303333333333335,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791610200000,
+    "values": {
+      "forecast_consumption": 11.095583333333334,
+      "forecast_consumption_lower": 2.7155333333333336,
+      "forecast_consumption_upper": 29.37
+    }
+  },
+  {
+    "ts": 1791611100000,
+    "values": {
+      "forecast_consumption": 12.244982142857143,
+      "forecast_consumption_lower": 2.574000000000001,
+      "forecast_consumption_upper": 28.580000000000002
+    }
+  },
+  {
+    "ts": 1791612000000,
+    "values": {
+      "forecast_consumption": 12.010642857142857,
+      "forecast_consumption_lower": 2.3880000000000017,
+      "forecast_consumption_upper": 28.406000000000002
+    }
+  },
+  {
+    "ts": 1791612900000,
+    "values": {
+      "forecast_consumption": 6.38477380952381,
+      "forecast_consumption_lower": 2.254666666666667,
+      "forecast_consumption_upper": 28.406000000000002
+    }
+  },
+  {
+    "ts": 1791613800000,
+    "values": {
+      "forecast_consumption": 7.398000000000001,
+      "forecast_consumption_lower": 2.3033333333333363,
+      "forecast_consumption_upper": 28.555
+    }
+  },
+  {
+    "ts": 1791614700000,
+    "values": {
+      "forecast_consumption": 11.857166666666664,
+      "forecast_consumption_lower": 2.3033333333333292,
+      "forecast_consumption_upper": 28.555
+    }
+  },
+  {
+    "ts": 1791615600000,
+    "values": {
+      "forecast_consumption": 13.445267857142857,
+      "forecast_consumption_lower": 3.4724666666666706,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791616500000,
+    "values": {
+      "forecast_consumption": 14.385380952380949,
+      "forecast_consumption_lower": 5.021933333333324,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791617400000,
+    "values": {
+      "forecast_consumption": 11.818833333333334,
+      "forecast_consumption_lower": 6.234399999999998,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791618300000,
+    "values": {
+      "forecast_consumption": 6.889988095238093,
+      "forecast_consumption_lower": 3.2382857142857127,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791619200000,
+    "values": {
+      "forecast_consumption": 8.738660714285714,
+      "forecast_consumption_lower": 1.8990000000000031,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791620100000,
+    "values": {
+      "forecast_consumption": 11.767083333333336,
+      "forecast_consumption_lower": 2.494000000000007,
+      "forecast_consumption_upper": 31.0
+    }
+  },
+  {
+    "ts": 1791621000000,
+    "values": {
+      "forecast_consumption": 11.237732142857137,
+      "forecast_consumption_lower": 2.5873333333333193,
+      "forecast_consumption_upper": 31.0
+    }
+  },
+  {
+    "ts": 1791621900000,
+    "values": {
+      "forecast_consumption": 9.763666666666664,
+      "forecast_consumption_lower": 1.9679999999999964,
+      "forecast_consumption_upper": 31.0
+    }
+  },
+  {
+    "ts": 1791622800000,
+    "values": {
+      "forecast_consumption": 7.196749999999996,
+      "forecast_consumption_lower": 2.613333333333337,
+      "forecast_consumption_upper": 48.650000000000006
+    }
+  },
+  {
+    "ts": 1791623700000,
+    "values": {
+      "forecast_consumption": 9.661630952380955,
+      "forecast_consumption_lower": 2.9006666666666803,
+      "forecast_consumption_upper": 48.650000000000006
+    }
+  },
+  {
+    "ts": 1791624600000,
+    "values": {
+      "forecast_consumption": 11.529172619047621,
+      "forecast_consumption_lower": 4.102133333333338,
+      "forecast_consumption_upper": 48.650000000000006
+    }
+  },
+  {
+    "ts": 1791625500000,
+    "values": {
+      "forecast_consumption": 12.946916666666667,
+      "forecast_consumption_lower": 3.7710666666666683,
+      "forecast_consumption_upper": 48.650000000000006
+    }
+  },
+  {
+    "ts": 1791626400000,
+    "values": {
+      "forecast_consumption": 13.078583333333334,
+      "forecast_consumption_lower": 3.7732666666666725,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791627300000,
+    "values": {
+      "forecast_consumption": 10.667613095238096,
+      "forecast_consumption_lower": 3.803600000000009,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791628200000,
+    "values": {
+      "forecast_consumption": 12.53833333333333,
+      "forecast_consumption_lower": 7.285933333333325,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791629100000,
+    "values": {
+      "forecast_consumption": 11.465083333333336,
+      "forecast_consumption_lower": 3.0559999999999903,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791630000000,
+    "values": {
+      "forecast_consumption": 11.88578571428571,
+      "forecast_consumption_lower": 3.0069523809523773,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791630900000,
+    "values": {
+      "forecast_consumption": 10.234839285714283,
+      "forecast_consumption_lower": 3.1820000000000093,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791631800000,
+    "values": {
+      "forecast_consumption": 7.270976190476192,
+      "forecast_consumption_lower": 3.4660000000000224,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791632700000,
+    "values": {
+      "forecast_consumption": 8.459666666666667,
+      "forecast_consumption_lower": 4.0433333333333366,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791633600000,
+    "values": {
+      "forecast_consumption": 10.516083333333334,
+      "forecast_consumption_lower": 3.955999999999989,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791634500000,
+    "values": {
+      "forecast_consumption": 11.175166666666668,
+      "forecast_consumption_lower": 3.445999999999998,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791635400000,
+    "values": {
+      "forecast_consumption": 9.009249999999993,
+      "forecast_consumption_lower": 3.095933333333325,
+      "forecast_consumption_upper": 32.46699999999999
+    }
+  },
+  {
+    "ts": 1791636300000,
+    "values": {
+      "forecast_consumption": 6.0216488095238105,
+      "forecast_consumption_lower": 3.0589999999999975,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791637200000,
+    "values": {
+      "forecast_consumption": 8.621166666666669,
+      "forecast_consumption_lower": 3.377999999999993,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791638100000,
+    "values": {
+      "forecast_consumption": 12.717083333333331,
+      "forecast_consumption_lower": 4.0555999999999885,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791639000000,
+    "values": {
+      "forecast_consumption": 12.330964285714288,
+      "forecast_consumption_lower": 4.071600000000001,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791639900000,
+    "values": {
+      "forecast_consumption": 10.617083333333333,
+      "forecast_consumption_lower": 3.994466666666665,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791640800000,
+    "values": {
+      "forecast_consumption": 5.143916666666662,
+      "forecast_consumption_lower": 3.0805999999999942,
+      "forecast_consumption_upper": 29.752
+    }
+  },
+  {
+    "ts": 1791641700000,
+    "values": {
+      "forecast_consumption": 6.939839285714287,
+      "forecast_consumption_lower": 3.3019999999999996,
+      "forecast_consumption_upper": 29.752
+    }
+  },
+  {
+    "ts": 1791642600000,
+    "values": {
+      "forecast_consumption": 11.486833333333337,
+      "forecast_consumption_lower": 3.6053333333333413,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791643500000,
+    "values": {
+      "forecast_consumption": 10.014916666666668,
+      "forecast_consumption_lower": 3.192666666666671,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791644400000,
+    "values": {
+      "forecast_consumption": 9.760357142857142,
+      "forecast_consumption_lower": 3.067333333333332,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791645300000,
+    "values": {
+      "forecast_consumption": 5.527500000000001,
+      "forecast_consumption_lower": 2.9284666666666674,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791646200000,
+    "values": {
+      "forecast_consumption": 6.275613095238095,
+      "forecast_consumption_lower": 2.9540476190476186,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791647100000,
+    "values": {
+      "forecast_consumption": 11.536,
+      "forecast_consumption_lower": 2.95,
+      "forecast_consumption_upper": 28.59
+    }
+  },
+  {
+    "ts": 1791648000000,
+    "values": {
+      "forecast_consumption": 10.055250000000001,
+      "forecast_consumption_lower": 3.867800000000001,
+      "forecast_consumption_upper": 28.59
+    }
+  },
+  {
+    "ts": 1791648900000,
+    "values": {
+      "forecast_consumption": 9.372666666666667,
+      "forecast_consumption_lower": 2.5586666666666664,
+      "forecast_consumption_upper": 28.59
+    }
+  },
+  {
+    "ts": 1791649800000,
+    "values": {
+      "forecast_consumption": 7.511148809523809,
+      "forecast_consumption_lower": 2.353333333333334,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791650700000,
+    "values": {
+      "forecast_consumption": 6.062833333333334,
+      "forecast_consumption_lower": 2.8495333333333335,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791651600000,
+    "values": {
+      "forecast_consumption": 9.834988095238096,
+      "forecast_consumption_lower": 3.120304761904762,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791652500000,
+    "values": {
+      "forecast_consumption": 11.004999999999999,
+      "forecast_consumption_lower": 3.006666666666667,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791653400000,
+    "values": {
+      "forecast_consumption": 10.008553571428571,
+      "forecast_consumption_lower": 3.261333333333334,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791654300000,
+    "values": {
+      "forecast_consumption": 4.523327380952381,
+      "forecast_consumption_lower": 2.8953333333333338,
+      "forecast_consumption_upper": 28.639
+    }
+  },
+  {
+    "ts": 1791655200000,
+    "values": {
+      "forecast_consumption": 5.933744047619047,
+      "forecast_consumption_lower": 2.9166666666666665,
+      "forecast_consumption_upper": 28.069000000000003
+    }
+  },
+  {
+    "ts": 1791656100000,
+    "values": {
+      "forecast_consumption": 9.833773809523809,
+      "forecast_consumption_lower": 3.1148571428571428,
+      "forecast_consumption_upper": 28.659999999999997
+    }
+  },
+  {
+    "ts": 1791657000000,
+    "values": {
+      "forecast_consumption": 10.333166666666667,
+      "forecast_consumption_lower": 3.0319999999999996,
+      "forecast_consumption_upper": 28.659999999999997
+    }
+  },
+  {
+    "ts": 1791657900000,
+    "values": {
+      "forecast_consumption": 12.162511904761905,
+      "forecast_consumption_lower": 3.434,
+      "forecast_consumption_upper": 29.28
+    }
+  },
+  {
+    "ts": 1791658800000,
+    "values": {
+      "forecast_consumption": 7.310583333333334,
+      "forecast_consumption_lower": 3.2827333333333337,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791659700000,
+    "values": {
+      "forecast_consumption": 7.580416666666666,
+      "forecast_consumption_lower": 2.947866666666667,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791660600000,
+    "values": {
+      "forecast_consumption": 11.233416666666667,
+      "forecast_consumption_lower": 3.2266666666666666,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791661500000,
+    "values": {
+      "forecast_consumption": 10.442565476190476,
+      "forecast_consumption_lower": 2.8866666666666667,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791662400000,
+    "values": {
+      "forecast_consumption": 9.624916666666667,
+      "forecast_consumption_lower": 3.2035333333333336,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791663300000,
+    "values": {
+      "forecast_consumption": 7.098833333333333,
+      "forecast_consumption_lower": 2.939333333333334,
+      "forecast_consumption_upper": 27.67
+    }
+  },
+  {
+    "ts": 1791664200000,
+    "values": {
+      "forecast_consumption": 5.499416666666667,
+      "forecast_consumption_lower": 3.1080000000000005,
+      "forecast_consumption_upper": 27.098
+    }
+  },
+  {
+    "ts": 1791665100000,
+    "values": {
+      "forecast_consumption": 9.163809523809524,
+      "forecast_consumption_lower": 3.0020000000000007,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791666000000,
+    "values": {
+      "forecast_consumption": 9.806,
+      "forecast_consumption_lower": 2.8613333333333335,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791666900000,
+    "values": {
+      "forecast_consumption": 10.080833333333333,
+      "forecast_consumption_lower": 3.228866666666667,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791667800000,
+    "values": {
+      "forecast_consumption": 9.435,
+      "forecast_consumption_lower": 3.079533333333334,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791668700000,
+    "values": {
+      "forecast_consumption": 7.164416666666666,
+      "forecast_consumption_lower": 3.0413333333333323,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791669600000,
+    "values": {
+      "forecast_consumption": 11.258166666666668,
+      "forecast_consumption_lower": 3.3164666666666665,
+      "forecast_consumption_upper": 28.003999999999998
+    }
+  },
+  {
+    "ts": 1791670500000,
+    "values": {
+      "forecast_consumption": 10.239583333333334,
+      "forecast_consumption_lower": 3.3792666666666666,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791671400000,
+    "values": {
+      "forecast_consumption": 10.435238095238095,
+      "forecast_consumption_lower": 2.800571428571429,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791672300000,
+    "values": {
+      "forecast_consumption": 9.517642857142857,
+      "forecast_consumption_lower": 3.0306666666666673,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791673200000,
+    "values": {
+      "forecast_consumption": 6.276601190476191,
+      "forecast_consumption_lower": 2.9154761904761903,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791674100000,
+    "values": {
+      "forecast_consumption": 4.349178571428571,
+      "forecast_consumption_lower": 3.0860000000000003,
+      "forecast_consumption_upper": 28.275
+    }
+  },
+  {
+    "ts": 1791675000000,
+    "values": {
+      "forecast_consumption": 10.415154761904763,
+      "forecast_consumption_lower": 3.0860000000000007,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791675900000,
+    "values": {
+      "forecast_consumption": 10.446214285714285,
+      "forecast_consumption_lower": 3.5080000000000005,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791676800000,
+    "values": {
+      "forecast_consumption": 14.348880952380954,
+      "forecast_consumption_lower": 4.2942,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791677700000,
+    "values": {
+      "forecast_consumption": 13.499250000000002,
+      "forecast_consumption_lower": 3.0491333333333346,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791678600000,
+    "values": {
+      "forecast_consumption": 7.609333333333334,
+      "forecast_consumption_lower": 3.4960666666666667,
+      "forecast_consumption_upper": 31.75
+    }
+  },
+  {
+    "ts": 1791679500000,
+    "values": {
+      "forecast_consumption": 4.8144880952380955,
+      "forecast_consumption_lower": 2.9357333333333337,
+      "forecast_consumption_upper": 28.480999999999998
+    }
+  },
+  {
+    "ts": 1791680400000,
+    "values": {
+      "forecast_consumption": 11.916529761904762,
+      "forecast_consumption_lower": 2.9727333333333332,
+      "forecast_consumption_upper": 28.480999999999998
+    }
+  },
+  {
+    "ts": 1791681300000,
+    "values": {
+      "forecast_consumption": 10.2915,
+      "forecast_consumption_lower": 3.1370000000000005,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791682200000,
+    "values": {
+      "forecast_consumption": 9.768488095238094,
+      "forecast_consumption_lower": 2.9593333333333325,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791683100000,
+    "values": {
+      "forecast_consumption": 9.614220238095239,
+      "forecast_consumption_lower": 2.8100000000000005,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791684000000,
+    "values": {
+      "forecast_consumption": 4.599916666666667,
+      "forecast_consumption_lower": 2.9300000000000006,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791684900000,
+    "values": {
+      "forecast_consumption": 7.516416666666667,
+      "forecast_consumption_lower": 3.049333333333334,
+      "forecast_consumption_upper": 29.172
+    }
+  },
+  {
+    "ts": 1791685800000,
+    "values": {
+      "forecast_consumption": 13.160732142857142,
+      "forecast_consumption_lower": 3.45,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791686700000,
+    "values": {
+      "forecast_consumption": 10.389833333333334,
+      "forecast_consumption_lower": 3.3753333333333333,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791687600000,
+    "values": {
+      "forecast_consumption": 12.586666666666666,
+      "forecast_consumption_lower": 2.7910666666666666,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791688500000,
+    "values": {
+      "forecast_consumption": 9.572666666666667,
+      "forecast_consumption_lower": 3.0469333333333335,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791689400000,
+    "values": {
+      "forecast_consumption": 4.281583333333334,
+      "forecast_consumption_lower": 3.094866666666667,
+      "forecast_consumption_upper": 28.52
+    }
+  },
+  {
+    "ts": 1791690300000,
+    "values": {
+      "forecast_consumption": 8.739416666666667,
+      "forecast_consumption_lower": 3.120066666666666,
+      "forecast_consumption_upper": 27.85
+    }
+  },
+  {
+    "ts": 1791691200000,
+    "values": {
+      "forecast_consumption": 11.843583333333335,
+      "forecast_consumption_lower": 3.0860000000000003,
+      "forecast_consumption_upper": 33.3
+    }
+  },
+  {
+    "ts": 1791692100000,
+    "values": {
+      "forecast_consumption": 12.212416666666666,
+      "forecast_consumption_lower": 3.1206666666666667,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791693000000,
+    "values": {
+      "forecast_consumption": 13.257333333333335,
+      "forecast_consumption_lower": 2.8600000000000003,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791693900000,
+    "values": {
+      "forecast_consumption": 10.7265,
+      "forecast_consumption_lower": 3.711133333333333,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791694800000,
+    "values": {
+      "forecast_consumption": 8.424166666666668,
+      "forecast_consumption_lower": 3.180266666666667,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791695700000,
+    "values": {
+      "forecast_consumption": 11.450464285714286,
+      "forecast_consumption_lower": 3.9303333333333335,
+      "forecast_consumption_upper": 38.79
+    }
+  },
+  {
+    "ts": 1791696600000,
+    "values": {
+      "forecast_consumption": 11.095583333333334,
+      "forecast_consumption_lower": 2.7155333333333336,
+      "forecast_consumption_upper": 29.37
+    }
+  },
+  {
+    "ts": 1791697500000,
+    "values": {
+      "forecast_consumption": 12.244982142857143,
+      "forecast_consumption_lower": 2.574000000000001,
+      "forecast_consumption_upper": 28.580000000000002
+    }
+  },
+  {
+    "ts": 1791698400000,
+    "values": {
+      "forecast_consumption": 12.010642857142857,
+      "forecast_consumption_lower": 2.3880000000000017,
+      "forecast_consumption_upper": 28.406000000000002
+    }
+  },
+  {
+    "ts": 1791699300000,
+    "values": {
+      "forecast_consumption": 6.38477380952381,
+      "forecast_consumption_lower": 2.254666666666667,
+      "forecast_consumption_upper": 28.406000000000002
+    }
+  },
+  {
+    "ts": 1791700200000,
+    "values": {
+      "forecast_consumption": 7.398000000000001,
+      "forecast_consumption_lower": 2.3033333333333363,
+      "forecast_consumption_upper": 28.555
+    }
+  },
+  {
+    "ts": 1791701100000,
+    "values": {
+      "forecast_consumption": 11.857166666666664,
+      "forecast_consumption_lower": 2.3033333333333292,
+      "forecast_consumption_upper": 28.555
+    }
+  },
+  {
+    "ts": 1791702000000,
+    "values": {
+      "forecast_consumption": 13.445267857142857,
+      "forecast_consumption_lower": 3.4724666666666706,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791702900000,
+    "values": {
+      "forecast_consumption": 14.385380952380949,
+      "forecast_consumption_lower": 5.021933333333324,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791703800000,
+    "values": {
+      "forecast_consumption": 11.818833333333334,
+      "forecast_consumption_lower": 6.234399999999998,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791704700000,
+    "values": {
+      "forecast_consumption": 6.889988095238093,
+      "forecast_consumption_lower": 3.2382857142857127,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791705600000,
+    "values": {
+      "forecast_consumption": 8.738660714285714,
+      "forecast_consumption_lower": 1.8990000000000031,
+      "forecast_consumption_upper": 30.916999999999998
+    }
+  },
+  {
+    "ts": 1791706500000,
+    "values": {
+      "forecast_consumption": 11.767083333333336,
+      "forecast_consumption_lower": 2.494000000000007,
+      "forecast_consumption_upper": 31.0
+    }
+  },
+  {
+    "ts": 1791707400000,
+    "values": {
+      "forecast_consumption": 11.237732142857137,
+      "forecast_consumption_lower": 2.5873333333333193,
+      "forecast_consumption_upper": 31.0
+    }
+  },
+  {
+    "ts": 1791708300000,
+    "values": {
+      "forecast_consumption": 9.763666666666664,
+      "forecast_consumption_lower": 1.9679999999999964,
+      "forecast_consumption_upper": 31.0
+    }
+  },
+  {
+    "ts": 1791709200000,
+    "values": {
+      "forecast_consumption": 7.196749999999996,
+      "forecast_consumption_lower": 2.613333333333337,
+      "forecast_consumption_upper": 48.650000000000006
+    }
+  },
+  {
+    "ts": 1791710100000,
+    "values": {
+      "forecast_consumption": 9.661630952380955,
+      "forecast_consumption_lower": 2.9006666666666803,
+      "forecast_consumption_upper": 48.650000000000006
+    }
+  },
+  {
+    "ts": 1791711000000,
+    "values": {
+      "forecast_consumption": 11.529172619047621,
+      "forecast_consumption_lower": 4.102133333333338,
+      "forecast_consumption_upper": 48.650000000000006
+    }
+  },
+  {
+    "ts": 1791711900000,
+    "values": {
+      "forecast_consumption": 12.946916666666667,
+      "forecast_consumption_lower": 3.7710666666666683,
+      "forecast_consumption_upper": 48.650000000000006
+    }
+  },
+  {
+    "ts": 1791712800000,
+    "values": {
+      "forecast_consumption": 13.078583333333334,
+      "forecast_consumption_lower": 3.7732666666666725,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791713700000,
+    "values": {
+      "forecast_consumption": 10.667613095238096,
+      "forecast_consumption_lower": 3.803600000000009,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791714600000,
+    "values": {
+      "forecast_consumption": 12.53833333333333,
+      "forecast_consumption_lower": 7.285933333333325,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791715500000,
+    "values": {
+      "forecast_consumption": 11.465083333333336,
+      "forecast_consumption_lower": 3.0559999999999903,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791716400000,
+    "values": {
+      "forecast_consumption": 11.88578571428571,
+      "forecast_consumption_lower": 3.0069523809523773,
+      "forecast_consumption_upper": 52.20399999999999
+    }
+  },
+  {
+    "ts": 1791717300000,
+    "values": {
+      "forecast_consumption": 10.234839285714283,
+      "forecast_consumption_lower": 3.1820000000000093,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791718200000,
+    "values": {
+      "forecast_consumption": 7.270976190476192,
+      "forecast_consumption_lower": 3.4660000000000224,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791719100000,
+    "values": {
+      "forecast_consumption": 8.459666666666667,
+      "forecast_consumption_lower": 4.0433333333333366,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791720000000,
+    "values": {
+      "forecast_consumption": 10.516083333333334,
+      "forecast_consumption_lower": 3.955999999999989,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791720900000,
+    "values": {
+      "forecast_consumption": 11.175166666666668,
+      "forecast_consumption_lower": 3.445999999999998,
+      "forecast_consumption_upper": 34.50899999999999
+    }
+  },
+  {
+    "ts": 1791721800000,
+    "values": {
+      "forecast_consumption": 9.009249999999993,
+      "forecast_consumption_lower": 3.095933333333325,
+      "forecast_consumption_upper": 32.46699999999999
+    }
+  },
+  {
+    "ts": 1791722700000,
+    "values": {
+      "forecast_consumption": 6.0216488095238105,
+      "forecast_consumption_lower": 3.0589999999999975,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791723600000,
+    "values": {
+      "forecast_consumption": 8.621166666666669,
+      "forecast_consumption_lower": 3.377999999999993,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791724500000,
+    "values": {
+      "forecast_consumption": 12.717083333333331,
+      "forecast_consumption_lower": 4.0555999999999885,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791725400000,
+    "values": {
+      "forecast_consumption": 12.330964285714288,
+      "forecast_consumption_lower": 4.071600000000001,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791726300000,
+    "values": {
+      "forecast_consumption": 10.617083333333333,
+      "forecast_consumption_lower": 3.994466666666665,
+      "forecast_consumption_upper": 38.717999999999996
+    }
+  },
+  {
+    "ts": 1791727200000,
+    "values": {
+      "forecast_consumption": 5.143916666666662,
+      "forecast_consumption_lower": 3.0805999999999942,
+      "forecast_consumption_upper": 29.752
+    }
+  },
+  {
+    "ts": 1791728100000,
+    "values": {
+      "forecast_consumption": 6.939839285714287,
+      "forecast_consumption_lower": 3.3019999999999996,
+      "forecast_consumption_upper": 29.752
+    }
+  },
+  {
+    "ts": 1791729000000,
+    "values": {
+      "forecast_consumption": 11.486833333333337,
+      "forecast_consumption_lower": 3.6053333333333413,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791729900000,
+    "values": {
+      "forecast_consumption": 10.014916666666668,
+      "forecast_consumption_lower": 3.192666666666671,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791730800000,
+    "values": {
+      "forecast_consumption": 9.760357142857142,
+      "forecast_consumption_lower": 3.067333333333332,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791731700000,
+    "values": {
+      "forecast_consumption": 5.527500000000001,
+      "forecast_consumption_lower": 2.9284666666666674,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791732600000,
+    "values": {
+      "forecast_consumption": 6.275613095238095,
+      "forecast_consumption_lower": 2.9540476190476186,
+      "forecast_consumption_upper": 29.054000000000002
+    }
+  },
+  {
+    "ts": 1791733500000,
+    "values": {
+      "forecast_consumption": 11.536,
+      "forecast_consumption_lower": 2.95,
+      "forecast_consumption_upper": 28.59
+    }
+  },
+  {
+    "ts": 1791734400000,
+    "values": {
+      "forecast_consumption": 10.055250000000001,
+      "forecast_consumption_lower": 3.867800000000001,
+      "forecast_consumption_upper": 28.59
+    }
+  },
+  {
+    "ts": 1791735300000,
+    "values": {
+      "forecast_consumption": 9.372666666666667,
+      "forecast_consumption_lower": 2.5586666666666664,
+      "forecast_consumption_upper": 28.59
+    }
+  },
+  {
+    "ts": 1791736200000,
+    "values": {
+      "forecast_consumption": 7.511148809523809,
+      "forecast_consumption_lower": 2.353333333333334,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791737100000,
+    "values": {
+      "forecast_consumption": 6.062833333333334,
+      "forecast_consumption_lower": 2.8495333333333335,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791738000000,
+    "values": {
+      "forecast_consumption": 9.834988095238096,
+      "forecast_consumption_lower": 3.120304761904762,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791738900000,
+    "values": {
+      "forecast_consumption": 11.004999999999999,
+      "forecast_consumption_lower": 3.006666666666667,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791739800000,
+    "values": {
+      "forecast_consumption": 10.008553571428571,
+      "forecast_consumption_lower": 3.261333333333334,
+      "forecast_consumption_upper": 30.018000000000004
+    }
+  },
+  {
+    "ts": 1791740700000,
+    "values": {
+      "forecast_consumption": 4.523327380952381,
+      "forecast_consumption_lower": 2.8953333333333338,
+      "forecast_consumption_upper": 28.639
+    }
+  },
+  {
+    "ts": 1791741600000,
+    "values": {
+      "forecast_consumption": 5.933744047619047,
+      "forecast_consumption_lower": 2.9166666666666665,
+      "forecast_consumption_upper": 28.069000000000003
+    }
+  },
+  {
+    "ts": 1791742500000,
+    "values": {
+      "forecast_consumption": 9.833773809523809,
+      "forecast_consumption_lower": 3.1148571428571428,
+      "forecast_consumption_upper": 28.659999999999997
+    }
+  },
+  {
+    "ts": 1791743400000,
+    "values": {
+      "forecast_consumption": 10.333166666666667,
+      "forecast_consumption_lower": 3.0319999999999996,
+      "forecast_consumption_upper": 28.659999999999997
+    }
+  },
+  {
+    "ts": 1791744300000,
+    "values": {
+      "forecast_consumption": 12.162511904761905,
+      "forecast_consumption_lower": 3.434,
+      "forecast_consumption_upper": 29.28
+    }
+  },
+  {
+    "ts": 1791745200000,
+    "values": {
+      "forecast_consumption": 7.310583333333334,
+      "forecast_consumption_lower": 3.2827333333333337,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791746100000,
+    "values": {
+      "forecast_consumption": 7.580416666666666,
+      "forecast_consumption_lower": 2.947866666666667,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791747000000,
+    "values": {
+      "forecast_consumption": 11.233416666666667,
+      "forecast_consumption_lower": 3.2266666666666666,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791747900000,
+    "values": {
+      "forecast_consumption": 10.442565476190476,
+      "forecast_consumption_lower": 2.8866666666666667,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791748800000,
+    "values": {
+      "forecast_consumption": 9.624916666666667,
+      "forecast_consumption_lower": 3.2035333333333336,
+      "forecast_consumption_upper": 31.04
+    }
+  },
+  {
+    "ts": 1791749700000,
+    "values": {
+      "forecast_consumption": 7.098833333333333,
+      "forecast_consumption_lower": 2.939333333333334,
+      "forecast_consumption_upper": 27.67
+    }
+  },
+  {
+    "ts": 1791750600000,
+    "values": {
+      "forecast_consumption": 5.499416666666667,
+      "forecast_consumption_lower": 3.1080000000000005,
+      "forecast_consumption_upper": 27.098
+    }
+  },
+  {
+    "ts": 1791751500000,
+    "values": {
+      "forecast_consumption": 9.163809523809524,
+      "forecast_consumption_lower": 3.0020000000000007,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791752400000,
+    "values": {
+      "forecast_consumption": 9.806,
+      "forecast_consumption_lower": 2.8613333333333335,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791753300000,
+    "values": {
+      "forecast_consumption": 10.080833333333333,
+      "forecast_consumption_lower": 3.228866666666667,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791754200000,
+    "values": {
+      "forecast_consumption": 9.435,
+      "forecast_consumption_lower": 3.079533333333334,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791755100000,
+    "values": {
+      "forecast_consumption": 7.164416666666666,
+      "forecast_consumption_lower": 3.0413333333333323,
+      "forecast_consumption_upper": 28.843999999999998
+    }
+  },
+  {
+    "ts": 1791756000000,
+    "values": {
+      "forecast_consumption": 9.802997835497836,
+      "forecast_consumption_lower": 3.3654666666666664,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791756900000,
+    "values": {
+      "forecast_consumption": 8.32777922077922,
+      "forecast_consumption_lower": 3.1773333333333227,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791757800000,
+    "values": {
+      "forecast_consumption": 8.292939393939394,
+      "forecast_consumption_lower": 2.8913333333333338,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791758700000,
+    "values": {
+      "forecast_consumption": 6.519056277056276,
+      "forecast_consumption_lower": 2.9813333333333336,
+      "forecast_consumption_upper": 28.43
+    }
+  },
+  {
+    "ts": 1791759600000,
+    "values": {
+      "forecast_consumption": 6.803969696969698,
+      "forecast_consumption_lower": 3.009999999999998,
+      "forecast_consumption_upper": 25.630000000000003
+    }
+  },
+  {
+    "ts": 1791760500000,
+    "values": {
+      "forecast_consumption": 7.105961038961038,
+      "forecast_consumption_lower": 3.192,
+      "forecast_consumption_upper": 27.019000000000002
+    }
+  },
+  {
+    "ts": 1791761400000,
+    "values": {
+      "forecast_consumption": 8.060140692640692,
+      "forecast_consumption_lower": 3.2273333333333323,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791762300000,
+    "values": {
+      "forecast_consumption": 7.947025974025976,
+      "forecast_consumption_lower": 2.921133333333346,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791763200000,
+    "values": {
+      "forecast_consumption": 7.936670995670995,
+      "forecast_consumption_lower": 2.962000000000001,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791764100000,
+    "values": {
+      "forecast_consumption": 9.241757575757577,
+      "forecast_consumption_lower": 2.9728000000000008,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791765000000,
+    "values": {
+      "forecast_consumption": 8.620051948051948,
+      "forecast_consumption_lower": 3.233714285714286,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791765900000,
+    "values": {
+      "forecast_consumption": 9.199783549783549,
+      "forecast_consumption_lower": 3.1306666666666665,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791766800000,
+    "values": {
+      "forecast_consumption": 8.592991341991342,
+      "forecast_consumption_lower": 3.054666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791767700000,
+    "values": {
+      "forecast_consumption": 7.981290043290044,
+      "forecast_consumption_lower": 2.990666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791768600000,
+    "values": {
+      "forecast_consumption": 6.963316017316018,
+      "forecast_consumption_lower": 3.2526666666666664,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791769500000,
+    "values": {
+      "forecast_consumption": 7.884196969696969,
+      "forecast_consumption_lower": 3.469533333333335,
+      "forecast_consumption_upper": 32.410000000000004
+    }
+  },
+  {
+    "ts": 1791770400000,
+    "values": {
+      "forecast_consumption": 8.277186147186148,
+      "forecast_consumption_lower": 3.331733333333333,
+      "forecast_consumption_upper": 35.230000000000004
+    }
+  },
+  {
+    "ts": 1791771300000,
+    "values": {
+      "forecast_consumption": 10.305361471861472,
+      "forecast_consumption_lower": 3.935933333333333,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791772200000,
+    "values": {
+      "forecast_consumption": 14.494365800865802,
+      "forecast_consumption_lower": 7.956666666666666,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791773100000,
+    "values": {
+      "forecast_consumption": 15.947792207792208,
+      "forecast_consumption_lower": 8.694666666666667,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791774000000,
+    "values": {
+      "forecast_consumption": 17.20181168831169,
+      "forecast_consumption_lower": 9.364666666666665,
+      "forecast_consumption_upper": 41.766000000000005
+    }
+  },
+  {
+    "ts": 1791774900000,
+    "values": {
+      "forecast_consumption": 18.796515151515152,
+      "forecast_consumption_lower": 12.076266666666667,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791775800000,
+    "values": {
+      "forecast_consumption": 24.402320346320344,
+      "forecast_consumption_lower": 13.434,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791776700000,
+    "values": {
+      "forecast_consumption": 27.644512987012988,
+      "forecast_consumption_lower": 19.772000000000002,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791777600000,
+    "values": {
+      "forecast_consumption": 30.647103896103896,
+      "forecast_consumption_lower": 25.4514,
+      "forecast_consumption_upper": 66.62
+    }
+  },
+  {
+    "ts": 1791778500000,
+    "values": {
+      "forecast_consumption": 32.50030735930736,
+      "forecast_consumption_lower": 26.655533333333338,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791779400000,
+    "values": {
+      "forecast_consumption": 34.02149134199134,
+      "forecast_consumption_lower": 26.710933333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791780300000,
+    "values": {
+      "forecast_consumption": 34.9053658008658,
+      "forecast_consumption_lower": 27.021938095238102,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791781200000,
+    "values": {
+      "forecast_consumption": 36.027545454545454,
+      "forecast_consumption_lower": 28.30533333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791782100000,
+    "values": {
+      "forecast_consumption": 35.839666666666666,
+      "forecast_consumption_lower": 29.511999999999997,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791783000000,
+    "values": {
+      "forecast_consumption": 36.511746753246754,
+      "forecast_consumption_lower": 28.325999999999997,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791783900000,
+    "values": {
+      "forecast_consumption": 36.90702813852813,
+      "forecast_consumption_lower": 29.935333333333332,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791784800000,
+    "values": {
+      "forecast_consumption": 32.90765367965368,
+      "forecast_consumption_lower": 28.86266666666667,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791785700000,
+    "values": {
+      "forecast_consumption": 34.393935064935064,
+      "forecast_consumption_lower": 29.815999999999995,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791786600000,
+    "values": {
+      "forecast_consumption": 35.88997835497835,
+      "forecast_consumption_lower": 31.762999999999998,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791787500000,
+    "values": {
+      "forecast_consumption": 39.4659025974026,
+      "forecast_consumption_lower": 29.349266666666665,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791788400000,
+    "values": {
+      "forecast_consumption": 38.93094155844156,
+      "forecast_consumption_lower": 31.487,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791789300000,
+    "values": {
+      "forecast_consumption": 37.374958874458876,
+      "forecast_consumption_lower": 31.832666666666668,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791790200000,
+    "values": {
+      "forecast_consumption": 33.21833766233766,
+      "forecast_consumption_lower": 29.4364,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791791100000,
+    "values": {
+      "forecast_consumption": 32.527359307359305,
+      "forecast_consumption_lower": 26.687333333333335,
+      "forecast_consumption_upper": 71.95799999999998
+    }
+  },
+  {
+    "ts": 1791792000000,
+    "values": {
+      "forecast_consumption": 33.10135064935065,
+      "forecast_consumption_lower": 28.911999999999995,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791792900000,
+    "values": {
+      "forecast_consumption": 39.1633354978355,
+      "forecast_consumption_lower": 31.13885714285714,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791793800000,
+    "values": {
+      "forecast_consumption": 39.28412987012987,
+      "forecast_consumption_lower": 31.215999999999998,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791794700000,
+    "values": {
+      "forecast_consumption": 37.610580086580086,
+      "forecast_consumption_lower": 31.179142857142853,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791795600000,
+    "values": {
+      "forecast_consumption": 37.44477489177489,
+      "forecast_consumption_lower": 32.50699999999999,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791796500000,
+    "values": {
+      "forecast_consumption": 36.590878787878786,
+      "forecast_consumption_lower": 29.550000000000008,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791797400000,
+    "values": {
+      "forecast_consumption": 37.46841558441558,
+      "forecast_consumption_lower": 32.771266666666655,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791798300000,
+    "values": {
+      "forecast_consumption": 38.13059523809524,
+      "forecast_consumption_lower": 32.11879999999999,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791799200000,
+    "values": {
+      "forecast_consumption": 35.82397835497836,
+      "forecast_consumption_lower": 28.829599999999985,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791800100000,
+    "values": {
+      "forecast_consumption": 37.200917748917746,
+      "forecast_consumption_lower": 27.736,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791801000000,
+    "values": {
+      "forecast_consumption": 36.05848051948052,
+      "forecast_consumption_lower": 28.507333333333342,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791801900000,
+    "values": {
+      "forecast_consumption": 34.016006493506495,
+      "forecast_consumption_lower": 23.192666666666668,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791802800000,
+    "values": {
+      "forecast_consumption": 33.62578787878788,
+      "forecast_consumption_lower": 16.44466666666667,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791803700000,
+    "values": {
+      "forecast_consumption": 31.42029004329004,
+      "forecast_consumption_lower": 17.052666666666664,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791804600000,
+    "values": {
+      "forecast_consumption": 27.24438528138528,
+      "forecast_consumption_lower": 20.215333333333326,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791805500000,
+    "values": {
+      "forecast_consumption": 21.229575757575756,
+      "forecast_consumption_lower": 16.248676190476207,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791806400000,
+    "values": {
+      "forecast_consumption": 15.362177489177487,
+      "forecast_consumption_lower": 10.203333333333333,
+      "forecast_consumption_upper": 59.92
+    }
+  },
+  {
+    "ts": 1791807300000,
+    "values": {
+      "forecast_consumption": 13.591253246753247,
+      "forecast_consumption_lower": 5.747238095238096,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791808200000,
+    "values": {
+      "forecast_consumption": 14.763510822510822,
+      "forecast_consumption_lower": 5.6213333333333395,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791809100000,
+    "values": {
+      "forecast_consumption": 14.84262337662338,
+      "forecast_consumption_lower": 5.718666666666671,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791810000000,
+    "values": {
+      "forecast_consumption": 14.653493506493506,
+      "forecast_consumption_lower": 5.710000000000001,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791810900000,
+    "values": {
+      "forecast_consumption": 11.415629870129873,
+      "forecast_consumption_lower": 4.838000000000008,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791811800000,
+    "values": {
+      "forecast_consumption": 10.203212121212122,
+      "forecast_consumption_lower": 4.8613333333333415,
+      "forecast_consumption_upper": 43.67
+    }
+  },
+  {
+    "ts": 1791812700000,
+    "values": {
+      "forecast_consumption": 10.316848484848485,
+      "forecast_consumption_lower": 3.906666666666659,
+      "forecast_consumption_upper": 35.802
+    }
+  },
+  {
+    "ts": 1791813600000,
+    "values": {
+      "forecast_consumption": 9.40781818181818,
+      "forecast_consumption_lower": 2.829333333333331,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791814500000,
+    "values": {
+      "forecast_consumption": 8.2065670995671,
+      "forecast_consumption_lower": 3.173333333333332,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791815400000,
+    "values": {
+      "forecast_consumption": 9.40096536796537,
+      "forecast_consumption_lower": 2.6999999999999957,
+      "forecast_consumption_upper": 25.34200000000001
+    }
+  },
+  {
+    "ts": 1791816300000,
+    "values": {
+      "forecast_consumption": 7.934296536796538,
+      "forecast_consumption_lower": 3.836666666666666,
+      "forecast_consumption_upper": 24.181999999999995
+    }
+  },
+  {
+    "ts": 1791817200000,
+    "values": {
+      "forecast_consumption": 8.492541125541127,
+      "forecast_consumption_lower": 3.636000000000001,
+      "forecast_consumption_upper": 23.634000000000007
+    }
+  },
+  {
+    "ts": 1791818100000,
+    "values": {
+      "forecast_consumption": 7.876162337662337,
+      "forecast_consumption_lower": 3.371904761904761,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791819000000,
+    "values": {
+      "forecast_consumption": 8.18032683982684,
+      "forecast_consumption_lower": 3.225400000000001,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791819900000,
+    "values": {
+      "forecast_consumption": 10.07782251082251,
+      "forecast_consumption_lower": 2.601333333333334,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791820800000,
+    "values": {
+      "forecast_consumption": 9.495878787878787,
+      "forecast_consumption_lower": 3.217199999999999,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791821700000,
+    "values": {
+      "forecast_consumption": 9.08024025974026,
+      "forecast_consumption_lower": 2.7379999999999995,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791822600000,
+    "values": {
+      "forecast_consumption": 8.37343722943723,
+      "forecast_consumption_lower": 2.64,
+      "forecast_consumption_upper": 30.04
+    }
+  },
+  {
+    "ts": 1791823500000,
+    "values": {
+      "forecast_consumption": 8.484376623376624,
+      "forecast_consumption_lower": 3.190666666666667,
+      "forecast_consumption_upper": 29.07
+    }
+  },
+  {
+    "ts": 1791824400000,
+    "values": {
+      "forecast_consumption": 8.35778354978355,
+      "forecast_consumption_lower": 3.2800000000000007,
+      "forecast_consumption_upper": 27.669999999999998
+    }
+  },
+  {
+    "ts": 1791825300000,
+    "values": {
+      "forecast_consumption": 6.9755670995671,
+      "forecast_consumption_lower": 3.329333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791826200000,
+    "values": {
+      "forecast_consumption": 6.559212121212121,
+      "forecast_consumption_lower": 3.4157333333333337,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791827100000,
+    "values": {
+      "forecast_consumption": 8.33495670995671,
+      "forecast_consumption_lower": 3.155333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791828000000,
+    "values": {
+      "forecast_consumption": 8.046666666666667,
+      "forecast_consumption_lower": 2.7533333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791828900000,
+    "values": {
+      "forecast_consumption": 7.414939393939394,
+      "forecast_consumption_lower": 2.796666666666666,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791829800000,
+    "values": {
+      "forecast_consumption": 7.017909090909091,
+      "forecast_consumption_lower": 2.9220000000000006,
+      "forecast_consumption_upper": 28.11
+    }
+  },
+  {
+    "ts": 1791830700000,
+    "values": {
+      "forecast_consumption": 7.840212121212121,
+      "forecast_consumption_lower": 2.9466666666666663,
+      "forecast_consumption_upper": 28.006
+    }
+  },
+  {
+    "ts": 1791831600000,
+    "values": {
+      "forecast_consumption": 9.129787878787878,
+      "forecast_consumption_lower": 3.1326666666666663,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791832500000,
+    "values": {
+      "forecast_consumption": 9.263214285714286,
+      "forecast_consumption_lower": 3.0905333333333336,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791833400000,
+    "values": {
+      "forecast_consumption": 9.053670995670997,
+      "forecast_consumption_lower": 3.249066666666667,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791834300000,
+    "values": {
+      "forecast_consumption": 7.905969696969697,
+      "forecast_consumption_lower": 3.482,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791835200000,
+    "values": {
+      "forecast_consumption": 7.6570909090909085,
+      "forecast_consumption_lower": 3.0279999999999996,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791836100000,
+    "values": {
+      "forecast_consumption": 6.472974025974026,
+      "forecast_consumption_lower": 3.0340000000000003,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791837000000,
+    "values": {
+      "forecast_consumption": 7.278287878787879,
+      "forecast_consumption_lower": 2.9613333333333336,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791837900000,
+    "values": {
+      "forecast_consumption": 7.703696969696969,
+      "forecast_consumption_lower": 2.8613333333333335,
+      "forecast_consumption_upper": 19.503999999999994
+    }
+  },
+  {
+    "ts": 1791838800000,
+    "values": {
+      "forecast_consumption": 7.7892012987012995,
+      "forecast_consumption_lower": 3.0406666666666675,
+      "forecast_consumption_upper": 26.455000000000002
+    }
+  },
+  {
+    "ts": 1791839700000,
+    "values": {
+      "forecast_consumption": 7.5711818181818185,
+      "forecast_consumption_lower": 3.0379999999999994,
+      "forecast_consumption_upper": 32.1
+    }
+  },
+  {
+    "ts": 1791840600000,
+    "values": {
+      "forecast_consumption": 6.864123376623376,
+      "forecast_consumption_lower": 2.8988,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791841500000,
+    "values": {
+      "forecast_consumption": 9.719647186147187,
+      "forecast_consumption_lower": 3.54,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791842400000,
+    "values": {
+      "forecast_consumption": 9.802997835497836,
+      "forecast_consumption_lower": 3.3654666666666664,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791843300000,
+    "values": {
+      "forecast_consumption": 8.32777922077922,
+      "forecast_consumption_lower": 3.1773333333333227,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791844200000,
+    "values": {
+      "forecast_consumption": 8.292939393939394,
+      "forecast_consumption_lower": 2.8913333333333338,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791845100000,
+    "values": {
+      "forecast_consumption": 6.519056277056276,
+      "forecast_consumption_lower": 2.9813333333333336,
+      "forecast_consumption_upper": 28.43
+    }
+  },
+  {
+    "ts": 1791846000000,
+    "values": {
+      "forecast_consumption": 6.803969696969698,
+      "forecast_consumption_lower": 3.009999999999998,
+      "forecast_consumption_upper": 25.630000000000003
+    }
+  },
+  {
+    "ts": 1791846900000,
+    "values": {
+      "forecast_consumption": 7.105961038961038,
+      "forecast_consumption_lower": 3.192,
+      "forecast_consumption_upper": 27.019000000000002
+    }
+  },
+  {
+    "ts": 1791847800000,
+    "values": {
+      "forecast_consumption": 8.060140692640692,
+      "forecast_consumption_lower": 3.2273333333333323,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791848700000,
+    "values": {
+      "forecast_consumption": 7.947025974025976,
+      "forecast_consumption_lower": 2.921133333333346,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791849600000,
+    "values": {
+      "forecast_consumption": 7.936670995670995,
+      "forecast_consumption_lower": 2.962000000000001,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791850500000,
+    "values": {
+      "forecast_consumption": 9.241757575757577,
+      "forecast_consumption_lower": 2.9728000000000008,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791851400000,
+    "values": {
+      "forecast_consumption": 8.620051948051948,
+      "forecast_consumption_lower": 3.233714285714286,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791852300000,
+    "values": {
+      "forecast_consumption": 9.199783549783549,
+      "forecast_consumption_lower": 3.1306666666666665,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791853200000,
+    "values": {
+      "forecast_consumption": 8.592991341991342,
+      "forecast_consumption_lower": 3.054666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791854100000,
+    "values": {
+      "forecast_consumption": 7.981290043290044,
+      "forecast_consumption_lower": 2.990666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791855000000,
+    "values": {
+      "forecast_consumption": 6.963316017316018,
+      "forecast_consumption_lower": 3.2526666666666664,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791855900000,
+    "values": {
+      "forecast_consumption": 7.884196969696969,
+      "forecast_consumption_lower": 3.469533333333335,
+      "forecast_consumption_upper": 32.410000000000004
+    }
+  },
+  {
+    "ts": 1791856800000,
+    "values": {
+      "forecast_consumption": 8.277186147186148,
+      "forecast_consumption_lower": 3.331733333333333,
+      "forecast_consumption_upper": 35.230000000000004
+    }
+  },
+  {
+    "ts": 1791857700000,
+    "values": {
+      "forecast_consumption": 10.305361471861472,
+      "forecast_consumption_lower": 3.935933333333333,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791858600000,
+    "values": {
+      "forecast_consumption": 14.494365800865802,
+      "forecast_consumption_lower": 7.956666666666666,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791859500000,
+    "values": {
+      "forecast_consumption": 15.947792207792208,
+      "forecast_consumption_lower": 8.694666666666667,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791860400000,
+    "values": {
+      "forecast_consumption": 17.20181168831169,
+      "forecast_consumption_lower": 9.364666666666665,
+      "forecast_consumption_upper": 41.766000000000005
+    }
+  },
+  {
+    "ts": 1791861300000,
+    "values": {
+      "forecast_consumption": 18.796515151515152,
+      "forecast_consumption_lower": 12.076266666666667,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791862200000,
+    "values": {
+      "forecast_consumption": 24.402320346320344,
+      "forecast_consumption_lower": 13.434,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791863100000,
+    "values": {
+      "forecast_consumption": 27.644512987012988,
+      "forecast_consumption_lower": 19.772000000000002,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791864000000,
+    "values": {
+      "forecast_consumption": 30.647103896103896,
+      "forecast_consumption_lower": 25.4514,
+      "forecast_consumption_upper": 66.62
+    }
+  },
+  {
+    "ts": 1791864900000,
+    "values": {
+      "forecast_consumption": 32.50030735930736,
+      "forecast_consumption_lower": 26.655533333333338,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791865800000,
+    "values": {
+      "forecast_consumption": 34.02149134199134,
+      "forecast_consumption_lower": 26.710933333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791866700000,
+    "values": {
+      "forecast_consumption": 34.9053658008658,
+      "forecast_consumption_lower": 27.021938095238102,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791867600000,
+    "values": {
+      "forecast_consumption": 36.027545454545454,
+      "forecast_consumption_lower": 28.30533333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791868500000,
+    "values": {
+      "forecast_consumption": 35.839666666666666,
+      "forecast_consumption_lower": 29.511999999999997,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791869400000,
+    "values": {
+      "forecast_consumption": 36.511746753246754,
+      "forecast_consumption_lower": 28.325999999999997,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791870300000,
+    "values": {
+      "forecast_consumption": 36.90702813852813,
+      "forecast_consumption_lower": 29.935333333333332,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791871200000,
+    "values": {
+      "forecast_consumption": 32.90765367965368,
+      "forecast_consumption_lower": 28.86266666666667,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791872100000,
+    "values": {
+      "forecast_consumption": 34.393935064935064,
+      "forecast_consumption_lower": 29.815999999999995,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791873000000,
+    "values": {
+      "forecast_consumption": 35.88997835497835,
+      "forecast_consumption_lower": 31.762999999999998,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791873900000,
+    "values": {
+      "forecast_consumption": 39.4659025974026,
+      "forecast_consumption_lower": 29.349266666666665,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791874800000,
+    "values": {
+      "forecast_consumption": 38.93094155844156,
+      "forecast_consumption_lower": 31.487,
+      "forecast_consumption_upper": 69.49
+    }
+  },
+  {
+    "ts": 1791875700000,
+    "values": {
+      "forecast_consumption": 37.374958874458876,
+      "forecast_consumption_lower": 31.832666666666668,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791876600000,
+    "values": {
+      "forecast_consumption": 33.21833766233766,
+      "forecast_consumption_lower": 29.4364,
+      "forecast_consumption_upper": 68.94999999999999
+    }
+  },
+  {
+    "ts": 1791877500000,
+    "values": {
+      "forecast_consumption": 32.527359307359305,
+      "forecast_consumption_lower": 26.687333333333335,
+      "forecast_consumption_upper": 71.95799999999998
+    }
+  },
+  {
+    "ts": 1791878400000,
+    "values": {
+      "forecast_consumption": 33.10135064935065,
+      "forecast_consumption_lower": 28.911999999999995,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791879300000,
+    "values": {
+      "forecast_consumption": 39.1633354978355,
+      "forecast_consumption_lower": 31.13885714285714,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791880200000,
+    "values": {
+      "forecast_consumption": 39.28412987012987,
+      "forecast_consumption_lower": 31.215999999999998,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791881100000,
+    "values": {
+      "forecast_consumption": 37.610580086580086,
+      "forecast_consumption_lower": 31.179142857142853,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791882000000,
+    "values": {
+      "forecast_consumption": 37.44477489177489,
+      "forecast_consumption_lower": 32.50699999999999,
+      "forecast_consumption_upper": 80.45
+    }
+  },
+  {
+    "ts": 1791882900000,
+    "values": {
+      "forecast_consumption": 36.590878787878786,
+      "forecast_consumption_lower": 29.550000000000008,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791883800000,
+    "values": {
+      "forecast_consumption": 37.46841558441558,
+      "forecast_consumption_lower": 32.771266666666655,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791884700000,
+    "values": {
+      "forecast_consumption": 38.13059523809524,
+      "forecast_consumption_lower": 32.11879999999999,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791885600000,
+    "values": {
+      "forecast_consumption": 35.82397835497836,
+      "forecast_consumption_lower": 28.829599999999985,
+      "forecast_consumption_upper": 76.42
+    }
+  },
+  {
+    "ts": 1791886500000,
+    "values": {
+      "forecast_consumption": 37.200917748917746,
+      "forecast_consumption_lower": 27.736,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791887400000,
+    "values": {
+      "forecast_consumption": 36.05848051948052,
+      "forecast_consumption_lower": 28.507333333333342,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791888300000,
+    "values": {
+      "forecast_consumption": 34.016006493506495,
+      "forecast_consumption_lower": 23.192666666666668,
+      "forecast_consumption_upper": 74.0
+    }
+  },
+  {
+    "ts": 1791889200000,
+    "values": {
+      "forecast_consumption": 33.62578787878788,
+      "forecast_consumption_lower": 16.44466666666667,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791890100000,
+    "values": {
+      "forecast_consumption": 31.42029004329004,
+      "forecast_consumption_lower": 17.052666666666664,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791891000000,
+    "values": {
+      "forecast_consumption": 27.24438528138528,
+      "forecast_consumption_lower": 20.215333333333326,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791891900000,
+    "values": {
+      "forecast_consumption": 21.229575757575756,
+      "forecast_consumption_lower": 16.248676190476207,
+      "forecast_consumption_upper": 69.627
+    }
+  },
+  {
+    "ts": 1791892800000,
+    "values": {
+      "forecast_consumption": 15.362177489177487,
+      "forecast_consumption_lower": 10.203333333333333,
+      "forecast_consumption_upper": 59.92
+    }
+  },
+  {
+    "ts": 1791893700000,
+    "values": {
+      "forecast_consumption": 13.591253246753247,
+      "forecast_consumption_lower": 5.747238095238096,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791894600000,
+    "values": {
+      "forecast_consumption": 14.763510822510822,
+      "forecast_consumption_lower": 5.6213333333333395,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791895500000,
+    "values": {
+      "forecast_consumption": 14.84262337662338,
+      "forecast_consumption_lower": 5.718666666666671,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791896400000,
+    "values": {
+      "forecast_consumption": 14.653493506493506,
+      "forecast_consumption_lower": 5.710000000000001,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791897300000,
+    "values": {
+      "forecast_consumption": 11.415629870129873,
+      "forecast_consumption_lower": 4.838000000000008,
+      "forecast_consumption_upper": 53.5
+    }
+  },
+  {
+    "ts": 1791898200000,
+    "values": {
+      "forecast_consumption": 10.203212121212122,
+      "forecast_consumption_lower": 4.8613333333333415,
+      "forecast_consumption_upper": 43.67
+    }
+  },
+  {
+    "ts": 1791899100000,
+    "values": {
+      "forecast_consumption": 10.316848484848485,
+      "forecast_consumption_lower": 3.906666666666659,
+      "forecast_consumption_upper": 35.802
+    }
+  },
+  {
+    "ts": 1791900000000,
+    "values": {
+      "forecast_consumption": 9.40781818181818,
+      "forecast_consumption_lower": 2.829333333333331,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791900900000,
+    "values": {
+      "forecast_consumption": 8.2065670995671,
+      "forecast_consumption_lower": 3.173333333333332,
+      "forecast_consumption_upper": 30.23
+    }
+  },
+  {
+    "ts": 1791901800000,
+    "values": {
+      "forecast_consumption": 9.40096536796537,
+      "forecast_consumption_lower": 2.6999999999999957,
+      "forecast_consumption_upper": 25.34200000000001
+    }
+  },
+  {
+    "ts": 1791902700000,
+    "values": {
+      "forecast_consumption": 7.934296536796538,
+      "forecast_consumption_lower": 3.836666666666666,
+      "forecast_consumption_upper": 24.181999999999995
+    }
+  },
+  {
+    "ts": 1791903600000,
+    "values": {
+      "forecast_consumption": 8.492541125541127,
+      "forecast_consumption_lower": 3.636000000000001,
+      "forecast_consumption_upper": 23.634000000000007
+    }
+  },
+  {
+    "ts": 1791904500000,
+    "values": {
+      "forecast_consumption": 7.876162337662337,
+      "forecast_consumption_lower": 3.371904761904761,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791905400000,
+    "values": {
+      "forecast_consumption": 8.18032683982684,
+      "forecast_consumption_lower": 3.225400000000001,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791906300000,
+    "values": {
+      "forecast_consumption": 10.07782251082251,
+      "forecast_consumption_lower": 2.601333333333334,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791907200000,
+    "values": {
+      "forecast_consumption": 9.495878787878787,
+      "forecast_consumption_lower": 3.217199999999999,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791908100000,
+    "values": {
+      "forecast_consumption": 9.08024025974026,
+      "forecast_consumption_lower": 2.7379999999999995,
+      "forecast_consumption_upper": 43.37
+    }
+  },
+  {
+    "ts": 1791909000000,
+    "values": {
+      "forecast_consumption": 8.37343722943723,
+      "forecast_consumption_lower": 2.64,
+      "forecast_consumption_upper": 30.04
+    }
+  },
+  {
+    "ts": 1791909900000,
+    "values": {
+      "forecast_consumption": 8.484376623376624,
+      "forecast_consumption_lower": 3.190666666666667,
+      "forecast_consumption_upper": 29.07
+    }
+  },
+  {
+    "ts": 1791910800000,
+    "values": {
+      "forecast_consumption": 8.35778354978355,
+      "forecast_consumption_lower": 3.2800000000000007,
+      "forecast_consumption_upper": 27.669999999999998
+    }
+  },
+  {
+    "ts": 1791911700000,
+    "values": {
+      "forecast_consumption": 6.9755670995671,
+      "forecast_consumption_lower": 3.329333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791912600000,
+    "values": {
+      "forecast_consumption": 6.559212121212121,
+      "forecast_consumption_lower": 3.4157333333333337,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791913500000,
+    "values": {
+      "forecast_consumption": 8.33495670995671,
+      "forecast_consumption_lower": 3.155333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791914400000,
+    "values": {
+      "forecast_consumption": 8.046666666666667,
+      "forecast_consumption_lower": 2.7533333333333334,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791915300000,
+    "values": {
+      "forecast_consumption": 7.414939393939394,
+      "forecast_consumption_lower": 2.796666666666666,
+      "forecast_consumption_upper": 28.79
+    }
+  },
+  {
+    "ts": 1791916200000,
+    "values": {
+      "forecast_consumption": 7.017909090909091,
+      "forecast_consumption_lower": 2.9220000000000006,
+      "forecast_consumption_upper": 28.11
+    }
+  },
+  {
+    "ts": 1791917100000,
+    "values": {
+      "forecast_consumption": 7.840212121212121,
+      "forecast_consumption_lower": 2.9466666666666663,
+      "forecast_consumption_upper": 28.006
+    }
+  },
+  {
+    "ts": 1791918000000,
+    "values": {
+      "forecast_consumption": 9.129787878787878,
+      "forecast_consumption_lower": 3.1326666666666663,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791918900000,
+    "values": {
+      "forecast_consumption": 9.263214285714286,
+      "forecast_consumption_lower": 3.0905333333333336,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791919800000,
+    "values": {
+      "forecast_consumption": 9.053670995670997,
+      "forecast_consumption_lower": 3.249066666666667,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791920700000,
+    "values": {
+      "forecast_consumption": 7.905969696969697,
+      "forecast_consumption_lower": 3.482,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791921600000,
+    "values": {
+      "forecast_consumption": 7.6570909090909085,
+      "forecast_consumption_lower": 3.0279999999999996,
+      "forecast_consumption_upper": 29.119999999999997
+    }
+  },
+  {
+    "ts": 1791922500000,
+    "values": {
+      "forecast_consumption": 6.472974025974026,
+      "forecast_consumption_lower": 3.0340000000000003,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791923400000,
+    "values": {
+      "forecast_consumption": 7.278287878787879,
+      "forecast_consumption_lower": 2.9613333333333336,
+      "forecast_consumption_upper": 22.53
+    }
+  },
+  {
+    "ts": 1791924300000,
+    "values": {
+      "forecast_consumption": 7.703696969696969,
+      "forecast_consumption_lower": 2.8613333333333335,
+      "forecast_consumption_upper": 19.503999999999994
+    }
+  },
+  {
+    "ts": 1791925200000,
+    "values": {
+      "forecast_consumption": 7.7892012987012995,
+      "forecast_consumption_lower": 3.0406666666666675,
+      "forecast_consumption_upper": 26.455000000000002
+    }
+  },
+  {
+    "ts": 1791926100000,
+    "values": {
+      "forecast_consumption": 7.5711818181818185,
+      "forecast_consumption_lower": 3.0379999999999994,
+      "forecast_consumption_upper": 32.1
+    }
+  },
+  {
+    "ts": 1791927000000,
+    "values": {
+      "forecast_consumption": 6.864123376623376,
+      "forecast_consumption_lower": 2.8988,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791927900000,
+    "values": {
+      "forecast_consumption": 9.719647186147187,
+      "forecast_consumption_lower": 3.54,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791928800000,
+    "values": {
+      "forecast_consumption": 9.802997835497836,
+      "forecast_consumption_lower": 3.3654666666666664,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791929700000,
+    "values": {
+      "forecast_consumption": 8.32777922077922,
+      "forecast_consumption_lower": 3.1773333333333227,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791930600000,
+    "values": {
+      "forecast_consumption": 8.292939393939394,
+      "forecast_consumption_lower": 2.8913333333333338,
+      "forecast_consumption_upper": 46.56
+    }
+  },
+  {
+    "ts": 1791931500000,
+    "values": {
+      "forecast_consumption": 6.519056277056276,
+      "forecast_consumption_lower": 2.9813333333333336,
+      "forecast_consumption_upper": 28.43
+    }
+  },
+  {
+    "ts": 1791932400000,
+    "values": {
+      "forecast_consumption": 6.803969696969698,
+      "forecast_consumption_lower": 3.009999999999998,
+      "forecast_consumption_upper": 25.630000000000003
+    }
+  },
+  {
+    "ts": 1791933300000,
+    "values": {
+      "forecast_consumption": 7.105961038961038,
+      "forecast_consumption_lower": 3.192,
+      "forecast_consumption_upper": 27.019000000000002
+    }
+  },
+  {
+    "ts": 1791934200000,
+    "values": {
+      "forecast_consumption": 8.060140692640692,
+      "forecast_consumption_lower": 3.2273333333333323,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791935100000,
+    "values": {
+      "forecast_consumption": 7.947025974025976,
+      "forecast_consumption_lower": 2.921133333333346,
+      "forecast_consumption_upper": 29.130000000000003
+    }
+  },
+  {
+    "ts": 1791936000000,
+    "values": {
+      "forecast_consumption": 7.936670995670995,
+      "forecast_consumption_lower": 2.962000000000001,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791936900000,
+    "values": {
+      "forecast_consumption": 9.241757575757577,
+      "forecast_consumption_lower": 2.9728000000000008,
+      "forecast_consumption_upper": 29.560000000000002
+    }
+  },
+  {
+    "ts": 1791937800000,
+    "values": {
+      "forecast_consumption": 8.620051948051948,
+      "forecast_consumption_lower": 3.233714285714286,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791938700000,
+    "values": {
+      "forecast_consumption": 9.199783549783549,
+      "forecast_consumption_lower": 3.1306666666666665,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791939600000,
+    "values": {
+      "forecast_consumption": 8.592991341991342,
+      "forecast_consumption_lower": 3.054666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791940500000,
+    "values": {
+      "forecast_consumption": 7.981290043290044,
+      "forecast_consumption_lower": 2.990666666666667,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791941400000,
+    "values": {
+      "forecast_consumption": 6.963316017316018,
+      "forecast_consumption_lower": 3.2526666666666664,
+      "forecast_consumption_upper": 29.86
+    }
+  },
+  {
+    "ts": 1791942300000,
+    "values": {
+      "forecast_consumption": 7.884196969696969,
+      "forecast_consumption_lower": 3.469533333333335,
+      "forecast_consumption_upper": 32.410000000000004
+    }
+  },
+  {
+    "ts": 1791943200000,
+    "values": {
+      "forecast_consumption": 8.277186147186148,
+      "forecast_consumption_lower": 3.331733333333333,
+      "forecast_consumption_upper": 35.230000000000004
+    }
+  },
+  {
+    "ts": 1791944100000,
+    "values": {
+      "forecast_consumption": 10.305361471861472,
+      "forecast_consumption_lower": 3.935933333333333,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791945000000,
+    "values": {
+      "forecast_consumption": 14.494365800865802,
+      "forecast_consumption_lower": 7.956666666666666,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791945900000,
+    "values": {
+      "forecast_consumption": 15.947792207792208,
+      "forecast_consumption_lower": 8.694666666666667,
+      "forecast_consumption_upper": 39.209999999999994
+    }
+  },
+  {
+    "ts": 1791946800000,
+    "values": {
+      "forecast_consumption": 17.20181168831169,
+      "forecast_consumption_lower": 9.364666666666665,
+      "forecast_consumption_upper": 41.766000000000005
+    }
+  },
+  {
+    "ts": 1791947700000,
+    "values": {
+      "forecast_consumption": 18.796515151515152,
+      "forecast_consumption_lower": 12.076266666666667,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791948600000,
+    "values": {
+      "forecast_consumption": 24.402320346320344,
+      "forecast_consumption_lower": 13.434,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791949500000,
+    "values": {
+      "forecast_consumption": 27.644512987012988,
+      "forecast_consumption_lower": 19.772000000000002,
+      "forecast_consumption_upper": 65.96000000000001
+    }
+  },
+  {
+    "ts": 1791950400000,
+    "values": {
+      "forecast_consumption": 30.647103896103896,
+      "forecast_consumption_lower": 25.4514,
+      "forecast_consumption_upper": 66.62
+    }
+  },
+  {
+    "ts": 1791951300000,
+    "values": {
+      "forecast_consumption": 32.50030735930736,
+      "forecast_consumption_lower": 26.655533333333338,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791952200000,
+    "values": {
+      "forecast_consumption": 34.02149134199134,
+      "forecast_consumption_lower": 26.710933333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791953100000,
+    "values": {
+      "forecast_consumption": 34.9053658008658,
+      "forecast_consumption_lower": 27.021938095238102,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791954000000,
+    "values": {
+      "forecast_consumption": 36.027545454545454,
+      "forecast_consumption_lower": 28.30533333333333,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791954900000,
+    "values": {
+      "forecast_consumption": 35.839666666666666,
+      "forecast_consumption_lower": 29.511999999999997,
+      "forecast_consumption_upper": 69.62
+    }
+  },
+  {
+    "ts": 1791955800000,
+    "values": {
+      "forecast_consumption": 36.511746753246754,
+      "forecast_consumption_lower": 28.325999999999997,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791956700000,
+    "values": {
+      "forecast_consumption": 36.90702813852813,
+      "forecast_consumption_lower": 29.935333333333332,
+      "forecast_consumption_upper": 66.94500000000002
+    }
+  },
+  {
+    "ts": 1791957600000,
+    "values": {
+      "forecast_consumption": 32.90765367965368,
+      "forecast_consumption_lower": 28.86266666666667,
+      "forecast_consumption_upper": 69.49
+    }
+  }
+]
