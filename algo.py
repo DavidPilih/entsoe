@@ -109,6 +109,105 @@ def optimize_trades(data: List[Dict[str, Any]], max_positions: float, minimum_pr
     return orders
 
 
+def optimize_consumption(data, capacity, power, soc, min_soc, max_soc,
+                         buy_mask, trade_mask, sun_percent, sun_factor,
+                         consumption_kw, tail_kw, margin, minimum_profit):
+    """Dve DP stanji: prosta rezerva ali obvezno kritje po prodaji do polnjenja."""
+    unit = power * 0.25 / ENERGY_STEPS
+    K = math.floor(capacity * (max_soc - min_soc) / unit + 1e-9)
+    initial = min(K, max(0, math.floor(capacity * (soc - min_soc) / unit + 1e-9)))
+    demands = [math.ceil(max(0, v) * 0.25 / unit) if active else 0
+               for v, active in zip(consumption_kw, trade_mask)]
+    tail = [math.ceil(max(0, v) * 0.25 / unit) for v in tail_kw]
+    reserve = sum(tail)
+    neg = float('-inf')
+    free = [0.] * (K + 1)
+    safe = [0. if k >= reserve and all(v <= ENERGY_STEPS for v in tail) else neg
+            for k in range(K + 1)]
+    choices = []
+
+    def transitions(t, k, protected):
+        demand = demands[t]
+        own = min(demand, ENERGY_STEPS, k)
+        grid = demand - own
+        if not protected or grid == 0:
+            yield (0, 0, k - own, protected, own, grid)
+        if not trade_mask[t]:
+            return
+        charge = math.floor(charge_fraction(sun_percent[t], sun_factor) * ENERGY_STEPS + 1e-9)
+        added = min(charge, K - k + demand)
+        # Lastna poraba porabi del vhodne energije; samo neto polnjenje sprosti rezervo.
+        if buy_mask[t] and added > demand:
+            yield (1, added, k + added - demand, 0, 0, 0)
+        if grid == 0:
+            for sold in range(1, min(k - own, ENERGY_STEPS - own) + 1):
+                yield (2, sold, k - own - sold, 1, own, 0)
+
+    for t in range(len(data) - 1, -1, -1):
+        price = float(data[t]['price'])
+        current = [[neg] * (K + 1), [neg] * (K + 1)]
+        decision = [bytearray(K + 1), bytearray(K + 1)]
+        amounts = [bytearray(K + 1), bytearray(K + 1)]
+        for protected in (0, 1):
+            for k in range(K + 1):
+                for action, amount, after, guarded, own, grid in transitions(t, k, protected):
+                    score = (safe if guarded else free)[after]
+                    score -= price * (1 + margin) * grid / ENERGY_STEPS
+                    if action == 1:
+                        score -= (price * (1 + margin) + minimum_profit) * amount / ENERGY_STEPS
+                    elif action == 2:
+                        score += price * (1 - margin) * amount / ENERGY_STEPS
+                    if score > current[protected][k]:
+                        current[protected][k] = score
+                        decision[protected][k] = action
+                        amounts[protected][k] = amount
+        free, safe = current
+        choices.append((decision, amounts))
+    choices.reverse()
+    orders = []
+    k, protected = initial, 0
+    for t, item in enumerate(data):
+        decision, amounts = choices[t]
+        action, amount = decision[protected][k], amounts[protected][k]
+        transition = next(x for x in transitions(t, k, protected) if x[0:2] == (action, amount))
+        _, _, after, guarded, own, grid = transition
+        orders.append(dict(time=item['time'], price=float(item['price']),
+                           order=('hold', 'buy', 'sell')[action], energy_fraction=amount / ENERGY_STEPS,
+                           sun_percent=sun_percent[t], charge_fraction=charge_fraction(sun_percent[t], sun_factor),
+                           consumption_kwh=demands[t] * unit, battery_consumption_kwh=own * unit,
+                           charging_consumption_kwh=(demands[t] * unit if action == 1 else 0),
+                           grid_consumption_kwh=grid * unit, trade_energy_kwh=amount * unit,
+                           soc=(capacity * min_soc + after * unit) / capacity))
+        k, protected = after, guarded
+    return orders
+
+
+def consumption_tail(last_time, lat, lng, use_sun_data, sun_factor, power, consumption_loader):
+    """Intervali po koncu načrta do prvega dovoljenega neto kandidata polnjenja."""
+    begin = pd.Timestamp(last_time)
+    if begin.tzinfo is None:
+        begin = begin.tz_localize('Europe/Ljubljana')
+    begin += pd.Timedelta(minutes=15)
+    tail = []
+    for day_offset in range(8):
+        day = begin.normalize() + pd.DateOffset(days=day_offset)
+        next_day = day + pd.DateOffset(days=1)
+        times = pd.date_range(max(begin, day), next_day, freq='15min', inclusive='left')
+        first, last = getwh(day.strftime('%Y-%m-%d'), lat, lng)
+        sun = ([100] * len(times) if not use_sun_data else solar_percentages(
+            get_sun_forecast(lat, lng, day.strftime('%Y-%m-%d'), next_day.strftime('%Y-%m-%d')),
+            times.tz_localize(None)))
+        for timestamp, percent in zip(times, sun):
+            if first <= timestamp.hour * 4 + timestamp.minute // 15 <= last:
+                charge = math.floor(charge_fraction(percent, sun_factor) * ENERGY_STEPS + 1e-9)
+                if charge > 0:
+                    demand = math.ceil(consumption_loader([timestamp])[0] / power * ENERGY_STEPS)
+                    if charge > demand:
+                        return tail
+            tail.append(timestamp)
+    raise ValueError('Naslednjega dovoljenega polnjenja v 8 dneh ni mogoče določiti.')
+
+
 def getwh(date, lat, lng):
     loc_key = f"{lat}_{lng}"
     path = "cache/sun_data/sun_data.json"
@@ -155,7 +254,9 @@ def load_price_data(filename: str, start: pd.Timestamp, end: pd.Timestamp) -> Li
     return [(row["time"], float(row["price"])) for _, row in df.iterrows()]
 
 
-def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True, use_sun_data: bool = False, *, margin: float, sun_factor: float = 1.2, min_soc: float = 0, max_soc: float = 1):
+def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True, use_sun_data: bool = False, *, margin: float, sun_factor: float = 1.2, min_soc: float = 0, max_soc: float = 1, use_consumption=False, consumption_loader=None):
+    if not isinstance(use_consumption, bool):
+        raise ValueError('use_consumption mora biti boolean.')
 
     if isinstance(margin, bool) or not isinstance(margin, (int, float)) or not 0 <= margin <= 1:
         raise ValueError("margin mora biti število med 0 in 1 (0.1 = 10 %).")
@@ -248,20 +349,34 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
 
     trade_data = [{"time": ts.strftime("%Y-%m-%d %H:%M"), "price": price} for ts, price in combined]
 
-    orders = optimize_trades(
-        trade_data,
-        max_positions=intervals_needed,
-        minimum_profit=minimum_profit,
-        buy_mask=buy_mask,
-        trade_mask=trade_mask,
-        initial_position=initial_position,
-        force_flat_end=True,
-        sun_percent=sun_percent,
-        margin=margin,
-        sun_factor=sun_factor,
-        min_soc=min_soc,
-        max_soc=max_soc,
-    )
+    if use_consumption:
+        if consumption_loader is None or not combined:
+            raise ValueError('Manjka vir napovedi porabe ali podatki cen.')
+        active_times = [pd.Timestamp(ts).tz_localize('Europe/Ljubljana') if pd.Timestamp(ts).tzinfo is None else pd.Timestamp(ts)
+                        for (ts, _), active in zip(combined, trade_mask) if active]
+        tail_times = consumption_tail(combined[-1][0], lat, lng, use_sun_data, sun_factor,
+                                      power, consumption_loader)
+        values = consumption_loader(active_times + tail_times)
+        active_values = iter(values[:len(active_times)])
+        loads = [next(active_values) if active else 0 for active in trade_mask]
+        orders = optimize_consumption(trade_data, capacity, power, soc, min_soc, max_soc,
+                                      buy_mask, trade_mask, sun_percent or [100] * len(combined), sun_factor,
+                                      loads, values[len(active_times):], margin, minimum_profit)
+    else:
+        orders = optimize_trades(
+            trade_data,
+            max_positions=intervals_needed,
+            minimum_profit=minimum_profit,
+            buy_mask=buy_mask,
+            trade_mask=trade_mask,
+            initial_position=initial_position,
+            force_flat_end=True,
+            sun_percent=sun_percent,
+            margin=margin,
+            sun_factor=sun_factor,
+            min_soc=min_soc,
+            max_soc=max_soc,
+        )
 
     charging_times = [{"time": o["time"], "value": o["energy_fraction"]}
                       for o in orders if o["order"] == "buy"]
@@ -296,6 +411,10 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
             "timestamp": order["time"],
             "value": action
         })
+
+    if use_consumption:
+        result['energy_balance'] = [o for o, active in zip(orders, trade_mask) if active]
+        return result, database_data
 
     suffix_2day = "_2day" if have_tomorrow else ""
 

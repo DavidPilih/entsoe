@@ -78,6 +78,31 @@ def save_result(device_id, database_data):
 def to_data_points(data):
     return [{"ts": convert_timestamp(item["timestamp"]), "values": {"schedule_auto": item["value"]}} for item in data]
 
+def fetch_consumption_forecast(device_id, timestamps):
+    if not timestamps:
+        return []
+    expected = [convert_timestamp(t) for t in timestamps]
+    conn = psycopg2.connect(**DB_CONFIG, connect_timeout=10)
+    try:
+        conn.set_session(readonly=True)
+        with conn.cursor() as cur:
+            cur.execute("SET LOCAL statement_timeout = '60s'")
+            cur.execute('SELECT t.ts, t.dbl_v, t.long_v FROM ts_kv t '
+                        'JOIN key_dictionary kd ON kd.key_id=t."key" '
+                        'WHERE t.entity_id=%s AND kd.key=%s AND t.ts >= %s AND t.ts <= %s',
+                        (device_id, 'forecast_consumption_upper', min(expected), max(expected)))
+            values = {int(ts): dbl if dbl is not None else lng for ts, dbl, lng in cur.fetchall()}
+    finally:
+        conn.close()
+    result = []
+    for ts in expected:
+        value = values.get(ts)
+        if isinstance(value, bool) or not isinstance(value, (float, int)) or not math.isfinite(value):
+            raise ValueError(f'Manjka veljaven forecast_consumption_upper za {pd.Timestamp(ts, unit="ms", tz="UTC").isoformat()}.')
+        result.append(max(0., float(value)))
+    return result
+
+
 def process_request(payload):
     if not isinstance(payload, dict):
         raise ValueError("Zahtevek mora biti slovar.")
@@ -87,6 +112,16 @@ def process_request(payload):
 
     if missing:
         raise ValueError(f"Manjkajoči podatki: {', '.join(missing)}.")
+
+    use_consumption = payload.get('use_consumption', False)
+    if not isinstance(use_consumption, bool):
+        raise ValueError('use_consumption mora biti boolean.')
+    consumption_args = {}
+    device_id = None
+    if use_consumption:
+        device_id = fetch_device_id(unique_id)
+        consumption_args = dict(use_consumption=True,
+                                consumption_loader=lambda times: fetch_consumption_forecast(device_id, times))
 
 
     now = pd.Timestamp.now(tz="UTC").ceil("15min").tz_convert("Europe/Ljubljana")
@@ -112,10 +147,11 @@ def process_request(payload):
 
     print(f"Začenjam zahtevek: {unique_id}")
 
-    _, database_data = main(
+    calculation, database_data = main(
         capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day,
         use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor,
         min_soc=min_soc, max_soc=max_soc,
+        **consumption_args,
     )
 
     result = {
@@ -127,7 +163,10 @@ def process_request(payload):
         ],
     }
 
-    device_id = fetch_device_id(unique_id)
+    if use_consumption:
+        result['energy_balance'] = calculation['energy_balance']
+    if device_id is None:
+        device_id = fetch_device_id(unique_id)
     save_result(device_id, database_data)
     send_tb_device(to_data_points(database_data), device_id)
     print(f"Končan zahtevek: {unique_id}")

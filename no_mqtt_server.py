@@ -29,8 +29,8 @@ def fetch_device_names():
     conn = psycopg2.connect(**DB_CONFIG)
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT DISTINCT name FROM device WHERE name LIKE %s AND name LIKE %s AND name NOT LIKE %s ORDER BY name", ("%02%", "%Agg%", "%controllers%"))
-            return [row[0] for row in cur.fetchall()]
+            cur.execute("SELECT DISTINCT name FROM device WHERE name LIKE %s AND name LIKE %s AND name NOT LIKE %s ORDER BY name", ("%02%", "%Agg%", "%controllers%")) 
+            return [row[0] for row in cur.fetchall()] 
     finally:
         conn.close()
 
