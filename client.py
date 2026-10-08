@@ -3,13 +3,14 @@ import os
 import sys
 import queue
 import json
+import time
 from datetime import date, timedelta
 import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
 from dotenv import load_dotenv
 from thingsboard_send_data import send_tb_device
-from algo import main
+from prepare_data import main
 
 load_dotenv()
 
@@ -206,7 +207,11 @@ def db_writer_loop():
             break
         device_id, database_data = item
         try:
-            rows = [(device_id, convert_timestamp(entry["timestamp"]), entry.get("value")) for entry in database_data]
+            rows = [
+                (device_id, convert_timestamp(entry["timestamp"]),
+                 None if entry.get("value") is None else float(entry["value"]))
+                for entry in database_data
+            ]
             with conn.cursor() as cur:
                 execute_values(cur, "INSERT INTO device_energy_schedule (device_id, timestamp, auto) VALUES %s ON CONFLICT (device_id, timestamp) DO UPDATE SET auto = EXCLUDED.auto", rows)
             conn.commit()
@@ -220,10 +225,28 @@ def db_writer_loop():
 
 def save_result(device_id, database_data):
     if database_data:
-        db_queue.put((device_id, database_data))
+        normalized = [
+            {
+                **entry,
+                "value": None if entry.get("value") is None else float(entry["value"]),
+            }
+            for entry in database_data
+        ]
+        db_queue.put((device_id, normalized))
 
 def to_data_points(data):
     return [{"ts": convert_timestamp(item["timestamp"]), "values": {"schedule_auto": item["value"]}} for item in data]
+
+
+def balance_data_points(balance):
+    return [{"ts": convert_timestamp(item['time']), "values": {
+        'forecast_solar[kW]': item['solar_kw'],
+        'forecast_battery[kW]': item['battery_kw'],
+        'forecast_grid[kW]': item['grid_kw'],
+        'forecast_result[EUR]': item['result_eur'],
+        'forecast_solar_to_battery[kW]': item['solar_to_battery_kw'],
+        'forecast_grid_to_battery[kW]': item['grid_to_battery_kw'],
+    }} for item in balance]
 
 
 def format_schedule_point(timestamp, value, power):
@@ -242,7 +265,12 @@ def format_schedule_point(timestamp, value, power):
     }
 
 
-def process_request(payload):
+def process_request(payload, *, dry_run=False, manual_end=None):
+    started = time.perf_counter()
+    def progress(message):
+        print(f"[client +{time.perf_counter() - started:.2f}s] {message}", flush=True)
+
+    progress("Začetek obdelave zahtevka.")
     if not isinstance(payload, dict):
         raise ValueError("Zahtevek mora biti slovar.")
     unique_id = payload.get("unique_id")
@@ -252,11 +280,12 @@ def process_request(payload):
     if missing:
         raise ValueError(f"Manjkajoči podatki: {', '.join(missing)}.")
 
-    
+
     device_id = None
     now = pd.Timestamp.now(tz="UTC").ceil("15min").tz_convert("Europe/Ljubljana")
     def_date = now.strftime("%Y-%m-%d")
     def_time = now.strftime("%H:%M")
+    # def_time = "00:00"
 
 
     capacity = payload["capacity"]
@@ -275,6 +304,7 @@ def process_request(payload):
     power_factor = payload.get("power_factor", 1)
     margin = payload.get("margin", 0.1)
     use_regime = payload.get("use_regime", False)
+    # power_factor določa največjo moč polnjenja in praznjenja.
     power *= power_factor
     use_consumption = payload.get('use_consumption', True)
 
@@ -298,12 +328,18 @@ def process_request(payload):
     print(f"Začenjam zahtevek: {unique_id}")
 
     if device_id is None:
+        progress("Iščem ID hranilnika ...")
         device_id = fetch_device_id(unique_id)
+        progress("ID hranilnika najden.")
     day = pd.Timestamp(date, tz="Europe/Ljubljana").normalize()
     start = pd.Timestamp(f"{day.strftime('%Y-%m-%d')} {from_time}", tz="Europe/Ljubljana")
     start = start.tz_convert("UTC").ceil("15min").tz_convert("Europe/Ljubljana")
     end = day + pd.DateOffset(days=2 if next_day else 1)
+    if manual_end is not None:
+        end = max(end, pd.Timestamp(manual_end))
+    progress("Berem ročni urnik ...")
     manual = fetch_manual_schedule(device_id, day, end)
+    progress(f"Ročni urnik prebran ({len(manual)} zapisov).")
     manual_days = {
         pd.Timestamp(ts, unit="ms", tz="UTC").tz_convert("Europe/Ljubljana").date()
         for ts in manual
@@ -328,9 +364,12 @@ def process_request(payload):
     energy_balance = []
     soc_forecast = [{
         "ts": convert_timestamp(start),
-        "values": {"forecasted_soc[%]": float(soc) * 100},
+        "values": {"forecasted_soc[%]": min(max(float(soc), float(min_soc)), float(max_soc)) * 100},
     }] if periods else []
+    solar_device = None
     for period_start, period_end, include_next_day in periods:
+        is_manual = period_start.date() in manual_days
+        progress(f"Pripravljam obdobje {period_start}–{period_end} ...")
         calculation, calculated = main(
             capacity, power, minimum_profit, period_start.strftime("%Y-%m-%d"),
             lat, lng, period_start.strftime("%H:%M"), soc, include_next_day,
@@ -338,35 +377,30 @@ def process_request(payload):
             min_soc=min_soc, max_soc=max_soc,
             use_consumption=use_consumption, unique_id=unique_id,
             graph_parameters={"power_factor": power_factor, "use_regime": use_regime},
+            manual_schedule=manual if is_manual else None, render_graph=not dry_run,
         )
+        progress(f"Obdobje izračunano ({len(calculated)} intervalov).")
         start_ms, end_ms = convert_timestamp(period_start), convert_timestamp(period_end)
         calculated = sorted(
             (item for item in calculated
              if start_ms <= convert_timestamp(item["timestamp"]) < end_ms),
             key=lambda item: convert_timestamp(item["timestamp"]),
         )
-        database_data.extend(calculated)
-        if period_start.date() in manual_days:
-            effective = [
-                {"timestamp": ts, "value": manual.get(convert_timestamp(ts), 0)}
-                for ts in pd.date_range(period_start, period_end, freq="15min", inclusive="left")
-            ]
-            soc = schedule_end_soc(effective, soc, capacity, power, min_soc, max_soc, soc_forecast)
-        else:
-            effective = calculated
+        solar_device = calculation['solar_device']
+        effective = calculated
+        # Manual commands retain ownership: never overwrite them or publish auto commands for that day.
+        if not is_manual:
+            database_data.extend(calculated)
             publish_data.extend(calculated)
-            if use_consumption:
-                balance = [item for item in calculation["energy_balance"]
-                           if start_ms <= convert_timestamp(item["time"]) < end_ms]
-                energy_balance.extend(balance)
-                soc_forecast.extend({
-                    "ts": convert_timestamp(item["time"]) + 15 * 60 * 1000,
-                    "values": {"forecasted_soc[%]": float(item["soc"]) * 100},
-                } for item in balance)
-                if balance:
-                    soc = balance[-1]["soc"]
-            else:
-                soc = schedule_end_soc(effective, soc, capacity, power, min_soc, max_soc, soc_forecast)
+        balance = [item for item in calculation["energy_balance"]
+                   if start_ms <= convert_timestamp(item["time"]) < end_ms]
+        energy_balance.extend(balance)
+        soc_forecast.extend({
+            "ts": convert_timestamp(item["time"]) + 15 * 60 * 1000,
+            "values": {"forecasted_soc[%]": float(item["soc"]) * 100},
+        } for item in balance)
+        if balance:
+            soc = balance[-1]["soc"]
         response_data.extend(effective)
 
     result = {
@@ -380,19 +414,35 @@ def process_request(payload):
         ],
     }
 
-    if use_consumption:
-        result['energy_balance'] = energy_balance
-    save_result(device_id, database_data)
-    telemetry = to_data_points(publish_data) + soc_forecast
-    if telemetry:
-        send_tb_device(telemetry, device_id)
+    result['energy_balance'] = energy_balance
+    result['solar_device'] = solar_device
+    result['dry_run'] = dry_run
+    telemetry = to_data_points(publish_data) + soc_forecast + balance_data_points(energy_balance)
+    if energy_balance:
+        telemetry.append({"ts": convert_timestamp(start), "values": {
+            "battery_model_power[kW]": float(power),
+            "battery_model_capacity[kWh]": float(capacity),
+            "battery_model_min_soc[%]": float(min_soc) * 100,
+            "battery_model_max_soc[%]": float(max_soc) * 100,
+        }})
+    if dry_run:
+        result['telemetry'] = telemetry
+    if not dry_run:
+        progress("Predajam urnik SQL zapisovalniku ...")
+        save_result(device_id, database_data)
+        progress("SQL korak končan.")
+        if telemetry:
+            progress(f"Pošiljam {len(telemetry)} telemetrijskih točk v ThingsBoard ...")
+            send_tb_device(telemetry, device_id)
+            progress("ThingsBoard pošiljanje končano.")
     print(f"Končan zahtevek: {unique_id}")
+    progress("Celoten zahtevek končan.")
     return result
 
 
 def fetch_device_parameters(device_id):
     """Vrne kapaciteto (kWh), moč (kW) in SOC kot delež 0–1."""
-    keys = ("battery_rated_capacity[kWh]", "max_charge_discharge_power[kW]", "SOC[%]")
+    keys = ("max_available_charge_power[kW]", "max_charge_discharge_power[kW]", "SOC[%]")
     conn = psycopg2.connect(**DB_CONFIG)
     try:
         with conn.cursor() as cur:

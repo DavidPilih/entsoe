@@ -2,6 +2,7 @@ import json
 import math
 import os
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
@@ -150,22 +151,33 @@ def wait_for_writes(writer_thread):
 
 
 def update_device(name, device_id, writer_thread, payload=None):
+    started = time.perf_counter()
+    print(f"[server {name} +0.00s] Berem parametre hranilnika ...", flush=True)
     if not writer_thread.is_alive():
         raise RuntimeError("Zapisovalna nit baze ne deluje.")
     capacity, power, soc = resolve_parameters(name, device_id)
+    print(f"[server {name} +{time.perf_counter() - started:.2f}s] Parametri prebrani.", flush=True)
     request = dict(payload or {})
     request["unique_id"] = name
     request.setdefault("capacity", capacity)
     request.setdefault("power", power)
     request.setdefault("soc", soc)
     try:
-        return request_client.process_request(request)
+        print(f"[server {name} +{time.perf_counter() - started:.2f}s] Začenjam pripravo in izračun ...", flush=True)
+        result = request_client.process_request(request)
+        print(f"[server {name} +{time.perf_counter() - started:.2f}s] Izračun in objava končana.", flush=True)
+        return result
     finally:
+        print(f"[server {name} +{time.perf_counter() - started:.2f}s] Čakam SQL vrsto ...", flush=True)
         wait_for_writes(writer_thread)
+        print(f"[server {name} +{time.perf_counter() - started:.2f}s] Zahtevek zaključen.", flush=True)
 
 
 def refresh_all_devices(mqtt_client, writer_thread, stopping):
+    started = time.perf_counter()
+    print("[server +0.00s] Iščem naprave za urno osvežitev ...", flush=True)
     device_names = fetch_device_names()
+    print(f"[server +{time.perf_counter() - started:.2f}s] Najdene naprave: {device_names}", flush=True)
     successful = []
     unsuccessful = []
     missing_types = [
@@ -247,19 +259,17 @@ def get_device_response(payload, writer_thread):
 def publish_manual_schedule(mqtt_client, device_name, device_id, entries):
     """Oblikuje shranjene ročne intervale in jih pošlje brez izračuna urnika."""
     try:
-        _, power, _ = request_client.fetch_device_parameters(device_id)
-        current_slot = pd.Timestamp.now(tz="UTC").ceil("15min")
-        current_slot_ms = int(current_slot.timestamp() * 1000)
-        data = [
-            request_client.format_schedule_point(ts, value, power)
-            for ts, value in entries
-            if ts >= current_slot_ms
-        ]
-        send_response(mqtt_client, {
-            "success": True,
-            "unique_id": device_name,
-            "data": data,
-        }, raise_on_error=True)
+        capacity, power, soc = request_client.fetch_device_parameters(device_id)
+        today = pd.Timestamp.now(tz="Europe/Ljubljana").normalize()
+        tomorrow_ms = request_client.convert_timestamp(today + pd.DateOffset(days=1))
+        manual_end = max((pd.Timestamp(ts, unit='ms', tz='UTC').tz_convert('Europe/Ljubljana').normalize()
+                          + pd.DateOffset(days=1) for ts, _ in entries), default=today + pd.DateOffset(days=1))
+        result = request_client.process_request({
+            "unique_id": device_name, "capacity": capacity, "power": power, "soc": soc,
+            "next_day": any(ts >= tomorrow_ms for ts, _ in entries),
+        }, manual_end=manual_end)
+        data = result["data"]
+        send_response(mqtt_client, result, raise_on_error=True)
     except Exception as exc:
         report_manual_status(mqtt_client, device_name, False, f"{type(exc).__name__}: {exc}")
         return

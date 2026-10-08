@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import paho.mqtt.client as mqtt
 import pandas as pd
 from dotenv import load_dotenv
-from algo import main
+from prepare_data import main
 
 load_dotenv()
 
@@ -25,7 +25,7 @@ def process_request(payload):
     unique_id = payload.get("unique_id")
     try:
         if "help" in payload:
-            sendData({"success": True, "unique_id": unique_id, "help": {"required": ["unique_id", "capacity", "power"], "optional": ["minimum_profit", "date", "latitude", "longitude", "start_time", "soc", "min_soc", "max_soc", "next_day", "power_factor", "use_sun_data", "sun_factor", "margin"], "defaults": {"min_soc": 0, "max_soc": 1, "use_sun_data": False, "sun_factor": 1.2, "margin": 0.1}}})
+            sendData({"success": True, "unique_id": unique_id, "help": {"required": ["unique_id", "capacity", "power"], "optional": ["minimum_profit", "date", "latitude", "longitude", "start_time", "soc", "min_soc", "max_soc", "next_day", "power_factor", "use_sun_data", "sun_factor", "margin", "use_consumption"], "defaults": {"min_soc": 0, "max_soc": 1, "use_sun_data": False, "sun_factor": 1.2, "margin": 0.1, "use_consumption": True}}})
             return
 
         required = ["capacity", "power", "unique_id"]
@@ -74,6 +74,7 @@ def process_request(payload):
             capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day,
             use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor,
             min_soc=min_soc, max_soc=max_soc,
+            unique_id=unique_id, use_consumption=payload.get('use_consumption', True),
         )
 
         result = {

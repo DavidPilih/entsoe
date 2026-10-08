@@ -1,6 +1,5 @@
 // Prosojnost podatkov desno od modre črte: 0 = nevidno, 1 = polno vidno.
 var FUTURE_DATA_OPACITY = 0.55;
-var FULL_BATTERY_INTERVALS = 8;
 var SOC_INTERVAL_MS = 15 * 60 * 1000;
 var MIN_ZOOM_MS = 15 * 60 * 1000;
 var MAX_ZOOM_MS = 7 * 24 * 60 * 60 * 1000;
@@ -11,11 +10,6 @@ var FORECAST_SOC_KEY = 'forecasted_soc[%]';
 var FORECAST_CONSUMPTION_KEY = 'forecast_consumption[kW]';
 var FORECAST_CONSUMPTION_LOWER_KEY = 'forecast_consumption_lower[kW]';
 var FORECAST_CONSUMPTION_UPPER_KEY = 'forecast_consumption_upper[kW]';
-
-// Privzeti vrednosti, uporabljeni samo, kadar serija max_discharge_power[kW]
-// oz. total_capacity[kWh] sploh ni na voljo (ne gre za dejansko izmerjeno ničlo).
-var DEFAULT_MAX_DISCHARGE_POWER_KW = 100;
-var DEFAULT_TOTAL_CAPACITY_KWH = 200;
 
 function consumptionForecastRole(key) {
     if (telemetryMatches(key, [FORECAST_CONSUMPTION_LOWER_KEY])) return 'lower';
@@ -185,64 +179,53 @@ function mergeSocMeasurements(history, live, min, max) {
 }
 
 // Čista računska funkcija: urnik in sonce veljata do naslednje spremembe.
-function calculateSocForecast(soc, sun, schedule, end, now, scheduleValues, maxDischargePower, totalCapacity) {
+function calculateSocForecast(soc, sun, schedule, end, now, scheduleValues, maxDischargePower, totalCapacity, model) {
     var measured = validTelemetryPoints(soc).filter(function (p) { return p[0] <= now; });
-    if (!measured.length || !(FULL_BATTERY_INTERVALS > 0)) return [];
-    var last = measured[measured.length - 1];
-    var time = last[0], value = Math.max(0, Math.min(100, last[1]));
+    if (!measured.length) return [];
+    var last = measured[measured.length - 1], time = last[0], value = last[1];
     if (!(end > time)) return [];
-    // Manjkajoče ali neveljavno sonce ne sme prekiniti celotne SOC črte.
-    // Uporabimo zadnji veljavni odstotek; pred prvim podatkom predpostavimo 0 %.
-    var solar = validTelemetryPoints(sun).filter(function (p) { return p[1] >= 0 && p[1] <= 100; });
-    var power = validTelemetryPoints(scheduleValues);
-    var dischargePower = validTelemetryPoints(maxDischargePower).filter(function (p) { return p[1] >= 0; });
-    var capacity = validTelemetryPoints(totalCapacity).filter(function (p) { return p[1] > 0; });
+    var commands = validTelemetryPoints(scheduleValues);
+    var powers = validTelemetryPoints(maxDischargePower);
+    var capacities = validTelemetryPoints(totalCapacity);
+    if (!powers.length || !capacities.length) return [];
+    model = model || {};
+    function setting(key, t, fallback) {
+        var v = valueAtOrBefore(model[key], t);
+        return v === null ? fallback : v;
+    }
     var boundaries = [time, end];
     for (var t = (Math.floor(time / SOC_INTERVAL_MS) + 1) * SOC_INTERVAL_MS; t < end; t += SOC_INTERVAL_MS) boundaries.push(t);
-    solar.forEach(function (p) { if (p[0] > time && p[0] < end) boundaries.push(p[0]); });
-    power.forEach(function (p) { if (p[0] > time && p[0] < end) boundaries.push(p[0]); });
-    dischargePower.forEach(function (p) { if (p[0] > time && p[0] < end) boundaries.push(p[0]); });
-    capacity.forEach(function (p) { if (p[0] > time && p[0] < end) boundaries.push(p[0]); });
+    [commands, powers, capacities].forEach(function (series) {
+        series.forEach(function (p) { if (p[0] > time && p[0] < end) boundaries.push(p[0]); });
+    });
     schedule.forEach(function (iv) {
         [iv.xMin, iv.xMax].forEach(function (ts) { if (ts > time && ts < end) boundaries.push(ts); });
     });
     boundaries.sort(function (a, b) { return a - b; });
-    var points = [{ x: time, y: value }], sunIndex = -1, powerIndex = -1;
-    var dischargePowerIndex = -1, capacityIndex = -1;
+    var points = [{x: time, y: value}];
     for (var i = 1; i < boundaries.length; i++) {
         var next = boundaries[i];
         if (next <= time) continue;
-        while (sunIndex + 1 < solar.length && solar[sunIndex + 1][0] <= time) sunIndex++;
-        while (powerIndex + 1 < power.length && power[powerIndex + 1][0] <= time) powerIndex++;
-        while (dischargePowerIndex + 1 < dischargePower.length && dischargePower[dischargePowerIndex + 1][0] <= time) dischargePowerIndex++;
-        while (capacityIndex + 1 < capacity.length && capacity[capacityIndex + 1][0] <= time) capacityIndex++;
-        var active = schedule.find(function (iv) { return iv.xMin <= time && time < iv.xMax; });
-        var rate = 0;
-        if (active && active.type === 'polnjenje') {
-            var sunPercent = sunIndex >= 0 ? solar[sunIndex][1] : 0;
-            var chargePower = powerIndex >= 0 ? power[powerIndex][1] : sunPercent / 100;
-            rate = (100 / FULL_BATTERY_INTERVALS) * Math.max(0, Math.min(1, chargePower));
-        } else if (active && active.type === 'praznjenje') {
-            var maxPower = dischargePowerIndex >= 0 ? dischargePower[dischargePowerIndex][1] :
-                (dischargePower.length ? 0 : DEFAULT_MAX_DISCHARGE_POWER_KW);
-            var totalEnergy = capacityIndex >= 0 ? capacity[capacityIndex][1] :
-                (capacity.length ? 0 : DEFAULT_TOTAL_CAPACITY_KWH);
-            var dischargeFraction = powerIndex >= 0 && power[powerIndex][1] < 0 ?
-                Math.max(0, Math.min(1, -power[powerIndex][1])) : 1;
-            // Negativna vrednost urnika določa delež največje moči: -0,6 pomeni 60 %.
-            rate = totalEnergy > 0 ? -(maxPower * dischargeFraction / totalEnergy) * 100 *
-                (SOC_INTERVAL_MS / 3600000) : 0;
+        var action = valueAtOrBefore(commands, time);
+        if (action === null) {
+            var active = schedule.find(function (iv) { return iv.xMin <= time && time < iv.xMax; });
+            action = active ? (active.type === 'polnjenje' ? 1 : -1) : 0;
         }
-        var delta = rate * (next - time) / SOC_INTERVAL_MS;
-        var raw = value + delta;
-        // Dodamo trenutek dosežene meje, da graf pravilno pokaže plato.
-        if (rate && (raw > 100 || raw < 0)) {
-            var limit = raw > 100 ? 100 : 0;
-            var hit = time + (limit - value) / rate * SOC_INTERVAL_MS;
-            if (hit > time && hit < next) points.push({ x: hit, y: limit });
+        var power = valueAtOrBefore(powers, time), capacity = valueAtOrBefore(capacities, time);
+        if (power === null) power = powers[0][1];
+        if (capacity === null) capacity = capacities[0][1];
+        if (!(capacity > 0) || !(power > 0)) break;
+        action = Math.max(-1, Math.min(1, action));
+        var rate = power / capacity * 100 / 3600000 * action;
+        var minimum = setting('minSoc', time, 0), maximum = setting('maxSoc', time, 100);
+        var raw = value + rate * (next - time);
+        if (rate && (raw > maximum || raw < minimum)) {
+            var limit = raw > maximum ? maximum : minimum;
+            var hit = time + (limit - value) / rate;
+            if (hit > time && hit < next) points.push({x: hit, y: limit});
         }
-        value = Math.max(0, Math.min(100, raw));
-        points.push({ x: next, y: value });
+        value = Math.max(minimum, Math.min(maximum, raw));
+        points.push({x: next, y: value});
         time = next;
     }
     return points;
@@ -252,11 +235,14 @@ function calculateSocForecast(soc, sun, schedule, end, now, scheduleValues, maxD
 var PERCENT_DATA_KEYS = ['sun_percent', 'sun_data', 'SOC[%]', 'soc'];
 
 // Te serije so prikazane stopničasto; ostale vidne serije so navadne črte.
-var STEPPED_DATA_KEYS = ['price', 'bsp cena', 'sun_data'];
+var STEPPED_DATA_KEYS = ['price', 'bsp cena', 'sun_data', 'forecast_solar[kw]', 'forecast_battery[kw]', 'forecast_grid[kw]'];
 
 // Ti podatki so na voljo izračunom widgeta, na grafu pa se ne prikažejo.
 var HIDDEN_DATA_KEYS = [
     'schedule_auto',
+    'forecast_result[EUR]',
+    'battery_model_power[kW]', 'battery_model_capacity[kWh]',
+    'battery_model_min_soc[%]', 'battery_model_max_soc[%]',
     'max_discharge_power[kW]',
     'total_capacity[kWh]'
 ];
@@ -305,59 +291,6 @@ function valueAtOrBefore(values, time) {
         } else high = middle - 1;
     }
     return found >= 0 ? points[found][1] : null;
-}
-
-function projectedActivePower(ctx, chart) {
-    if (!chart || !chart.scales.x) return [];
-    var now = Date.now();
-    var end = Number(chart.scales.x.max);
-    if (!(end > now)) return [];
-
-    var scheduleEntry = (ctx.data || []).find(function (entry) {
-        return telemetryMatches(entry.dataKey, ['schedule_auto']);
-    });
-    var powerEntry = (ctx.data || []).find(function (entry) {
-        return telemetryMatches(entry.dataKey, ['max_discharge_power[kw]']);
-    });
-    var schedulePoints = scheduleEntry && scheduleEntry.data;
-    var powerPoints = powerEntry && powerEntry.data;
-
-    function actionAt(time) {
-        if (ctx._scheduleEdited || ctx._scheduleLocalOverride) {
-            var active = (ctx.intervals || []).find(function (interval) {
-                return interval.from <= time && time < interval.to;
-            });
-            return active ? (active.type === 'polnjenje' ? 1 : -1) : 0;
-        }
-        var stored = valueAtOrBefore(schedulePoints, time);
-        return stored === null ? 0 : Math.max(-1, Math.min(1, stored));
-    }
-
-    function powerAt(time) {
-        var maximumPower = valueAtOrBefore(powerPoints, time);
-        if (maximumPower === null || !isFinite(maximumPower)) {
-            // Serija sploh ni na voljo oz. ni podatka pred tem časom: uporabimo privzeto moč.
-            maximumPower = DEFAULT_MAX_DISCHARGE_POWER_KW;
-        }
-        return Math.max(0, maximumPower) * actionAt(time);
-    }
-
-    var result = [];
-    function appendPower(time, value) {
-        if (value === null) return;
-        var previous = result[result.length - 1];
-        if (previous && previous.y !== value && time > previous.x) {
-            result.push({ x: time - 1, y: previous.y });
-        }
-        result.push({ x: time, y: value });
-    }
-    appendPower(now, powerAt(now));
-    var firstBoundary = (Math.floor(now / SOC_INTERVAL_MS) + 1) * SOC_INTERVAL_MS;
-    for (var time = firstBoundary; time < end; time += SOC_INTERVAL_MS) {
-        appendPower(time, powerAt(time));
-    }
-    appendPower(end, powerAt(end));
-    return result;
 }
 
 // Poišče vrednost na dejanskem času, ne na skupnem indeksu različnih serij.
@@ -414,7 +347,7 @@ self.onInit = function () {
         '      <button id="zoomReset" type="button" title="Pokaži cel dan" style="border:1px solid #d8e2ee; border-radius:6px; padding:5px 10px; background:#f8fafc; color:#31506e; font-size:12px; cursor:pointer;">Cel dan</button>' +
         '    </span>' +
         '    <span id="profitCalculator" style="font-size:13px; color:#26384a; margin-left:auto; white-space:nowrap; padding:6px 10px; border-radius:7px; background:#f2f7fc; border:1px solid #dce9f5;">' +
-        '      Profit: <b id="actualProfit">–</b> dosežen + <b id="forecastProfit">–</b> predvideni = <b id="totalProfit">–</b>' +
+        '      Izmerjeni rezultat: <b id="actualProfit">ni izmerjeno</b> · Napoved: <b id="forecastProfit">–</b><span id="totalProfit"></span>' +
         '    </span>' +
         '    <span id="rangeLabel" style="font-size:12px; color:#555; margin-left:12px;"></span>' +
         '  </div>' +
@@ -672,34 +605,6 @@ self.onInit = function () {
         });
     }
 
-    function lastValueAt(points, time) {
-        points = points || [];
-        var low = 0, high = points.length - 1, found = -1;
-        while (low <= high) {
-            var middle = (low + high) >> 1;
-            if (points[middle][0] <= time) {
-                found = middle;
-                low = middle + 1;
-            } else high = middle - 1;
-        }
-        return found >= 0 ? points[found][1] : null;
-    }
-
-    function scheduleValueAt(time, schedulePoints) {
-        // Shranjen urnik je edini vir za dosežen in predvideni profit.
-        // Dejanska moč, SOC in poraba zato ne morejo spremeniti zneska.
-        if (!ctx._scheduleEdited && !ctx._scheduleLocalOverride) {
-            var stored = lastValueAt(schedulePoints, time);
-            return stored === null ? 0 : stored;
-        }
-
-        // Med urejanjem takoj pokažemo predogled lokalno narisanih intervalov.
-        var active = (intervals || []).find(function (iv) {
-            return iv.xMin <= time && time < iv.xMax;
-        });
-        return active ? (active.type === 'polnjenje' ? 1 : -1) : 0;
-    }
-
     function formatProfit(value) {
         return value === null || !isFinite(value) ? '–' :
             value.toLocaleString('sl-SI', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
@@ -711,67 +616,21 @@ self.onInit = function () {
         var rangeMax = Number(chart.scales.x.max);
         if (!isFinite(rangeMin) || !isFinite(rangeMax) || rangeMax <= rangeMin) return;
 
-        var price = seriesByName(['price', 'bsp cena']);
-        var schedule = seriesByName(['schedule_auto']);
-        var maxDischarge = seriesByName(['max_discharge_power[kw]']);
-        var capacity = seriesByName(['total_capacity[kwh]']);
-        var pricePoints = validTelemetryPoints(price && price.data);
-        var schedulePoints = validTelemetryPoints(schedule && schedule.data);
-        var dischargePoints = validTelemetryPoints(maxDischarge && maxDischarge.data);
-        var capacityPoints = validTelemetryPoints(capacity && capacity.data);
-        var now = Date.now();
-
-        // Doseženi in predvideni profit uporabljata izbrane nakupe/prodaje.
-        // Razlikuje ju samo časovna meja "zdaj".
-        function integrateSchedule(from, to) {
-            if (!(to > from)) return 0;
-            var profit = 0, samples = 0;
-            for (var time = from; time < to; time += SOC_INTERVAL_MS) {
-                var next = Math.min(to, time + SOC_INTERVAL_MS);
-                var priceValue = lastValueAt(pricePoints, time);
-                if (priceValue === null) continue;
-
-                var action = scheduleValueAt(time, schedulePoints);
-                if (action === 0) {
-                    samples++;
-                    continue;
-                }
-
-                var powerValue = null;
-                if (action < 0) {
-                    var maximumDischargePower = lastValueAt(dischargePoints, time);
-                    // Serije sploh ni na voljo: uporabimo privzeto moč namesto izpusta intervala.
-                    if (maximumDischargePower === null && !dischargePoints.length) {
-                        maximumDischargePower = DEFAULT_MAX_DISCHARGE_POWER_KW;
-                    }
-                    var dischargeFraction = Math.max(0, Math.min(1, -action));
-                    powerValue = maximumDischargePower === null ? null :
-                        maximumDischargePower * dischargeFraction;
-                } else {
-                    var totalEnergy = lastValueAt(capacityPoints, time);
-                    // Serije sploh ni na voljo: uporabimo privzeto kapaciteto namesto izpusta intervala.
-                    if (totalEnergy === null && !capacityPoints.length) {
-                        totalEnergy = DEFAULT_TOTAL_CAPACITY_KWH;
-                    }
-                    if (totalEnergy > 0) {
-                        // Enaka hitrost polnjenja kot v SOC napovedi: polna baterija v 8 intervalih.
-                        powerValue = -action * totalEnergy * 3600000 /
-                            (FULL_BATTERY_INTERVALS * SOC_INTERVAL_MS);
-                    }
-                }
-                if (powerValue === null || !isFinite(powerValue)) continue;
-                profit += powerValue * ((next - time) / 3600000) * priceValue / 1000;
-                samples++;
-            }
-            return samples ? profit : null;
+        // A forecast is not a measured financial result. Each point is EUR per 15-minute interval.
+        var entry = seriesByName(['forecast_result[eur]']);
+        var points = validTelemetryPoints(entry && entry.data);
+        var from = Math.max(rangeMin, Date.now()), amount = 0, covered = 0;
+        if (!(ctx._scheduleEdited || ctx._scheduleLocalOverride)) {
+            points.forEach(function (p, i) {
+                var end = Math.min(p[0] + SOC_INTERVAL_MS, i + 1 < points.length ? points[i + 1][0] : Infinity);
+                var span = Math.max(0, Math.min(rangeMax, end) - Math.max(from, p[0]));
+                amount += p[1] * span / SOC_INTERVAL_MS;
+                covered += span;
+            });
         }
-
-        var achieved = integrateSchedule(rangeMin, Math.min(rangeMax, now));
-        var forecast = integrateSchedule(Math.max(rangeMin, now), rangeMax);
-        var total = achieved === null || forecast === null ? null : achieved + forecast;
-        actualProfit.textContent = formatProfit(achieved);
-        forecastProfit.textContent = formatProfit(forecast);
-        totalProfit.textContent = formatProfit(total);
+        actualProfit.textContent = 'ni izmerjeno';
+        forecastProfit.textContent = covered > 0 ? formatProfit(amount) : '–';
+        totalProfit.textContent = '';
     }
 
     function updateZoomButtons() {
@@ -958,11 +817,11 @@ self.onInit = function () {
         var soc = data.find(function (d) { return telemetryMatches(d.dataKey, ['soc[%]', 'soc']); });
         var sun = data.find(function (d) { return telemetryMatches(d.dataKey, ['sun_data', 'sun_percent']); });
         var autoSchedule = data.find(function (d) { return telemetryMatches(d.dataKey, ['schedule_auto']); });
-        var maxDischargePower = data.find(function (d) {
-            return telemetryMatches(d.dataKey, ['max_discharge_power[kw]']);
+        var maxDischargePower = data.find(function (d) { return telemetryMatches(d.dataKey, ['battery_model_power[kw]']); }) || data.find(function (d) {
+            return telemetryMatches(d.dataKey, ['battery_model_power[kw]', 'max_charge_discharge_power[kw]', 'max_discharge_power[kw]']);
         });
-        var totalCapacity = data.find(function (d) {
-            return telemetryMatches(d.dataKey, ['total_capacity[kwh]']);
+        var totalCapacity = data.find(function (d) { return telemetryMatches(d.dataKey, ['battery_model_capacity[kwh]']); }) || data.find(function (d) {
+            return telemetryMatches(d.dataKey, ['battery_model_capacity[kwh]', 'battery_rated_capacity[kwh]', 'total_capacity[kwh]']);
         });
         var end = chart.scales.x.max;
         var now = Date.now();
@@ -971,7 +830,10 @@ self.onInit = function () {
             min == null ? -Infinity : Number(min), Math.min(now, end));
         var points = calculateSocForecast(measurements, sun && sun.data, intervals, end, now,
             ctx._scheduleEdited || ctx._scheduleLocalOverride ? [] : autoSchedule && autoSchedule.data,
-            maxDischargePower && maxDischargePower.data, totalCapacity && totalCapacity.data);
+            maxDischargePower && maxDischargePower.data, totalCapacity && totalCapacity.data, {
+                minSoc: (seriesByName(['battery_model_min_soc[%]']) || {}).data,
+                maxSoc: (seriesByName(['battery_model_max_soc[%]']) || {}).data
+            });
         var socSeries = chart.data.datasets.find(function (d) { return d._socSeries; });
         if (socSeries) {
             // Lokalni SOC ohrani izmerjeno zgodovino in izračunano prihodnost.
@@ -1555,18 +1417,20 @@ self.onDataUpdated = function () {
         var isForecastSoc = telemetryMatches(dataKey, [FORECAST_SOC_KEY]);
         var isActivePower = isActivePowerDataKey(dataKey);
         var forecastRole = consumptionForecastRole(dataKey);
+        var isIntervalForecast = !!forecastRole || telemetryMatches(dataKey,
+            ['forecast_solar[kw]', 'forecast_battery[kw]', 'forecast_grid[kw]']);
         var isStepped = !!forecastRole || telemetryMatches(dataKey, STEPPED_DATA_KEYS);
         if (isHiddenDataKey(dataKey)) continue;
         var values = ctx.data[i].data || [];
         var seriesData = values.map(function (point) {
             return { x: Number(point[0]), y: point[1] == null || point[1] === '' ? null : Number(point[1]) };
         }).filter(function (point) {
-            return isFinite(point.x) && (forecastRole || point.y != null) && (point.y == null || isFinite(point.y)) &&
+            return isFinite(point.x) && (isIntervalForecast || point.y != null) && (point.y == null || isFinite(point.y)) &&
                 (!isActivePower || point.x <= updateNow) &&
                 (!isForecastSoc || point.x >= updateNow);
         }).sort(function (a, b) { return a.x - b.x; });
-        if (isActivePower) seriesData = seriesData.concat(projectedActivePower(ctx, chart));
-        if (forecastRole && seriesData.length) {
+        // Actual battery telemetry ends at now; forecast_battery is the separate planned power.
+        if (isIntervalForecast && seriesData.length) {
             var complete = [];
             seriesData.forEach(function (point, index) {
                 complete.push(point);
@@ -1585,6 +1449,8 @@ self.onDataUpdated = function () {
             (isSoc ? 'SOC (lokalna napoved)' :
                 (isForecastSoc ? 'SOC napoved (prejeta)' :
                     (dataKey ? (dataKey.label || dataKey.name) : ('ds' + i))));
+        var energyLabels = {'forecast_solar[kw]': 'Sončna napoved [kW]', 'forecast_battery[kw]': 'Hranilnik: + polnjenje [kW]', 'forecast_grid[kw]': 'Omrežje: + nakup / − prodaja [kW]', 'power_active_total[kw]': 'Sončna proizvodnja [kW]'};
+        Object.keys(energyLabels).forEach(function (key) { if (telemetryMatches(dataKey, [key])) label = energyLabels[key]; });
         datasets.push({
             _socSeries: isSoc,
             _receivedSocForecast: isForecastSoc,

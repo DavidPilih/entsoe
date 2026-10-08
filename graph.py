@@ -112,30 +112,27 @@ def graph_plot(
         for i in sell_x
     ]
 
-    has_sun = use_sun_data and bool(orders) and all("sun_percent" in order for order in orders)
-    fig = Figure(figsize=(16, 10 if has_sun else 8))
-    if has_sun:
-        ax, sun_ax = fig.subplots(2, 1, sharex=True, height_ratios=[3, 1])
-        sun_values = [order["sun_percent"] for order in orders]
-        # Vsaka vrednost velja za celoten 15-minutni interval.
-        edges = [i - 0.5 for i in range(len(sun_values) + 1)]
-        sun_ax.stairs(sun_values, edges, color="darkorange", linewidth=1.8,
-                      label="Napoved sonca")
-        sun_ax.stairs(sun_values, edges, color="orange", alpha=0.18, fill=True)
-        sun_ax.scatter(buy_x, [sun_values[i] for i in buy_x], color="green",
-                       s=30, zorder=5, label="Polnjenje")
-        sun_ax.scatter(sell_x, [sun_values[i] for i in sell_x], color="red",
-                       s=30, zorder=5, label="Praznjenje")
-        sun_ax.axhline(50, color="gray", linestyle=":", linewidth=1)
-        sun_ax.set_ylim(-3, 105)
-        sun_ax.set_yticks([0, 25, 50, 75, 100])
-        sun_ax.set_ylabel("Sonce (%)")
-        sun_ax.set_title("Napoved sonca", fontsize=10)
-        sun_ax.grid(True, alpha=0.25)
-        sun_ax.legend(loc="upper left", fontsize=8)
+    has_balance = bool(orders) and all("solar_kw" in order for order in orders)
+    fig = Figure(figsize=(16, 10 if has_balance else 8))
+    if has_balance:
+        ax, power_ax = fig.subplots(2, 1, sharex=True, height_ratios=[3, 1.5])
+        edges = list(range(len(orders) + 1))
+        for key, label, color in (
+            ('solar_kw', 'Sončna proizvodnja', '#e5b000'),
+            ('consumption_kw', 'Poraba objekta', '#15956b'),
+            ('battery_kw', 'Hranilnik (+ polnjenje)', '#9c27b0'),
+            ('grid_kw', 'Omrežje (+ nakup, - prodaja)', '#1565c0'),
+        ):
+            power_ax.stairs([order[key] for order in orders], edges,
+                            color=color, linewidth=1.5, label=label)
+        power_ax.axhline(0, color='gray', linewidth=.8)
+        power_ax.set_ylabel('Moč [kW]')
+        power_ax.set_title('Energijska bilanca', fontsize=10)
+        power_ax.grid(True, alpha=.25)
+        power_ax.legend(loc='upper left', fontsize=8, ncol=2)
         if day_boundary is not None:
-            sun_ax.axvline(day_boundary - 0.5, color="gray", linestyle="--", alpha=0.6)
-        time_ax = sun_ax
+            power_ax.axvline(day_boundary, color='gray', linestyle='--', alpha=.6)
+        time_ax = power_ax
     else:
         ax = fig.add_subplot(111)
         time_ax = ax

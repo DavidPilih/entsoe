@@ -62,7 +62,7 @@ def get_sun_data_points(price_points, start, end, lat, lng):
     if values.isna().any():
         raise ValueError("Sončna napoved ne vsebuje obsevanja za vse časovne žige cen.")
 
-    # Enaka ocena kot v algo.py: 1000 W/m² = 100 %.
+    # Enaka ocena kot v prepare_data.py: 1000 W/m² = 100 %.
     percentages = (values.clip(lower=0, upper=1000) / 1000 * 100).round().astype(int)
     return [
         {"ts": point["ts"], "values": {"sun_percent": int(percent)}}
