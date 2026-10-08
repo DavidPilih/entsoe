@@ -5,6 +5,7 @@ import os
 import tempfile
 from dotenv import load_dotenv
 import json
+import time
 from datetime import datetime
 from filelock import FileLock
 
@@ -158,21 +159,40 @@ def scrap_data_sun(lat, lng, date_start, date_end):
 
 
 def get_sun_forecast(lat, lng, date_start, date_end):
-    response = requests.get(
-        "https://api.open-meteo.com/v1/forecast",
-        params={
-            "latitude": lat,
-            "longitude": lng,
-            "start_date": date_start,
-            "end_date": date_end,
-            "hourly": "cloud_cover,shortwave_radiation,sunshine_duration",
-            "timezone": "Europe/Ljubljana",
-        },
-        timeout=30,
-    )
-    response.raise_for_status()
+    url = "https://api.open-meteo.com/v1/forecast"
+    params = {
+        "latitude": lat,
+        "longitude": lng,
+        "start_date": date_start,
+        "end_date": date_end,
+        "hourly": "cloud_cover,shortwave_radiation,sunshine_duration",
+        "timezone": "Europe/Ljubljana",
+    }
+    retry_delays = (5, 15, 30)
+    retryable_statuses = {429, 500, 502, 503, 504}
 
-    df = pd.DataFrame(response.json()["hourly"])
-    df["time"] = pd.to_datetime(df["time"])
-    df["sunshine_minutes"] = df["sunshine_duration"] / 60
-    return df
+    for attempt in range(len(retry_delays) + 1):
+        try:
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            df = pd.DataFrame(response.json()["hourly"])
+            df["time"] = pd.to_datetime(df["time"])
+            df["sunshine_minutes"] = df["sunshine_duration"] / 60
+            return df
+        except requests.HTTPError as exc:
+            error = exc
+            status_code = exc.response.status_code if exc.response is not None else None
+            retryable = status_code in retryable_statuses
+        except (requests.Timeout, requests.ConnectionError) as exc:
+            error = exc
+            retryable = True
+
+        if not retryable or attempt == len(retry_delays):
+            raise error
+
+        delay = retry_delays[attempt]
+        print(
+            f"Open-Meteo začasno ni dosegljiv ({type(error).__name__}: {error}). "
+            f"Ponovni poskus čez {delay} s."
+        )
+        time.sleep(delay)

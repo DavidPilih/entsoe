@@ -7,9 +7,10 @@ from matplotlib.figure import Figure
 import tempfile
 import os
 import math
+import textwrap
 import matplotlib.pyplot as plt
 
-def forecast_soc(timestamps, orders, soc, intervals_needed, forecast_start, use_sun_data=False):
+def forecast_soc(timestamps, orders, soc, intervals_needed, forecast_start, use_sun_data=False, min_soc=0, max_soc=1):
     """SOC (%) na mejah prihodnjih intervalov; vhodni soc je delež 0–1."""
     soc = float(soc)
     intervals_needed = float(intervals_needed)
@@ -33,6 +34,11 @@ def forecast_soc(timestamps, orders, soc, intervals_needed, forecast_start, use_
         if not xs:
             xs.append(x)
             ys.append(value)
+        if "soc" in order:
+            value = float(order["soc"]) * 100
+            xs.append(i + 1)
+            ys.append(value)
+            continue
         rate = 0
         if order["order"] == "buy":
             sun = float(order.get("sun_percent", 100)) if use_sun_data else 100
@@ -42,13 +48,13 @@ def forecast_soc(timestamps, orders, soc, intervals_needed, forecast_start, use_
         elif order["order"] == "sell":
             rate = -step * float(order.get("energy_fraction", 1))
         raw = value + rate * fraction
-        if rate and (raw > 100 or raw < 0):
-            limit = 100 if raw > 100 else 0
+        if rate and (raw > max_soc * 100 or raw < min_soc * 100):
+            limit = max_soc * 100 if raw > max_soc * 100 else min_soc * 100
             hit = x + (limit - value) / rate
             if x < hit < i + 1:
                 xs.append(hit)
                 ys.append(limit)
-        value = min(100, max(0, raw))
+        value = min(max_soc * 100, max(min_soc * 100, raw))
         xs.append(i + 1)
         ys.append(value)
     return xs, ys
@@ -82,6 +88,9 @@ def graph_plot(
     from_time: str = None,
     include_next_day: bool = False,
     use_sun_data: bool = False,
+    parameters=None,
+    min_soc=0,
+    max_soc=1,
 ):
     times_labels = [ts.strftime("%m-%d %H:%M") for ts in timestamps]
 
@@ -121,7 +130,7 @@ def graph_plot(
         sun_ax.set_ylim(-3, 105)
         sun_ax.set_yticks([0, 25, 50, 75, 100])
         sun_ax.set_ylabel("Sonce (%)")
-        sun_ax.set_title("Sonce linearrn?", fontsize=10)
+        sun_ax.set_title("Napoved sonca", fontsize=10)
         sun_ax.grid(True, alpha=0.25)
         sun_ax.legend(loc="upper left", fontsize=8)
         if day_boundary is not None:
@@ -169,25 +178,16 @@ def graph_plot(
             f"LWH jutri: {wh_to_hm(lwh_tom)}"
         )
 
+    if parameters:
+        input_lines = ["ZAČETNI PODATKI"] + textwrap.wrap(
+            "  |  ".join(f"{key}={value}" for key, value in parameters.items()),
+            width=150, break_long_words=False, break_on_hyphens=False,
+        )
     input_text = "\n".join(input_lines)
+    fig.text(0.06, 0.98, input_text, ha="left", va="top", fontsize=9,
+             bbox=dict(facecolor="whitesmoke", edgecolor="gray", pad=6))
 
     fig.subplots_adjust(top=0.72, bottom=0.18, left=0.06, right=0.98)
-
-    # fig.text(
-    #     0.5,
-    #     0.96,
-    #     input_text,
-    #     ha="center",
-    #     va="top",
-    #     fontsize=9,
-    #     family="monospace",
-    #     bbox=dict(
-    #         boxstyle="round,pad=0.6",
-    #         facecolor="whitesmoke",
-    #         edgecolor="gray",
-    #         linewidth=1
-    #     )
-    # )
 
     ax.plot(
         range(len(prices_all)),
@@ -229,7 +229,8 @@ def graph_plot(
         else:
             forecast_start = forecast_start.tz_convert(timestamp_tz)
         soc_x, soc_y = forecast_soc(
-            timestamps, orders, soc, intervals_needed, forecast_start, use_sun_data
+            timestamps, orders, soc, intervals_needed, forecast_start, use_sun_data,
+            min_soc, max_soc,
         )
         if soc_x:
             soc_ax = ax.twinx()
@@ -237,6 +238,8 @@ def graph_plot(
             soc_ax.set_ylim(0, 100)
             soc_ax.set_yticks([0, 20, 40, 60, 80, 100])
             soc_ax.set_ylabel("SOC (%)")
+            soc_ax.axhline(min_soc * 100, color="gray", linestyle=":", linewidth=1)
+            soc_ax.axhline(max_soc * 100, color="gray", linestyle=":", linewidth=1)
             soc_ax.grid(False)
             soc_ax.legend(loc="upper right", fontsize=8)
 
@@ -394,7 +397,7 @@ def graph_plot(
         fontsize=8
     )
 
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 0.96, 0.85))
 
     graph_file = Path(filename_png)
 

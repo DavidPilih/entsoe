@@ -7,11 +7,20 @@ var MAX_ZOOM_MS = 7 * 24 * 60 * 60 * 1000;
 
 var CONSUMPTION_FORECAST_COLOR = '#15956b';
 var CONSUMPTION_RANGE_COLOR = 'rgba(21, 149, 107, 0.20)';
+var FORECAST_SOC_KEY = 'forecasted_soc[%]';
+var FORECAST_CONSUMPTION_KEY = 'forecast_consumption[kW]';
+var FORECAST_CONSUMPTION_LOWER_KEY = 'forecast_consumption_lower[kW]';
+var FORECAST_CONSUMPTION_UPPER_KEY = 'forecast_consumption_upper[kW]';
+
+// Privzeti vrednosti, uporabljeni samo, kadar serija max_discharge_power[kW]
+// oz. total_capacity[kWh] sploh ni na voljo (ne gre za dejansko izmerjeno ničlo).
+var DEFAULT_MAX_DISCHARGE_POWER_KW = 100;
+var DEFAULT_TOTAL_CAPACITY_KWH = 200;
 
 function consumptionForecastRole(key) {
-    if (telemetryMatches(key, ['forecast_consumption_lower'])) return 'lower';
-    if (telemetryMatches(key, ['forecast_consumption_upper'])) return 'upper';
-    if (telemetryMatches(key, ['forecast_consumption'])) return 'mean';
+    if (telemetryMatches(key, [FORECAST_CONSUMPTION_LOWER_KEY])) return 'lower';
+    if (telemetryMatches(key, [FORECAST_CONSUMPTION_UPPER_KEY])) return 'upper';
+    if (telemetryMatches(key, [FORECAST_CONSUMPTION_KEY])) return 'mean';
     return null;
 }
 
@@ -26,8 +35,8 @@ function consumptionSource(entry) {
 // Vsak pravokotnik pokrije samo svoj 15-minutni interval; vrzeli ostanejo prazne.
 function drawConsumptionRange(chart) {
     var area = chart.chartArea;
-    var x = chart.scales.x, y = chart.scales.yPower;
-    if (!area || !x || !y) return;
+    var x = chart.scales.x;
+    if (!area || !x) return;
     var c = chart.ctx;
     c.save();
     c.beginPath();
@@ -36,6 +45,8 @@ function drawConsumptionRange(chart) {
     c.fillStyle = CONSUMPTION_RANGE_COLOR;
     chart.data.datasets.forEach(function (lower, lowerIndex) {
         if (lower._consumptionRole !== 'lower' || !chart.isDatasetVisible(lowerIndex)) return;
+        var y = chart.scales[lower.yAxisID || 'y'];
+        if (!y) return;
         var upperIndex = chart.data.datasets.findIndex(function (d) {
             return d._consumptionRole === 'upper' && d._consumptionSource === lower._consumptionSource;
         });
@@ -51,7 +62,14 @@ function drawConsumptionRange(chart) {
             var right = Math.min(area.right, x.getPixelForValue(end));
             if (right <= left) return;
             var top = y.getPixelForValue(high), bottom = y.getPixelForValue(point.y);
-            c.fillRect(left, top, right - left, bottom - top);
+            var split = Math.max(left, Math.min(right, x.getPixelForValue(Date.now())));
+            if (split > left) c.fillRect(left, top, split - left, bottom - top);
+            if (right > split) {
+                c.save();
+                c.globalAlpha *= Math.max(0, Math.min(1, FUTURE_DATA_OPACITY));
+                c.fillRect(split, top, right - split, bottom - top);
+                c.restore();
+            }
         });
     });
     c.restore();
@@ -144,7 +162,8 @@ function encodeManualSchedule(intervals, original, timeWindow) {
 function telemetryMatches(key, names) {
     return key && names.some(function (name) {
         return [key.name, key.label].some(function (value) {
-            return String(value || '').trim().toLowerCase() === name;
+            return String(value || '').trim().toLowerCase() ===
+                String(name || '').trim().toLowerCase();
         });
     });
 }
@@ -204,8 +223,10 @@ function calculateSocForecast(soc, sun, schedule, end, now, scheduleValues, maxD
             var chargePower = powerIndex >= 0 ? power[powerIndex][1] : sunPercent / 100;
             rate = (100 / FULL_BATTERY_INTERVALS) * Math.max(0, Math.min(1, chargePower));
         } else if (active && active.type === 'praznjenje') {
-            var maxPower = dischargePowerIndex >= 0 ? dischargePower[dischargePowerIndex][1] : 0;
-            var totalEnergy = capacityIndex >= 0 ? capacity[capacityIndex][1] : 0;
+            var maxPower = dischargePowerIndex >= 0 ? dischargePower[dischargePowerIndex][1] :
+                (dischargePower.length ? 0 : DEFAULT_MAX_DISCHARGE_POWER_KW);
+            var totalEnergy = capacityIndex >= 0 ? capacity[capacityIndex][1] :
+                (capacity.length ? 0 : DEFAULT_TOTAL_CAPACITY_KWH);
             var dischargeFraction = powerIndex >= 0 && power[powerIndex][1] < 0 ?
                 Math.max(0, Math.min(1, -power[powerIndex][1])) : 1;
             // Negativna vrednost urnika določa delež največje moči: -0,6 pomeni 60 %.
@@ -252,10 +273,8 @@ function isHiddenDataKey(dataKey) {
 
 function isPercentDataKey(dataKey) {
     if (!dataKey) return false;
-    var name = String(dataKey.name == null ? '' : dataKey.name).trim();
-    var key = (name || String(dataKey.label || '').trim()).toLowerCase();
-    return PERCENT_DATA_KEYS.some(function (entry) {
-        return String(entry).trim().toLowerCase() === key;
+    return [dataKey.name, dataKey.label].some(function (value) {
+        return String(value || '').toLowerCase().indexOf('[%]') !== -1;
     });
 }
 
@@ -271,7 +290,7 @@ function isActivePowerDataKey(dataKey) {
 function isKwDataKey(dataKey) {
     if (!dataKey) return false;
     return [dataKey.name, dataKey.label].some(function (value) {
-        return /kw(?!h)/.test(String(value || '').trim().toLowerCase());
+        return String(value || '').toLowerCase().indexOf('[kw]') !== -1;
     });
 }
 
@@ -316,7 +335,10 @@ function projectedActivePower(ctx, chart) {
 
     function powerAt(time) {
         var maximumPower = valueAtOrBefore(powerPoints, time);
-        if (maximumPower === null || !isFinite(maximumPower)) return null;
+        if (maximumPower === null || !isFinite(maximumPower)) {
+            // Serija sploh ni na voljo oz. ni podatka pred tem časom: uporabimo privzeto moč.
+            maximumPower = DEFAULT_MAX_DISCHARGE_POWER_KW;
+        }
         return Math.max(0, maximumPower) * actionAt(time);
     }
 
@@ -513,7 +535,7 @@ self.onInit = function () {
                 // Ista časovna meja za vse podatkovne serije v tem izrisu.
                 activeChart._futureOpacityNow = Date.now();
             },
-            beforeDatasetDraw: function (activeChart) {
+            beforeDatasetDraw: function (activeChart, args) {
                 var area = activeChart.chartArea;
                 var axis = activeChart.scales.x;
                 var split = axis.getPixelForValue(activeChart._futureOpacityNow);
@@ -523,9 +545,13 @@ self.onInit = function () {
 
                 // Običajni izris omejimo na preteklost.
                 var c = activeChart.ctx;
+                var dataset = activeChart.data.datasets[args.index];
+                var hidePastSocForecast = dataset && dataset._receivedSocForecast;
                 c.save();
                 c.beginPath();
-                c.rect(area.left, area.top, split - area.left, area.bottom - area.top);
+                c.rect(area.left, area.top,
+                    hidePastSocForecast ? 0 : split - area.left,
+                    area.bottom - area.top);
                 c.clip();
             },
             afterDatasetDraw: function (activeChart, args) {
@@ -542,9 +568,7 @@ self.onInit = function () {
                     c.beginPath();
                     c.rect(split, area.top, area.right - split, area.bottom - area.top);
                     c.clip();
-                    if (!activeChart.data.datasets[args.index]._consumptionRole) {
-                        c.globalAlpha *= Math.max(0, Math.min(1, FUTURE_DATA_OPACITY));
-                    }
+                    c.globalAlpha *= Math.max(0, Math.min(1, FUTURE_DATA_OPACITY));
                     args.meta.controller.draw();
                 } finally {
                     c.restore();
@@ -563,6 +587,7 @@ self.onInit = function () {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            animation: false,
             interaction: { mode: 'socTimeCursor', intersect: false },
             scales: {
                 x: {
@@ -715,11 +740,19 @@ self.onInit = function () {
                 var powerValue = null;
                 if (action < 0) {
                     var maximumDischargePower = lastValueAt(dischargePoints, time);
+                    // Serije sploh ni na voljo: uporabimo privzeto moč namesto izpusta intervala.
+                    if (maximumDischargePower === null && !dischargePoints.length) {
+                        maximumDischargePower = DEFAULT_MAX_DISCHARGE_POWER_KW;
+                    }
                     var dischargeFraction = Math.max(0, Math.min(1, -action));
                     powerValue = maximumDischargePower === null ? null :
                         maximumDischargePower * dischargeFraction;
                 } else {
                     var totalEnergy = lastValueAt(capacityPoints, time);
+                    // Serije sploh ni na voljo: uporabimo privzeto kapaciteto namesto izpusta intervala.
+                    if (totalEnergy === null && !capacityPoints.length) {
+                        totalEnergy = DEFAULT_TOTAL_CAPACITY_KWH;
+                    }
                     if (totalEnergy > 0) {
                         // Enaka hitrost polnjenja kot v SOC napovedi: polna baterija v 8 intervalih.
                         powerValue = -action * totalEnergy * 3600000 /
@@ -941,11 +974,10 @@ self.onInit = function () {
             maxDischargePower && maxDischargePower.data, totalCapacity && totalCapacity.data);
         var socSeries = chart.data.datasets.find(function (d) { return d._socSeries; });
         if (socSeries) {
-            // Vedno izhajamo iz meritev, da se napoved pri ponovnem izrisu ne podvaja.
+            // Lokalni SOC ohrani izmerjeno zgodovino in izračunano prihodnost.
             var measured = measurements
                 .filter(function (p) { return p[0] <= now; })
                 .map(function (p) { return { x: p[0], y: p[1] }; });
-            // Prva napovedana točka je zadnja meritev, zato je ne dodamo dvakrat.
             socSeries.data = measured.concat(points.slice(1));
             socSeries.stepped = false;
             socSeries.tension = 0;
@@ -1516,9 +1548,11 @@ self.onDataUpdated = function () {
     if (ctx._ensureLiveSoc) ctx._ensureLiveSoc();
 
     var datasets = [];
+    var updateNow = Date.now();
     for (var i = 0; i < (ctx.data || []).length; i++) {
         var dataKey = ctx.data[i].dataKey;
         var isSoc = telemetryMatches(dataKey, ['soc[%]', 'soc']);
+        var isForecastSoc = telemetryMatches(dataKey, [FORECAST_SOC_KEY]);
         var isActivePower = isActivePowerDataKey(dataKey);
         var forecastRole = consumptionForecastRole(dataKey);
         var isStepped = !!forecastRole || telemetryMatches(dataKey, STEPPED_DATA_KEYS);
@@ -1528,7 +1562,8 @@ self.onDataUpdated = function () {
             return { x: Number(point[0]), y: point[1] == null || point[1] === '' ? null : Number(point[1]) };
         }).filter(function (point) {
             return isFinite(point.x) && (forecastRole || point.y != null) && (point.y == null || isFinite(point.y)) &&
-                (!isActivePower || point.x <= Date.now());
+                (!isActivePower || point.x <= updateNow) &&
+                (!isForecastSoc || point.x >= updateNow);
         }).sort(function (a, b) { return a.x - b.x; });
         if (isActivePower) seriesData = seriesData.concat(projectedActivePower(ctx, chart));
         if (forecastRole && seriesData.length) {
@@ -1546,17 +1581,22 @@ self.onDataUpdated = function () {
         }
         var forecastLabels = { mean: 'Napoved porabe', lower: 'Spodnja meja porabe', upper: 'Zgornja meja porabe' };
         var color = forecastRole ? CONSUMPTION_FORECAST_COLOR : (dataKey ? dataKey.color : '#999');
+        var label = forecastRole ? forecastLabels[forecastRole] :
+            (isSoc ? 'SOC (lokalna napoved)' :
+                (isForecastSoc ? 'SOC napoved (prejeta)' :
+                    (dataKey ? (dataKey.label || dataKey.name) : ('ds' + i))));
         datasets.push({
             _socSeries: isSoc,
+            _receivedSocForecast: isForecastSoc,
             _consumptionRole: forecastRole,
             _consumptionSource: consumptionSource(ctx.data[i]),
-            label: forecastRole ? forecastLabels[forecastRole] : (dataKey ? dataKey.label : ('ds' + i)),
-            yAxisID: (isActivePower || isKwDataKey(dataKey) || forecastRole) ? 'yPower' : (isPercentDataKey(dataKey) ? 'yPercent' : 'y'),
+            label: label,
+            yAxisID: isPercentDataKey(dataKey) ? 'yPercent' : (isKwDataKey(dataKey) ? 'yPower' : 'y'),
             data: seriesData,
             borderColor: forecastRole && forecastRole !== 'mean' ? 'rgba(21, 149, 107, 0.65)' : color,
             backgroundColor: forecastRole ? CONSUMPTION_RANGE_COLOR : color,
-            borderWidth: forecastRole === 'mean' ? 2.8 : (forecastRole ? 1.2 : 2),
-            borderDash: forecastRole && forecastRole !== 'mean' ? [4, 3] : [],
+            borderWidth: forecastRole === 'mean' ? 2.8 : (forecastRole ? 0 : 2),
+            borderDash: [],
             spanGaps: false,
             fill: false,
             tension: 0,
@@ -1569,7 +1609,8 @@ self.onDataUpdated = function () {
         });
     }
     chart.data.datasets = datasets;
-    chart.update();
+    // Realtime osvežitev brez animacije prepreči navpično poskakovanje grafa.
+    chart.update('none');
     if (ctx._updateZoomButtons) ctx._updateZoomButtons();
 
     if (self.ctx._renderTrack) self.ctx._renderTrack();

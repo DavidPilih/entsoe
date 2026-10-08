@@ -251,9 +251,9 @@ def plot_consumption(history, forecast, path, forecast_start, forecast_end):
 
 
 TELEMETRY_KEYS = {
-    "consumption_kw": "forecast_consumption",
-    "lower_kw": "forecast_consumption_lower",
-    "upper_kw": "forecast_consumption_upper",
+    "consumption_kw": "forecast_consumption[kW]",
+    "lower_kw": "forecast_consumption_lower[kW]",
+    "upper_kw": "forecast_consumption_upper[kW]",
 }
 
 

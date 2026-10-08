@@ -1,0 +1,96 @@
+[
+  {
+    "device": {
+      "id": "03-eastron",
+      "type": "GRID_METER",
+      "object": "deplast"
+    },
+    "timestamp[s]": 1791360391,
+    "grid": {
+      "power_active_total[kW]": 3.69,
+      "import_energy_total[kWh]": 46123.45,
+      "export_energy_total[kWh]": 49244.21
+    },
+    "communication": {
+      "error": 1
+    }
+  },
+  {
+    "device": {
+      "id": "03-enerArk",
+      "type": "BHEE",
+      "object": "deplast"
+    },
+    "timestamp[s]": 1791360416,
+    "pcs_data": {
+      "active_power_total[kW]": 6.5,
+      "active_power_control_setpoint[kW]": 7.2,
+      "max_charge_power[kW]": null,
+      "max_discharge_power[kW]": null,
+      "available_charge_power[kW]": null,
+      "available_discharge_power[kW]": null,
+      "imported_activ_energy[kWh]": 33486.68,
+      "exported_activ_energy[kWh]": 29037.2
+    },
+    "battery_data": {
+      "SOC[%]": 37.0,
+      "total_capacity[kWh]": null
+    },
+    "communication": {
+      "error": 0
+    }
+  },
+  {
+    "device": {
+      "id": "03-deyeString",
+      "type": "SOLAR_INVERTER",
+      "object": "deplast"
+    },
+    "timestamp[s]": 1791360411,
+    "grid": {
+      "power_active_total[kW]": 35.75,
+      "active_total_energy[kWh]": 109419.1
+    },
+    "communication": {
+      "error": 1
+    }
+  },
+  {
+    "device": {
+      "id": "deplast-agg",
+      "type": "AGG",
+      "object": "deplast"
+    },
+    "timestamp[s]": null,
+    "agg": {
+      "grid_power": null,
+      "solar_power": null,
+      "battery_power": null,
+      "consumption": null
+    },
+    "grid": {
+      "import_energy_total[kWh]": null,
+      "export_energy_total[kWh]": null
+    },
+    "solar": {
+      "active_total_energy[kWh]": null
+    },
+    "pcs_data": {
+      "active_power_control_setpoint[kW]": null,
+      "max_charge_power[kW]": null,
+      "max_discharge_power[kW]": null,
+      "available_charge_power[kW]": null,
+      "available_discharge_power[kW]": null,
+      "imported_activ_energy[kWh]": null,
+      "exported_activ_energy[kWh]": null
+    },
+    "battery_data": {
+      "SOC[%]": null,
+      "total_capacity[kWh]": null
+    },
+    "status_data": {
+      "devices_in_comm_fault_state[]": null,
+      "total_devices[]": null
+    },
+  }
+]

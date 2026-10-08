@@ -1,0 +1,87 @@
+<div class="app">
+
+  <div class="header">
+    <h1>Režimi polnjenja / praznjenja</h1>
+  </div>
+
+  <div class="layout">
+
+    <!-- Levi stolpec -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Razpoložljivi režimi</h2>
+      </div>
+
+      <div class="card-body">
+        <div class="regime-list" id="regimeList"></div>
+      </div>
+    </div>
+
+    <!-- Desni stolpec -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Tedenski urnik</h2>
+        <button class="btn btn-ghost" id="btnClear">Počisti</button>
+      </div>
+
+      <div class="card-body">
+
+        <div class="week-grid" id="weekGrid"></div>
+
+        <div class="quick-actions">
+
+          <div>
+            <button class="btn btn-ghost" id="btnMonFri">Pon–Pet</button>
+            <button class="btn btn-ghost" id="btnSatSun">Sob–Ned</button>
+            <button class="btn btn-ghost" id="btnAll">Cel teden</button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card leave-card">
+    <div class="card-header leave-header">
+      <div>
+        <h2>Kolektivni dopust</h2>
+        <p>V izbranem obdobju velja nastavljen režim.</p>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <div class="leave-form">
+        <label class="form-field form-field-name">
+          <span>Naziv</span>
+          <input id="leaveName" type="text">
+        </label>
+        <label class="form-field">
+          <span>Od</span>
+          <input id="leaveFrom" type="date">
+        </label>
+        <label class="form-field">
+          <span>Do</span>
+          <input id="leaveTo" type="date">
+        </label>
+        <label class="form-field form-field-regime">
+          <span>Režim</span>
+          <select id="leaveRegime"></select>
+        </label>
+        <div class="leave-form-actions">
+          <button class="btn btn-solid" id="btnAddLeave">Dodaj obdobje</button>
+          <button class="btn btn-ghost btn-cancel" id="btnCancelLeave" hidden>Prekliči</button>
+        </div>
+      </div>
+
+      <div class="form-message" id="leaveMessage"></div>
+      <div class="leave-list" id="leaveList"></div>
+    </div>
+  </div>
+
+  <div class="save-footer">
+    <button class="btn btn-solid" id="btnSave">Shrani</button>
+  </div>
+
+</div>

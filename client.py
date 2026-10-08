@@ -2,6 +2,8 @@ import math
 import os
 import sys
 import queue
+import json
+from datetime import date, timedelta
 import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
@@ -49,6 +51,151 @@ def convert_timestamp(timestamp):
         ts = ts.tz_localize("Europe/Ljubljana")
     return int(ts.timestamp() * 1000)
 
+def fetch_schedule(device_id, from_time, next_day=False):
+    today = pd.Timestamp.now(tz="Europe/Ljubljana").normalize()
+    start_ts = convert_timestamp(f"{today.strftime('%Y-%m-%d')} {from_time}")
+    end_ts = convert_timestamp(today + pd.DateOffset(days=2 if next_day else 1))
+    conn = psycopg2.connect(**DB_CONFIG)
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                'SELECT "timestamp", "protocol" FROM device_energy_schedule '
+                'WHERE device_id = %s AND "protocol" IS NOT NULL '
+                'AND "timestamp" >= %s AND "timestamp" < %s '
+                'ORDER BY "timestamp"',
+                (device_id, start_ts, end_ts),
+            )
+            return [{"ts": ts, "protocol": protocol} for ts, protocol in cur.fetchall()]
+    finally:
+        conn.close()
+
+
+def fetch_manual_schedule(device_id, start, end):
+    """Prebere tudi ročne ukaze pred from_time, saj določajo lastništvo dneva."""
+    conn = psycopg2.connect(**DB_CONFIG)
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                'SELECT "timestamp", manual FROM device_energy_schedule '
+                'WHERE device_id = %s AND manual IS NOT NULL '
+                'AND "timestamp" >= %s AND "timestamp" < %s '
+                'ORDER BY "timestamp"',
+                (device_id, convert_timestamp(start), convert_timestamp(end)),
+            )
+            return {int(ts): value for ts, value in cur.fetchall()}
+    finally:
+        conn.close()
+
+
+def schedule_end_soc(schedule, soc, capacity, power, min_soc, max_soc, forecast=None):
+    """Ocena SOC po 15-minutnih ukazih, z omejitvijo po vsakem ukazu."""
+    soc = min(max(float(soc), float(min_soc)), float(max_soc))
+    for item in schedule:
+        soc += float(item["value"]) * float(power) * 0.25 / float(capacity)
+        soc = min(max(soc, float(min_soc)), float(max_soc))
+        if forecast is not None:
+            forecast.append({
+                "ts": convert_timestamp(item["timestamp"]) + 15 * 60 * 1000,
+                "values": {"forecasted_soc[%]": soc * 100},
+            })
+    return soc
+
+
+def fetch_device_regimes(device_id):
+    conn = psycopg2.connect(**DB_CONFIG)
+    try:
+        with conn.cursor() as cur:
+            cur.execute(
+                'SELECT a.json_v, a.str_v FROM attribute_kv a '
+                'JOIN key_dictionary kd ON kd.key_id = a.attribute_key '
+                'WHERE a.entity_id = %s AND a.attribute_type = %s '
+                'AND kd.key = %s ORDER BY a.last_update_ts DESC LIMIT 1',
+                (device_id, 3, "device_energy_protocol"),
+            )
+            row = cur.fetchone()
+    finally:
+        conn.close()
+
+    if row is None:
+        raise ValueError("Naprava nima shared atributa device_energy_protocol.")
+    value = row[0] if row[0] is not None else row[1]
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except json.JSONDecodeError as exc:
+            raise ValueError("Atribut device_energy_protocol ni veljaven JSON.") from exc
+    if not isinstance(value, dict):
+        raise ValueError("Atribut device_energy_protocol mora biti JSON objekt.")
+    return value
+
+
+def easter_sunday(year):
+    a = year % 19
+    b = year // 100
+    c = year % 100
+    d = b // 4
+    e = b % 4
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19 * a + b - d - g + 15) % 30
+    i = c // 4
+    k = c % 4
+    length = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * length) // 451
+    month = (h + length - 7 * m + 114) // 31
+    day = (h + length - 7 * m + 114) % 31 + 1
+    return date(year, month, day)
+
+
+def is_slovenian_holiday(target_date):
+    fixed_holidays = {
+        (1, 1), (1, 2), (2, 8), (4, 27), (5, 1), (5, 2),
+        (6, 25), (8, 15), (10, 31), (11, 1), (12, 25), (12, 26),
+    }
+    easter = easter_sunday(target_date.year)
+    movable_holidays = {easter, easter + timedelta(days=1), easter + timedelta(days=49)}
+    return (target_date.month, target_date.day) in fixed_holidays or target_date in movable_holidays
+
+
+def regime_for_date(regimes, target_date):
+    date_key = target_date.isoformat()
+    temporary = regimes.get("zacasno", [])
+    if isinstance(temporary, list):
+        for item in temporary:
+            if (isinstance(item, dict) and item.get("datum") == date_key
+                    and isinstance(item.get("rezim"), str) and item["rezim"]):
+                return item["rezim"]
+
+    permanent = regimes.get("stalno")
+    if not isinstance(permanent, dict):
+        permanent = regimes
+    if is_slovenian_holiday(target_date):
+        return permanent.get("prazniki") or permanent.get("holidays")
+
+    weekday_keys = (
+        ("pon", "monday"),
+        ("tor", "tuesday"),
+        ("sre", "wednesday"),
+        ("cet", "thursday"),
+        ("pet", "friday"),
+        ("sob", "saturday"),
+        ("ned", "sunday"),
+    )
+    current_key, legacy_key = weekday_keys[target_date.weekday()]
+    return permanent.get(current_key) or permanent.get(legacy_key)
+
+
+def selected_device_regimes(regimes, next_day=False, today=None):
+    if today is None:
+        today = pd.Timestamp.now(tz="Europe/Ljubljana").date()
+    dates = [today]
+    if next_day:
+        dates.append(today + timedelta(days=1))
+    return {
+        target_date.isoformat(): regime_for_date(regimes, target_date)
+        for target_date in dates
+    }
+
 def db_writer_loop():
     conn = psycopg2.connect(**DB_CONFIG)
     conn.autocommit = False
@@ -78,29 +225,21 @@ def save_result(device_id, database_data):
 def to_data_points(data):
     return [{"ts": convert_timestamp(item["timestamp"]), "values": {"schedule_auto": item["value"]}} for item in data]
 
-def fetch_consumption_forecast(device_id, timestamps):
-    if not timestamps:
-        return []
-    expected = [convert_timestamp(t) for t in timestamps]
-    conn = psycopg2.connect(**DB_CONFIG, connect_timeout=10)
-    try:
-        conn.set_session(readonly=True)
-        with conn.cursor() as cur:
-            cur.execute("SET LOCAL statement_timeout = '60s'")
-            cur.execute('SELECT t.ts, t.dbl_v, t.long_v FROM ts_kv t '
-                        'JOIN key_dictionary kd ON kd.key_id=t."key" '
-                        'WHERE t.entity_id=%s AND kd.key=%s AND t.ts >= %s AND t.ts <= %s',
-                        (device_id, 'forecast_consumption_upper', min(expected), max(expected)))
-            values = {int(ts): dbl if dbl is not None else lng for ts, dbl, lng in cur.fetchall()}
-    finally:
-        conn.close()
-    result = []
-    for ts in expected:
-        value = values.get(ts)
-        if isinstance(value, bool) or not isinstance(value, (float, int)) or not math.isfinite(value):
-            raise ValueError(f'Manjka veljaven forecast_consumption_upper za {pd.Timestamp(ts, unit="ms", tz="UTC").isoformat()}.')
-        result.append(max(0., float(value)))
-    return result
+
+def format_schedule_point(timestamp, value, power):
+    power_setpoint = round(float(value) * float(power), 3)
+    if power_setpoint == 0:
+        power_setpoint = 0.0
+        operation = "idle"
+    elif power_setpoint > 0:
+        operation = "charging"
+    else:
+        operation = "discharging"
+    return {
+        "timestamp": int(timestamp),
+        "power_setpoint[kW]": power_setpoint,
+        "operation": operation,
+    }
 
 
 def process_request(payload):
@@ -113,20 +252,12 @@ def process_request(payload):
     if missing:
         raise ValueError(f"Manjkajoči podatki: {', '.join(missing)}.")
 
-    use_consumption = payload.get('use_consumption', False)
-    if not isinstance(use_consumption, bool):
-        raise ValueError('use_consumption mora biti boolean.')
-    consumption_args = {}
+    
     device_id = None
-    if use_consumption:
-        device_id = fetch_device_id(unique_id)
-        consumption_args = dict(use_consumption=True,
-                                consumption_loader=lambda times: fetch_consumption_forecast(device_id, times))
-
-
     now = pd.Timestamp.now(tz="UTC").ceil("15min").tz_convert("Europe/Ljubljana")
     def_date = now.strftime("%Y-%m-%d")
     def_time = now.strftime("%H:%M")
+
 
     capacity = payload["capacity"]
     power = payload["power"]
@@ -143,38 +274,125 @@ def process_request(payload):
     sun_factor = payload.get("sun_factor", 1.2)
     power_factor = payload.get("power_factor", 1)
     margin = payload.get("margin", 0.1)
+    use_regime = payload.get("use_regime", False)
     power *= power_factor
+    use_consumption = payload.get('use_consumption', True)
+
+    print(
+        f"Začetni podatki [{unique_id}]: "
+        f"capacity={capacity} kWh, power={power} kW (power_factor={power_factor}), "
+        f"soc={soc}, min_soc={min_soc}, max_soc={max_soc} (SOC v območju 0–1), "
+        f"date={date}, start_time={from_time}, next_day={next_day}, "
+        f"latitude={lat}, longitude={lng}, minimum_profit={minimum_profit}, "
+        f"margin={margin}, use_consumption={use_consumption}, "
+        f"use_sun_data={use_sun_data}, sun_factor={sun_factor}, use_regime={use_regime}"
+    )
+
+    schedule = []
+    selected_regimes = {}
+    if use_regime:
+        device_id = fetch_device_id(unique_id)
+        device_regimes = fetch_device_regimes(device_id)
+        selected_regimes = selected_device_regimes(device_regimes, next_day)
 
     print(f"Začenjam zahtevek: {unique_id}")
 
-    calculation, database_data = main(
-        capacity, power, minimum_profit, date, lat, lng, from_time, soc, next_day,
-        use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor,
-        min_soc=min_soc, max_soc=max_soc,
-        **consumption_args,
-    )
+    if device_id is None:
+        device_id = fetch_device_id(unique_id)
+    day = pd.Timestamp(date, tz="Europe/Ljubljana").normalize()
+    start = pd.Timestamp(f"{day.strftime('%Y-%m-%d')} {from_time}", tz="Europe/Ljubljana")
+    start = start.tz_convert("UTC").ceil("15min").tz_convert("Europe/Ljubljana")
+    end = day + pd.DateOffset(days=2 if next_day else 1)
+    manual = fetch_manual_schedule(device_id, day, end)
+    manual_days = {
+        pd.Timestamp(ts, unit="ms", tz="UTC").tz_convert("Europe/Ljubljana").date()
+        for ts in manual
+    }
+
+    if manual_days:
+        periods = []
+
+        for current in pd.date_range(day, end, freq="D", inclusive="left"):
+            konec_dneva = current + pd.DateOffset(days=1)
+
+            if konec_dneva > start:
+                zacetek_obdobja = max(start, current)
+                periods.append((zacetek_obdobja, konec_dneva, False))
+
+    else:
+        periods = [(start, end, next_day)] if start < end else []
+
+    database_data = []
+    response_data = []
+    publish_data = []
+    energy_balance = []
+    soc_forecast = [{
+        "ts": convert_timestamp(start),
+        "values": {"forecasted_soc[%]": float(soc) * 100},
+    }] if periods else []
+    for period_start, period_end, include_next_day in periods:
+        calculation, calculated = main(
+            capacity, power, minimum_profit, period_start.strftime("%Y-%m-%d"),
+            lat, lng, period_start.strftime("%H:%M"), soc, include_next_day,
+            use_sun_data=use_sun_data, margin=margin, sun_factor=sun_factor,
+            min_soc=min_soc, max_soc=max_soc,
+            use_consumption=use_consumption, unique_id=unique_id,
+            graph_parameters={"power_factor": power_factor, "use_regime": use_regime},
+        )
+        start_ms, end_ms = convert_timestamp(period_start), convert_timestamp(period_end)
+        calculated = sorted(
+            (item for item in calculated
+             if start_ms <= convert_timestamp(item["timestamp"]) < end_ms),
+            key=lambda item: convert_timestamp(item["timestamp"]),
+        )
+        database_data.extend(calculated)
+        if period_start.date() in manual_days:
+            effective = [
+                {"timestamp": ts, "value": manual.get(convert_timestamp(ts), 0)}
+                for ts in pd.date_range(period_start, period_end, freq="15min", inclusive="left")
+            ]
+            soc = schedule_end_soc(effective, soc, capacity, power, min_soc, max_soc, soc_forecast)
+        else:
+            effective = calculated
+            publish_data.extend(calculated)
+            if use_consumption:
+                balance = [item for item in calculation["energy_balance"]
+                           if start_ms <= convert_timestamp(item["time"]) < end_ms]
+                energy_balance.extend(balance)
+                soc_forecast.extend({
+                    "ts": convert_timestamp(item["time"]) + 15 * 60 * 1000,
+                    "values": {"forecasted_soc[%]": float(item["soc"]) * 100},
+                } for item in balance)
+                if balance:
+                    soc = balance[-1]["soc"]
+            else:
+                soc = schedule_end_soc(effective, soc, capacity, power, min_soc, max_soc, soc_forecast)
+        response_data.extend(effective)
 
     result = {
         "success": True,
         "unique_id": unique_id,
         "data": [
-            {"timestamp": convert_timestamp(item["timestamp"]), "value": item["value"]}
-            for item in database_data
+            format_schedule_point(
+                convert_timestamp(item["timestamp"]), item["value"], power
+            )
+            for item in response_data
         ],
     }
 
     if use_consumption:
-        result['energy_balance'] = calculation['energy_balance']
-    if device_id is None:
-        device_id = fetch_device_id(unique_id)
+        result['energy_balance'] = energy_balance
     save_result(device_id, database_data)
-    send_tb_device(to_data_points(database_data), device_id)
+    telemetry = to_data_points(publish_data) + soc_forecast
+    if telemetry:
+        send_tb_device(telemetry, device_id)
     print(f"Končan zahtevek: {unique_id}")
     return result
 
 
 def fetch_device_parameters(device_id):
-    keys = ("total_capacity[kWh]", "max_charge_power[kW]", "SOC[%]")
+    """Vrne kapaciteto (kWh), moč (kW) in SOC kot delež 0–1."""
+    keys = ("battery_rated_capacity[kWh]", "max_charge_discharge_power[kW]", "SOC[%]")
     conn = psycopg2.connect(**DB_CONFIG)
     try:
         with conn.cursor() as cur:

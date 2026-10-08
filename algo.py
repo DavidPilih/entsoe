@@ -9,6 +9,8 @@ import time
 from filelock import FileLock
 import os
 import math
+import psycopg2
+from dotenv import load_dotenv
 
 from graph import graph_plot
 
@@ -17,6 +19,78 @@ from graph import graph_plot
 # Ocena: 1000 W/m² pomeni polno razpoložljivo moč polnjenja.
 SOLAR_REFERENCE_W_M2 = 1000.0
 ENERGY_STEPS = 100  # Ločljivost: 1 % energije enega 15-minutnega intervala.
+
+load_dotenv()
+
+
+def database_config():
+    username = os.getenv("USER_DB")
+    password = os.getenv("PASSWORD_DB")
+    if not username or not password:
+        raise RuntimeError("Manjkata USER_DB in/ali PASSWORD_DB.")
+    return {
+        "host": "10.188.20.3",
+        "port": 5432,
+        "dbname": "thingsboard",
+        "user": username,
+        "password": password,
+    }
+
+
+def timestamp_ms(timestamp):
+    value = pd.Timestamp(timestamp)
+    if value.tzinfo is None:
+        value = value.tz_localize("Europe/Ljubljana")
+    return int(value.timestamp() * 1000)
+
+
+def fetch_consumption_device_id(unique_id):
+    conn = psycopg2.connect(**database_config(), connect_timeout=10)
+    try:
+        conn.set_session(readonly=True)
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM device WHERE name = %s", (unique_id,))
+            row = cur.fetchone()
+    finally:
+        conn.close()
+    if row is None:
+        raise ValueError(f"Naprava z imenom '{unique_id}' ne obstaja v tabeli device.")
+    return row[0]
+
+
+def fetch_consumption_forecast(device_id, timestamps):
+    if not timestamps:
+        return []
+    expected = [timestamp_ms(timestamp) for timestamp in timestamps]
+    conn = psycopg2.connect(**database_config(), connect_timeout=10)
+    try:
+        conn.set_session(readonly=True)
+        with conn.cursor() as cur:
+            cur.execute("SET LOCAL statement_timeout = '60s'")
+            cur.execute(
+                'SELECT t.ts, t.dbl_v, t.long_v FROM ts_kv t '
+                'JOIN key_dictionary kd ON kd.key_id=t."key" '
+                'WHERE t.entity_id=%s AND kd.key=%s AND t.ts >= %s AND t.ts <= %s',
+                (device_id, "forecast_consumption[kW]", min(expected), max(expected)),
+            )
+            values = {
+                int(ts): dbl if dbl is not None else lng
+                for ts, dbl, lng in cur.fetchall()
+            }
+    finally:
+        conn.close()
+
+    result = []
+    for timestamp in expected:
+        value = values.get(timestamp)
+        if (isinstance(value, bool) or not isinstance(value, (float, int))
+                or not math.isfinite(value)):
+            readable = pd.Timestamp(timestamp, unit="ms", tz="UTC").isoformat()
+            raise ValueError(
+                f"Manjka veljaven forecast_consumption[kW] za {readable}."
+            )
+        result.append(max(0.0, float(value)))
+    return result
 
 
 def solar_percentages(forecast, timestamps):
@@ -182,7 +256,7 @@ def optimize_consumption(data, capacity, power, soc, min_soc, max_soc,
     return orders
 
 
-def consumption_tail(last_time, lat, lng, use_sun_data, sun_factor, power, consumption_loader):
+def consumption_tail(last_time, lat, lng, use_sun_data, sun_factor, power, device_id):
     """Intervali po koncu načrta do prvega dovoljenega neto kandidata polnjenja."""
     begin = pd.Timestamp(last_time)
     if begin.tzinfo is None:
@@ -201,7 +275,10 @@ def consumption_tail(last_time, lat, lng, use_sun_data, sun_factor, power, consu
             if first <= timestamp.hour * 4 + timestamp.minute // 15 <= last:
                 charge = math.floor(charge_fraction(percent, sun_factor) * ENERGY_STEPS + 1e-9)
                 if charge > 0:
-                    demand = math.ceil(consumption_loader([timestamp])[0] / power * ENERGY_STEPS)
+                    demand = math.ceil(
+                        fetch_consumption_forecast(device_id, [timestamp])[0]
+                        / power * ENERGY_STEPS
+                    )
                     if charge > demand:
                         return tail
             tail.append(timestamp)
@@ -254,7 +331,7 @@ def load_price_data(filename: str, start: pd.Timestamp, end: pd.Timestamp) -> Li
     return [(row["time"], float(row["price"])) for _, row in df.iterrows()]
 
 
-def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True, use_sun_data: bool = False, *, margin: float, sun_factor: float = 1.2, min_soc: float = 0, max_soc: float = 1, use_consumption=False, consumption_loader=None):
+def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, include_next_day: bool = True, use_sun_data: bool = False, *, margin: float, sun_factor: float = 1.2, min_soc: float = 0, max_soc: float = 1, use_consumption=False, unique_id=None, graph_parameters=None):
     if not isinstance(use_consumption, bool):
         raise ValueError('use_consumption mora biti boolean.')
 
@@ -350,13 +427,16 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
     trade_data = [{"time": ts.strftime("%Y-%m-%d %H:%M"), "price": price} for ts, price in combined]
 
     if use_consumption:
-        if consumption_loader is None or not combined:
-            raise ValueError('Manjka vir napovedi porabe ali podatki cen.')
+        if not isinstance(unique_id, str) or not unique_id.strip():
+            raise ValueError('Pri use_consumption=true manjka unique_id naprave.')
+        if not combined:
+            raise ValueError('Manjkajo podatki cen.')
+        device_id = fetch_consumption_device_id(unique_id)
         active_times = [pd.Timestamp(ts).tz_localize('Europe/Ljubljana') if pd.Timestamp(ts).tzinfo is None else pd.Timestamp(ts)
                         for (ts, _), active in zip(combined, trade_mask) if active]
         tail_times = consumption_tail(combined[-1][0], lat, lng, use_sun_data, sun_factor,
-                                      power, consumption_loader)
-        values = consumption_loader(active_times + tail_times)
+                                      power, device_id)
+        values = fetch_consumption_forecast(device_id, active_times + tail_times)
         active_values = iter(values[:len(active_times)])
         loads = [next(active_values) if active else 0 for active in trade_mask]
         orders = optimize_consumption(trade_data, capacity, power, soc, min_soc, max_soc,
@@ -414,7 +494,6 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
 
     if use_consumption:
         result['energy_balance'] = [o for o, active in zip(orders, trade_mask) if active]
-        return result, database_data
 
     suffix_2day = "_2day" if have_tomorrow else ""
 
@@ -447,6 +526,17 @@ def main(capacity, power, minimum_profit, date, lat, lng, from_time, soc, includ
         from_time=from_time,
         include_next_day=include_next_day,
         use_sun_data=use_sun_data,
+        min_soc=min_soc,
+        max_soc=max_soc,
+        parameters={
+            "device": unique_id, "capacity[kWh]": capacity, "power[kW]": power,
+            "soc[%]": soc * 100, "min_soc[%]": min_soc * 100, "max_soc[%]": max_soc * 100,
+            "date": date, "start_time": from_time, "next_day": include_next_day,
+            "latitude": lat, "longitude": lng, "minimum_profit": minimum_profit,
+            "margin": margin, "use_consumption": use_consumption,
+            "use_sun_data": use_sun_data, "sun_factor": sun_factor,
+            **(graph_parameters or {}),
+        },
     )
 
     return result, database_data
